@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
+
+
+html, body {
+    font-family: 'Playpen Sans Thai', sans-serif;
+    font-family: 'Schoolbell', cursive;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50%;
+  width: 50%;
+  border: 3px solid #000000;
+  border-radius: 30px;
+  filter: drop-shadow(6px 6px 0px #00000020);
+  background-color: #ffffff;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 500px;
+}
+
+.container-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f0f0f0;
+}
+
+.Icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  margin-left: auto;
+}
+
+.inputbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.header {
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 10px;
+}
+
+.forgot-password {
+  display: block;
+  text-align: right;
+  width: 60%; 
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-right: 50px;
+}
+
+.forgot-password a {
+    color: #00000050;
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+.have-account {
+  display: block;
+  text-align: center;
+  width: 100%; 
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 20px;
+  color: #00000050;
+}
+
+.have-account a {
+    color: #000000;
+    text-decoration: none;
+}
+
+.have-account a:hover {
+    text-decoration: underline;
+}
+
+.Icon {
+  position: relative; 
+  width: 600px; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Icon img {
+  width: 100%;
+  display: block;
+}
+
+.curved-text-svg {
+  position: absolute;
+  top: -70px; 
+  width: 100%;
+  height: auto;
+  pointer-events: none; 
+}
+
+text {
+  font-family: 'Playpen Sans Thai', sans-serif;
+  font-family: 'Schoolbell', cursive;
+  font-size: 50px;
+  font-weight: bold;
+  fill: #000; 
+}

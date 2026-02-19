@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
+
+.button-let-go {
+    font-family: 'Playpen Sans Thai', sans-serif;
+    font-family: 'Schoolbell', cursive;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000000;
+    background-color: #FF9A52;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    letter-spacing: 10px;
+    border: 3px solid #000000;
+    filter: drop-shadow(6px 6px 0px rgba(0, 0, 0, 0.20));
+
+}
+
+/* .button-let-go:hover {
+    background-color: #fff;
+    color: #FF9A52;
+    border: 3px solid #FF9A52;
+} */
+
+.button-let-go:hover {
+    background-color: #ff7513;
+}
