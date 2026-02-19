@@ -4,9 +4,9 @@ import ButtonLetGo from '../Component/ButtonLetGo'
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 
-import './SignIn.css'
+import './Signup.css'
 
-function SignIn() {
+function SignUp() {
   return (
     <>
       <div className="container-all">
@@ -26,15 +26,16 @@ function SignIn() {
           </svg>
         </div>
         <div className="container">
-          <h1 className='header'>S i g n I n</h1>
+          <h1 className='header'>S i g n U p</h1>
           <div className="inputbox">
             <InputField label="Username" type="text" placeholder="Username" />
             <InputField label="Password" type="password" placeholder="Password" />
+            <InputField label="Password" type="password" placeholder="Password Confirm" />
+            <InputField label="Email" type="email" placeholder="Email" />
           </div>
-          <span className='forgot-password'><a href="/">Forgot Password?</a></span>
           <ButtonLetGo />
           <span className='have-account'>
-            Don't have an account? <Link to="/signup">Sign up</Link>
+            Have an account? <Link to="/signin">Sign in</Link>
           </span>
         </div>
       </div>
@@ -43,4 +44,4 @@ function SignIn() {
   )
 }
 
-export default SignIn
+export default SignUp

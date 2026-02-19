@@ -16,8 +16,8 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 50%;
-  width: 50%;
+  height: auto;
+  width: 100%;
   border: 3px solid #000000;
   border-radius: 30px;
   filter: drop-shadow(6px 6px 0px #00000020);
@@ -25,6 +25,7 @@ html, body {
   margin-left: auto;
   margin-right: auto;
   max-width: 500px;
+  padding: 40px;
 }
 
 .container-all {
@@ -60,24 +61,6 @@ html, body {
     letter-spacing: 10px;
 }
 
-.forgot-password {
-  display: block;
-  text-align: right;
-  width: 60%; 
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-  margin-right: 50px;
-}
-
-.forgot-password a {
-    color: #00000050;
-    text-decoration: none;
-}
-
-.forgot-password a:hover {
-    text-decoration: underline;
-}
 
 .have-account {
   display: block;
