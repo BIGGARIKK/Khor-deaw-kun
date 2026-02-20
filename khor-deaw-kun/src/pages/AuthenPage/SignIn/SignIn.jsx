@@ -1,8 +1,7 @@
 import React from 'react'
 import InputField from '../Component/InputField'
 import ButtonLetGo from '../Component/ButtonLetGo'
-import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom' // เหลือแค่ Link ที่จำเป็น
 
 import './SignIn.css'
 
@@ -12,10 +11,8 @@ function SignIn() {
       <div className="container-all">
         <div className='Icon'>
           <img src="/Mootha.png" alt="Mootha" />
-
           <svg viewBox="0 0 500 250" className="curved-text-svg">
             <path id="curve" d="M 50,200 A 200,120 0 0 1 450,200" fill="transparent" />
-
             <text>
               <textPath xlinkHref="#curve" startOffset="50%" textAnchor="middle">
                 <tspan fill="#000000" dx="-20">Khor</tspan>
@@ -25,21 +22,28 @@ function SignIn() {
             </text>
           </svg>
         </div>
+
         <div className="container">
           <h1 className='header'>S i g n I n</h1>
+          
           <div className="inputbox">
             <InputField label="Username" type="text" placeholder="Username" />
             <InputField label="Password" type="password" placeholder="Password" />
           </div>
-          <span className='forgot-password'><a href="/">Forgot Password?</a></span>
-          <ButtonLetGo />
+
+          <div className="signin-options">
+            <span className='forgot-password'><a href="/">Forgot Password?</a></span>
+          </div>
+
+
+          <ButtonLetGo disabled={false} />
+
           <span className='have-account'>
             Don't have an account? <Link to="/signup">Sign up</Link>
           </span>
         </div>
       </div>
     </>
-
   )
 }
 

@@ -2,11 +2,12 @@ import React from 'react'
 import './ButtonLetGo.css'
 
 
-function ButtonLetGo() {
+function ButtonLetGo({ disabled }) {
   return (
     <>
-      <button className="button-let-go">Let's Go  - {" > "}</button>
-    </>
+      <button className={disabled ? 'btn-disabled' : 'btn-active'} disabled={disabled}>
+        Let's Go &rarr;
+      </button>    </>
   )
 }
 

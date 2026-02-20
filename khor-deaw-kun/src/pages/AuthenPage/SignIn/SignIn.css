@@ -16,8 +16,8 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 50%;
-  width: 50%;
+  height: auto;
+  width: 100%;
   border: 3px solid #000000;
   border-radius: 30px;
   filter: drop-shadow(6px 6px 0px #00000020);
@@ -55,15 +55,20 @@ html, body {
 }
 
 .header {
+    color: #FF9A52;
     font-size: 2rem;
     font-weight: bold;
     letter-spacing: 10px;
 }
 
+
+h1 {
+  color: #FF9A52;
+}
 .forgot-password {
   display: block;
   text-align: right;
-  width: 60%; 
+  width: 80%; 
   font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 20px;
@@ -125,4 +130,43 @@ text {
   font-size: 50px;
   font-weight: bold;
   fill: #000; 
+}
+
+/* ใช้ CSS เดิมที่คุณมีอยู่แล้ว และเพิ่ม/ปรับตรงนี้ครับ */
+
+.signin-options {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end; /* ผลัก Forgot Password ไปทางขวา */
+    margin-bottom: 20px;
+}
+
+.forgot-password a {
+    font-family: 'Schoolbell', cursive;
+    font-size: 1rem;
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.forgot-password a:hover {
+    color: #FF9F43;
+    text-decoration: underline;
+}
+
+/* ปรับ Header Sign In ให้ดูขี้เล่นเหมือน Sign Up */
+.header {
+    font-size: 3rem;
+    color: #FF9A52;
+    margin-bottom: 20px;
+    letter-spacing: 5px; /* ปรับให้ไม่อ่านยากจนเกินไป */
+}
+
+
+.container {
+    transform: rotate(1deg); 
+}
+
+.container:hover {
+    transform: rotate(0deg);
 }

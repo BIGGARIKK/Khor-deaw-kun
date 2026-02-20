@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
 
-.button-let-go {
-    font-family: 'Playpen Sans Thai', sans-serif;
-    font-family: 'Schoolbell', cursive;
+/* สถานะปุ่มปกติ (ที่ผู้ใช้ติ๊กยอมรับแล้ว) */
+.btn-active {
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive; /* ปรับลำดับ font fallback */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -11,22 +11,39 @@
     font-weight: bold;
     color: #000000;
     background-color: #FF9A52;
-    border: none;
+    border: 3px solid #000000;
     border-radius: 30px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    letter-spacing: 10px;
-    border: 3px solid #000000;
-    filter: drop-shadow(6px 6px 0px rgba(0, 0, 0, 0.20));
-
+    transition: all 0.2s ease; /* ใช้ all เพื่อให้ smooth ทั้งสีและเงา */
+    letter-spacing: 5px; /* ลดลงนิดนึงเพื่อความอ่านง่าย แต่ยังคงสไตล์เดิม */
+    filter: drop-shadow(6px 6px 0px rgba(0, 0, 0, 1)); /* ปรับเงาให้คมเข้มตามสไตล์รูปภาพ */
 }
 
-/* .button-let-go:hover {
-    background-color: #fff;
-    color: #FF9A52;
-    border: 3px solid #FF9A52;
-} */
-
-.button-let-go:hover {
+.btn-active:hover {
     background-color: #ff7513;
+    transform: translateY(-2px); /* เพิ่มลูกเล่นให้ปุ่มลอยขึ้นนิดนึงตอน hover */
+    filter: drop-shadow(8px 8px 0px rgba(0, 0, 0, 1));
+}
+
+.btn-active:active {
+    transform: translateY(2px); /* กดแล้วปุ่มยุบลง */
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 1));
+}
+
+/* --- ส่วนที่เพิ่มใหม่: สถานะปุ่มที่ยังกดไม่ได้ --- */
+.btn-disabled {
+    font-family: 'Schoolbell', cursive;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    color: #999; /* สีตัวอักษรจางลง */
+    background-color: #e0e0e0; /* สีพื้นหลังเทา */
+    border: 3px solid #ccc;
+    border-radius: 30px;
+    cursor: not-allowed; /* เปลี่ยนหัวลูกศรเป็นเครื่องหมายห้าม */
+    letter-spacing: 5px;
+    filter: none; /* เอาเงาออกเพื่อให้ดู "ปิดใช้งาน" */
+    opacity: 0.7;
 }

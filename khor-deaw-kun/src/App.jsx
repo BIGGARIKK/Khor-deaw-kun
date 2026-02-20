@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom' // เพิ่มบรรทัดนี้ครับ
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -9,13 +9,16 @@ import SignUp from './pages/AuthenPage/SignUp/SignUp'
 function App() {
   return (
     <BrowserRouter>
-      <nav>
-        <Link to="/">หน้าหลัก</Link> | <Link to="/Signin">เข้าสู่ระบบ</Link>
-      </nav>
 
+      
       <Routes>
-
+        {/* 1. เมื่อเข้าหน้าแรกสุด (/) ให้โยนไปหน้า /Signin */}
+        <Route path="/" element={<Navigate to="/Signin" />} />
+        
+        {/* 2. หน้า Sign In หลัก */}
         <Route path="/Signin" element={<SignIn />} />
+        
+        {/* 3. หน้า Sign Up */}
         <Route path="/Signup" element={<SignUp />} />
       </Routes>
     </BrowserRouter>
