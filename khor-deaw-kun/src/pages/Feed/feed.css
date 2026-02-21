@@ -1,0 +1,189 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Itim&family=Patrick+Hand&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Patrick Hand', 'Itim', cursive; 
+    color: #111;
+}
+
+body {
+    background-image: url('../assets/bg.png'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* --- Layout หลัก (คุมพื้นที่ทั้ง 3 คอลัมน์) --- */
+/* feed.css */
+.app-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 40px;
+    justify-content: center;
+    
+    /* 🌟 เพิ่มบรรทัดนี้ เพื่อปลดล็อกให้ Sidebar เลื่อนได้! */
+    align-items: flex-start; 
+}
+
+/* 🌟 --- สไตล์กล่องลายเส้นปากกา (คลาสกลางที่ใช้ร่วมกันทั้งเว็บ) --- */
+.doodle-box {
+    background: #fff;
+    border: 3px solid #111;
+    border-radius: 30px;
+    padding: 20px;
+    box-shadow: 4px 4px 0px #111; 
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.doodle-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 6px 6px 0px #111;
+}
+
+/* 🌟 --- ปุ่มสีเหลืองสไตล์ Doodle (คลาสกลางที่ใช้ร่วมกัน) --- */
+.btn-yellow {
+    background-color: #FFA237;
+    border: 3px solid #111;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #111;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-yellow:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px #111;
+}
+
+.btn-yellow:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0px 0px 0px #111;
+}
+
+/* --- พื้นที่ Feed ตรงกลาง --- */
+.feed-content {
+    flex: 1;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.feed-title {
+    font-size: 2.5rem; /* ขยายให้ใหญ่ขึ้นนิดนึงจะได้เด่นๆ */
+    font-weight: bold;
+    display: inline-block;
+    position: relative; /* สำคัญมาก: เพื่อให้แถบสีมาเกาะกับข้อความนี้ */
+    padding: 0 10px;
+    margin-bottom: 10px;
+    color: #111;
+    z-index: 1; /* ดันข้อความให้อยู่บนสุด */
+    
+    /* ทริค: ใส่ text-shadow สีขาวบางๆ ให้ตัวหนังสือตัดกับเส้นกรอบรอบๆ */
+    text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff;
+}
+
+/* 🌟 สร้างแถบสีไฮไลต์ด้วย ::after (ไม่ต้องแก้ HTML เลย) */
+.feed-title::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; /* ดันขึ้นมาให้ทับครึ่งล่างของตัวหนังสือ */
+    left: 0;
+    width: 100%; /* ขีดให้ยาวเท่าตัวหนังสือพอดี */
+    height: 18px; /* ความหนาของหัวปากกาไฮไลต์ */
+    background-color: #FFA237; /* สีส้มที่คุณเลือก */
+    z-index: -1; /* ให้แถบสีมุดไปอยู่หลังตัวหนังสือ */
+    transform: rotate(-2deg); /* เอียงนิดๆ ให้ดูเหมือนมือขีดเบี้ยวๆ */
+    border-radius: 5px; /* ลบมุมให้มนๆ เหมือนรอยปากกา */
+}
+
+/* แอบใส่ลูกเล่นตอนเอาเมาส์ชี้ให้แถบสีขยับนิดนึง */
+.feed-title:hover::after {
+    transform: rotate(1deg) scaleY(1.2);
+    transition: all 0.2s ease-in-out;
+}
+
+/* ---------------------------------------------------
+   การ์ดโพสต์แต่ละอัน (ถ้าอนาคตแยก PostCard.css ค่อยย้ายออก) 
+--------------------------------------------------- */
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.post-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid #111;
+    box-shadow: 2px 2px 0px #111;
+}
+.post-text {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+.post-image-placeholder {
+    width: 100%;
+    height: 250px;
+    border: 3px solid #111;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    background-color: #f0f0f0; 
+    box-shadow: 4px 4px 0px #111;
+}
+.post-footer {
+    border-top: 2px dashed #111;
+    padding-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+.post-footer div {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.post-footer div:hover {
+    transform: scale(1.1) rotate(2deg);
+    color: #FFA237;
+}
+
+/* ---------------------------------------------------
+   Sidebar ด้านขวา (ถ้าอนาคตแยก RightSidebar.css ค่อยย้ายออก) 
+--------------------------------------------------- */
+.right-sidebar {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    position: sticky;
+    top: 20px;
+    height: max-content;
+}
+.tag-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+    font-size: 1.1rem;
+}
+.tag-list span:nth-child(2) {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.tag-list span:nth-child(2):hover {
+    background-color: #FFA237;
+    transform: translateY(-2px);
+    box-shadow: 2px 2px 0px #111;
+}

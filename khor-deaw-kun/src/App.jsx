@@ -5,7 +5,6 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import SignIn from './pages/AuthenPage/SignIn/SignIn'
 import SignUp from './pages/AuthenPage/SignUp/SignUp'
-import Profile from './pages/profile/profile' 
 
 function App() {
   return (
@@ -22,6 +21,7 @@ function App() {
         
         {/* 3. หน้า Sign Up */}
         <Route path="/Signup" element={<SignUp />} />
+        <Route path="/Feed" element={<Feed />} />
       </Routes>
     </BrowserRouter>
   )

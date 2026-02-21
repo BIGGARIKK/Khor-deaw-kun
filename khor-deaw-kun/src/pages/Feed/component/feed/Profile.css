@@ -1,0 +1,72 @@
+/* Profile.css */
+
+/* กล่อง Profile คลุมทั้งหมด */
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    background-color: #fff;
+    border: 3px solid #111;
+    border-radius: 20px;
+    box-shadow: 4px 4px 0px #111;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* เอฟเฟกต์ตอนเอาเมาส์ชี้กล่องโปรไฟล์ */
+.profile-card:hover {
+    transform: translateY(-3px) rotate(-1deg);
+    box-shadow: 6px 6px 0px #111;
+    background-color: #fcfcfc;
+}
+
+/* รูปโปรไฟล์ (Avatar) */
+.profile-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #111;
+    background-color: #f0f0f0;
+    background-image: url("https://api.dicebear.com/7.x/micah/svg?seed=DoodleKing");
+    background-size: cover;
+    background-position: center;
+    box-shadow: 2px 2px 0px #111; /* เพิ่มเงาแข็งๆ ให้รูปดูลอยขึ้นมา */
+    transition: transform 0.2s ease;
+}
+
+/* รูปขยับนิดๆ ตอน Hover กล่องหลัก */
+.profile-card:hover .profile-avatar {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* กล่องครอบชื่อและสถานะ */
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* จัดให้อยู่ชิดซ้าย */
+}
+
+/* ชื่อผู้ใช้ */
+.profile-name {
+    font-size: 1.2rem;
+    line-height: 1;
+    font-weight: bold;
+    color: #111;
+    margin-bottom: 5px;
+}
+
+/* ป้ายสถานะ (ทำเป็นสติกเกอร์) */
+.profile-badge {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #111;
+    background-color: #FFD500; /* สีเหลืองสไตล์ Doodle */
+    padding: 2px 8px;
+    border: 2px solid #111;
+    border-radius: 10px;
+    box-shadow: 1px 1px 0px #111;
+    letter-spacing: 0.5px;
+}
