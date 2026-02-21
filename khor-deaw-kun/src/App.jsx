@@ -5,6 +5,8 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import SignIn from './pages/AuthenPage/SignIn/SignIn'
 import SignUp from './pages/AuthenPage/SignUp/SignUp'
+import Profile from './pages/profile/profile'
+import Feed from './pages/Feed/Feed'
 
 function App() {
   return (
