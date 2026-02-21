@@ -5,6 +5,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import SignIn from './pages/AuthenPage/SignIn/SignIn'
 import SignUp from './pages/AuthenPage/SignUp/SignUp'
+import Profile from './pages/profile/profile' 
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         
         {/* 2. หน้า Sign In หลัก */}
         <Route path="/Signin" element={<SignIn />} />
+        <Route path="/profile" element={<Profile />} />
         
         {/* 3. หน้า Sign Up */}
         <Route path="/Signup" element={<SignUp />} />
