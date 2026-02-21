@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
+/* CreatePostBox.css */
+
+.create-post-container {
+    margin-bottom: 20px;
+    filter: drop-shadow(2px 2px 0px #111); /* เงาแบบการ์ตูน */
+    transition: all 0.2s ease-in-out;
+}
+
+.create-post-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 1.2rem;
+    padding: 10px 0;
+    margin-bottom: 15px;
+    background: transparent;
+    font-family: 'Schoolbell', cursive;
+
+
+
+}
+
+.post-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #111; /* เส้นคั่นปากกา */
+    padding-top: 15px;
+}
+
+.icon-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.icon-button {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s ease-in-out;
+}
+
+/* เอฟเฟกต์เวลาเอาเมาส์ไปชี้ไอคอน */
+.icon-button:hover {
+    background-color: #fcbf65; /* ไฮไลต์สีเหลือง */
+    transform: scale(1.1) rotate(-5deg);
+    box-shadow: 2px 2px 0px #111;
+}
+
+.btn-post {
+    padding: 6px 25px;
+    font-size: 1.1rem;
+}
+/* เพิ่มในไฟล์ CSS */
+.post-actions-row div div:hover {
+    transform: scale(1.2) rotate(5deg); /* ขยายและหมุนนิดๆ ให้ดูขี้เล่น */
+    color: #fcbf65; /* เปลี่ยนสีเป็นเหลืองตามธีม */
+}
+
+/* เพิ่มต่อท้ายไฟล์ CreatePostBox.css เดิมของคุณ */
+
+.preview-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.preview-image {
+    max-height: 200px; /* จำกัดความสูงไม่ให้พรีวิวใหญ่เกินไป */
+    border-radius: 15px;
+    border: 3px solid #111; /* ขอบปากกา */
+    box-shadow: 4px 4px 0px #111; /* เงาสไตล์ Doodle */
+    object-fit: cover;
+}
+
+/* ปุ่ม (X) สำหรับลบรูปออกแบบให้เหมือนสติกเกอร์แปะทับ */
+.remove-image-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #ff4d4f; /* สีแดง */
+    color: white;
+    border: 2px solid #111;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px #111;
+    transition: transform 0.1s ease;
+}
+
+.remove-image-btn:hover {
+    transform: scale(1.1) rotate(10deg);
+}
