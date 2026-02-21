@@ -6,7 +6,7 @@ import './App.css'
 import SignIn from './pages/AuthenPage/SignIn/SignIn'
 import SignUp from './pages/AuthenPage/SignUp/SignUp'
 import Feed from './pages/Feed/Feed'
-
+// 1. สร้างหน้า Sign In และ Sign Up
 function App() {
   return (
     <BrowserRouter>
