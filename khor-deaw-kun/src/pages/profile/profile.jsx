@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './profile.css';
 
 const Profile = () => {
+    const [isContactOpen, setIsContactOpen] = useState(false);
   return (
     <div className="profile-page">
       <div className="profile-container">
@@ -11,10 +12,19 @@ const Profile = () => {
           <div className="doodle-box stat-btn">20 Posts</div>
           <div className="doodle-box stat-btn">2.1K Following</div>
           <div className="doodle-box stat-btn">1.4K Follower</div>
-          <div className="doodle-box action-btn">Contact</div>
-          <div className="doodle-box link-btn">🔗 Link</div>
-          <div className="doodle-box link-btn">🔗 Link</div>
-          <div className="doodle-box link-btn">🔗 Link</div>
+         <div 
+        className="doodle-box action-btn"
+        onClick={() => setIsContactOpen(!isContactOpen)}
+      >
+        Contact {isContactOpen ? '▲' : '▼'}
+      </div>
+
+      <div className={`contact-dropdown ${isContactOpen ? 'open' : ''}`}>
+        <div className="doodle-box contact-item">📱 Line</div>
+        <div className="doodle-box contact-item">📘 Facebook</div>
+        <div className="doodle-box contact-item">📧 Email</div>
+      </div>
+          
         </div>
 
         {/* คอลัมน์กลาง: ข้อมูลหลัก */}

@@ -88,6 +88,38 @@
 }
 
 /* =========================================
+   Contact Dropdown (เมนูย่อยที่เลื่อนลงมา)
+========================================= */
+.contact-dropdown {
+  max-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: max-height 0.4s ease-in-out, margin 0.4s ease-in-out;
+  margin-bottom: 0;
+}
+
+.contact-dropdown.open {
+  max-height: 250px; /* ขยายความสูงให้เนื้อหาแสดงออกมา */
+  margin-bottom: 15px;
+}
+
+.contact-item {
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  background-color: #fdfd96; /* สีเหลืองอ่อน */
+}
+
+.contact-item:hover {
+  transform: scale(1.05) rotate(-2deg);
+  background-color: #ffecd2;
+}
+
+/* =========================================
    Center Panel (ตรงกลาง - พระเอกของงาน)
 ========================================= */
 .center-panel {
