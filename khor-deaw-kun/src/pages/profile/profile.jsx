@@ -1,99 +1,120 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './profile.css';
+import bgImage from '../../assets/bg.png'; // ตรวจสอบว่า Path นี้ถูกต้องตามโครงสร้างโฟลเดอร์
 
-const Profile = () => {
-    const [isContactOpen, setIsContactOpen] = useState(false);
+const App = () => {
+  const posts = [
+    { id: 1, text: "หมูสามชั้นนนนนนนน", tag: "#ร้านอร่อยบอกต่อ", likes: 105, comments: 20 },
+    { id: 2, text: "หมูสามชั้นนนนนนนน", tag: "#ร้านอร่อยบอกต่อ", likes: 105, comments: 20 },
+  ];
+
   return (
-    <div className="profile-page">
-      <div className="profile-container">
-        
-        {/* คอลัมน์ซ้าย: สถิติและปุ่ม */}
+    /* เพิ่ม div ครอบทั้งหมดเพื่อแสดงพื้นหลัง */
+    <div className="main-layout" style={{ 
+      backgroundImage: `url(${bgImage})`,
+      backgroundRepeat: 'repeat',
+      backgroundSize: '500px', // ปรับขนาดลายตามความเหมาะสม
+      backgroundAttachment: 'fixed',
+      height: '100vh',
+      overflow: 'hidden'
+    }}>
+      <div className="app-container">
+        {/* ---------------- ซ้าย: สถิติและลิงก์ ---------------- */}
         <div className="left-panel">
-          <div className="doodle-box stat-btn">20 Posts</div>
-          <div className="doodle-box stat-btn">2.1K Following</div>
-          <div className="doodle-box stat-btn">1.4K Follower</div>
-         <div 
-        className="doodle-box action-btn"
-        onClick={() => setIsContactOpen(!isContactOpen)}
-      >
-        Contact {isContactOpen ? '▲' : '▼'}
-      </div>
+          <div className="stat-box neo-box">
+            <span>20</span>
+            <span>Posts</span>
+          </div>
+          <div className="stat-box neo-box">
+            <span>2.1K</span>
+            <span>Following</span>
+          </div>
+          <div className="stat-box neo-box">
+            <span>1.4K</span>
+            <span>Follower</span>
+          </div>
 
-      <div className={`contact-dropdown ${isContactOpen ? 'open' : ''}`}>
-        <div className="doodle-box contact-item">📱 Line</div>
-        <div className="doodle-box contact-item">📘 Facebook</div>
-        <div className="doodle-box contact-item">📧 Email</div>
-      </div>
-          
+          <div className="contact-btn neo-box">Contact</div>
+
+          <div className="link-list">
+            <div className="link-box">🌐 Link</div>
+            <div className="link-box">◎ Link</div>
+            <div className="link-box">☺ Link</div>
+          </div>
         </div>
 
-        {/* คอลัมน์กลาง: ข้อมูลหลัก */}
+        {/* ---------------- กลาง: โปรไฟล์และฟีด ---------------- */}
         <div className="center-panel">
-          <div className="doodle-box profile-title">PROFILE</div>
-          
-          <div className="info-section">
+          <div className="profile-title neo-box">PROFILE</div>
+
+          <div className="profile-header">
             <div className="avatar-wrapper">
-              {/* ใช้รูป Default ไปก่อน เปลี่ยน src ได้ตามต้องการ */}
-              <img src="https://api.dicebear.com/7.x/open-peeps/svg?seed=Duckky" alt="avatar" className="avatar" />
-              <div className="online-dot"></div>
+              <img 
+                src="https://api.dicebear.com/7.x/notionists/svg?seed=Duckky" 
+                alt="Avatar" 
+                className="avatar-img" 
+              />
+              <div className="status-dot"></div>
             </div>
-            
-            <div className="text-info">
-              <div className="doodle-box name-box">Duckky</div>
-              <div className="doodle-box bio-box">HELLO</div>
+
+            <div className="name-bio-wrapper">
+              <div className="name-box neo-box">Duckky</div>
+              <div className="diamond-icon"></div>
+              <div className="bio-box neo-box">HELLO</div>
             </div>
           </div>
 
-          {/* คอนเทนเนอร์รวมโพสต์ */}
-          <div className="doodle-box feed-section">
-            <PostItem />
-            <PostItem />
+          <div className="feed-container neo-box">
+            {posts.map((post) => (
+              <div key={post.id} className="post-card neo-box">
+                <div className="post-header">
+                  <div className="user-info">
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Duckky" alt="user" />
+                    <div>
+                      <p className="user-name">Duckky</p>
+                      <p className="post-time">5 min ago</p>
+                    </div>
+                  </div>
+                  <div className="post-stats">
+                    <span>{post.likes} ❤️</span>
+                    <span>{post.comments} 💬</span>
+                  </div>
+                </div>
+                <div className="post-content">
+                  <div>{post.text}</div>
+                  <div className="hashtag">{post.tag}</div>
+                </div>
+                <div className="post-image-placeholder">
+                   bacon 🥓
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* คอลัมน์ขวา: รูปภาพน้องแมวซ้อนกัน */}
+        {/* ---------------- ขวา: รูปภาพแมวซ้อนกัน ---------------- */}
         <div className="right-panel">
-          <div className="card-stack">
-            {/* การ์ดแผ่นหลังสุด */}
-            <div className="photo-card card-bg-2"></div>
-            {/* การ์ดแผ่นกลาง */}
-            <div className="photo-card card-bg-1"></div>
-            {/* การ์ดแผ่นหน้าสุด (รูปแมว) */}
-            <div className="photo-card card-front">
-              <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Cute Cat" />
-            </div>
+          <div className="photo-stack">
+            <img 
+              src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&q=80" 
+              alt="cat-back" 
+              className="stacked-img img-back" 
+            />
+            <img 
+              src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=400&q=80" 
+              alt="cat-mid" 
+              className="stacked-img img-middle" 
+            />
+            <img 
+              src="https://images.unsplash.com/photo-1529778459826-3d2310134700?auto=format&fit=crop&w=400&q=80" 
+              alt="cat-front" 
+              className="stacked-img img-front" 
+            />
           </div>
         </div>
-
       </div>
     </div>
   );
 };
 
-// Component ย่อยสำหรับแต่ละโพสต์ (เขียนไว้ในไฟล์เดียวกันเพื่อความง่าย)
-const PostItem = () => {
-  return (
-    <div className="doodle-box post-item">
-      <div className="post-header">
-        <div className="post-user">
-          <img src="https://api.dicebear.com/7.x/open-peeps/svg?seed=Duckky" alt="user" className="post-avatar" />
-          <div>
-            <strong>Duckky</strong><br/>
-            <span style={{ fontSize: '0.7rem', color: '#666' }}>1 min ago</span>
-          </div>
-        </div>
-        <div className="post-actions">
-          <span>105 ❤️</span>
-          <span>20 💬</span>
-        </div>
-      </div>
-      <div className="post-content">
-        <p>หยุด น่ารักได้มั้ย ใจเราก็แค่นี้อะ</p>
-        <p style={{ color: '#FF8A65' }}>#รักน้องแมวมาก</p>
-        <div className="post-image"></div>
-      </div>
-    </div>
-  );
-};
-
-export default Profile;
+export default App;

@@ -1,313 +1,334 @@
-@import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap');
 
-/* Reset พื้นฐาน */
-* {
+:root {
+  --bg-color: #f6f5ef;
+  --black: #1a1a1a;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Mali', cursive;
+  background-color: var(--bg-color);
+}
+
+/* เพิ่มคลาสใหม่สำหรับจัดการ layout หลัก */
+.main-layout {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 40px 20px;
+  max-width: 1200px;
+  height: 100%;
   box-sizing: border-box;
 }
 
-.profile-page {
-  background-color: #f7f6f0;
-  /* เปลี่ยนฟอนต์เป็น Mali ให้ดูน่ารักขึ้น (รองรับภาษาไทย) */
-  font-family: 'Mali', cursive, sans-serif; 
-  min-height: 100vh;
-  width: 100%;
-  
-  /* จัดกึ่งกลางทั้งแนวตั้งและแนวนอน */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
+.left-panel, .right-panel {
+  flex-shrink: 0;
 }
 
-/* =========================================
-   GRID LAYOUT (หัวใจสำคัญของความสมมาตร)
-========================================= */
-.profile-container {
-  display: grid;
-  /* แบ่ง 3 ส่วน: ซ้าย(คงที่) - กลาง(ยืดหยุ่น) - ขวา(คงที่) */
-  /* 280px คือความกว้างแถบข้าง, 1fr คือพื้นที่ที่เหลือตรงกลาง */
-  grid-template-columns: 280px 1fr 280px; 
-  gap: 40px; /* ช่องว่างระหว่างคอลัมน์ */
-  
-  width: 100%;
-  max-width: 1400px; /* จำกัดความกว้างไม่ให้เกินสายตา */
-  margin: 0 auto;
+/* ส่วนที่เหลือคงเดิมตามที่คุณเขียนไว้... */
+.neo-box {
+  background-color: #fff;
+  border: 3px solid var(--black);
+  box-shadow: 5px 5px 0px var(--black);
+  border-radius: 30px;
 }
 
-/* สไตล์พื้นฐานของกล่องวาดมือ */
-.doodle-box {
-  background-color: #ffffff;
-  border: 3px solid #222222;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 5px 5px 0px #222222;
-  transition: transform 0.2s ease;
-}
-
-.doodle-box:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0px #222222;
-}
-
-/* =========================================
-   Left Panel (ฝั่งซ้าย)
-========================================= */
+/* ================= LEFT PANEL ================= */
 .left-panel {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  /* จัดให้เนื้อหาชิดขวาของคอลัมน์ตัวเอง เพื่อให้ดูเกาะกลุ่มกับตรงกลาง */
-  align-items: stretch; 
+  width: 220px;
+  margin-top: 100px;
 }
 
-.stat-btn {
-  padding: 12px;
-  font-size: 1.1rem;
+.stat-box {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 25px;
   font-weight: 700;
-  text-align: center;
-  cursor: pointer;
-  background: #fff;
+  font-size: 1.1rem;
 }
 
-.action-btn {
-  padding: 15px;
-  font-size: 1.3rem;
-  font-weight: bold;
+.contact-btn {
   text-align: center;
-  margin: 20px 0;
+  padding: 12px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 10px 0;
   cursor: pointer;
-  background: #fff;
 }
 
-.link-btn {
-  padding: 10px 20px;
-  font-size: 1rem;
+.link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.link-box {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 5px 15px;
+  font-size: 0.9rem;
+  border-radius: 15px;
+  box-shadow: 3px 3px 0px var(--black);
+  border: 2px solid var(--black);
+  background: #fff;
   cursor: pointer;
 }
 
-/* =========================================
-   Contact Dropdown (เมนูย่อยที่เลื่อนลงมา)
-========================================= */
-.contact-dropdown {
-  max-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  transition: max-height 0.4s ease-in-out, margin 0.4s ease-in-out;
-  margin-bottom: 0;
-}
-
-.contact-dropdown.open {
-  max-height: 250px; /* ขยายความสูงให้เนื้อหาแสดงออกมา */
-  margin-bottom: 15px;
-}
-
-.contact-item {
-  padding: 12px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  text-align: center;
-  cursor: pointer;
-  background-color: #fdfd96; /* สีเหลืองอ่อน */
-}
-
-.contact-item:hover {
-  transform: scale(1.05) rotate(-2deg);
-  background-color: #ffecd2;
-}
-
-/* =========================================
-   Center Panel (ตรงกลาง - พระเอกของงาน)
-========================================= */
+/* ================= CENTER PANEL ================= */
 .center-panel {
+  width: 500px;
+  height: calc(100vh - 80px); /* ลบ padding บน-ล่างของ container ออก */
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 25px;
+  overflow-y: auto; /* เปิดให้เลื่อนได้เฉพาะแนวตั้ง */
+  padding-right: 15px; /* เว้นที่ให้ scrollbar ไม่ทับกล่อง */
+  
+  /* สำหรับ Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--black) transparent;
+
+  
+}
+
+.center-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.center-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.center-panel::-webkit-scrollbar-thumb {
+  background-color: var(--black);
+  border-radius: 20px;
+  border: 2px solid var(--bg-color); /* เพิ่มขอบให้ดูมีมิติ */
 }
 
 .profile-title {
-  font-size: 3rem;
-  font-weight: 800;
-  padding: 15px 60px;
-  background: #fff;
-  /* ปรับกรอบให้ดูมนๆ สมมาตรขึ้น */
-  border-radius: 60px 40px 50px 40px / 40px 50px 40px 60px;
+  font-size: 3.5rem;
+  font-weight: 700;
+  padding: 5px 60px;
+  border-radius: 60px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
-/* ส่วน Avatar และ ชื่อ */
-.info-section {
+.profile-header {
   display: flex;
-  gap: 30px;
-  width: 100%;
   align-items: center;
-  justify-content: center; /* จัดกึ่งกลาง */
+  gap: 20px;
+  width: 100%;
 }
 
 .avatar-wrapper {
   position: relative;
-  flex-shrink: 0;
 }
 
-.avatar {
-  width: 100px;
-  height: 100px;
+.avatar-img {
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  border: 3px solid #222;
-  box-shadow: 4px 4px 0px #222;
   object-fit: cover;
-  background-color: #eee;
+  border: 3px solid var(--black);
+  box-shadow: 4px 4px 0px var(--black);
+  background: #fff;
 }
 
-.online-dot {
+.status-dot {
   position: absolute;
-  bottom: 5px;
-  right: 5px;
-  width: 22px;
-  height: 22px;
-  background-color: #84E045;
-  border: 2px solid #222;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background-color: #84cc16; /* สีเขียวออนไลน์ */
+  border: 3px solid var(--black);
   border-radius: 50%;
 }
 
-.text-info {
+.name-bio-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: 100%; /* ยืดให้เต็มพื้นที่ */
+  position: relative;
 }
 
-.name-box, .bio-box {
-  padding: 10px 25px;
-  font-size: 1.2rem;
-  width: 100%;
-  background: #fff;
+.name-box {
+  text-align: center;
+  padding: 5px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-radius: 20px;
+}
+
+/* รูปเพชรเล็กๆ ขวากล่องชื่อ */
+.diamond-icon {
+  position: absolute;
+  right: -30px;
+  top: 10px;
+  width: 15px;
+  height: 20px;
+  background-color: #c2410c;
+  border: 2px solid var(--black);
+  transform: rotate(45deg);
+  box-shadow: 2px 2px 0px var(--black);
 }
 
 .bio-box {
-  min-height: 70px; /* เพิ่มความสูงให้ดูสมดุลกับ Avatar */
+  padding: 10px 20px;
+  min-height: 40px;
+  border-radius: 20px;
+  font-size: 0.9rem;
 }
 
-/* กล่อง Feed */
-.feed-section {
-  width: 100%;
-  background: #fff;
-  padding: 25px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  /* กรอบใหญ่ให้ดูมนเท่ากัน 4 มุมมากขึ้น */
-  border-radius: 30px; 
-  min-height: 400px; /* กันไม่ให้กล่องหด */
-}
-
-.post-item {
+.feed-container {
+  flex: 1; /* กินพื้นที่ที่เหลือในแนวตั้ง */
+  overflow-y: auto; /* เปิดให้เลื่อนได้เฉพาะในกล่องนี้ */
   padding: 20px;
-  border-radius: 20px 25px 20px 25px;
+  background-color: #fff;
+  
+  /* ตกแต่ง Scrollbar ให้ดูมินิมอล (สำหรับ Chrome/Safari) */
+  scrollbar-width: thin;
+}
+
+.feed-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.feed-container::-webkit-scrollbar-thumb {
+  background: var(--black);
+  border-radius: 10px;
+}
+
+.feed-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.post-card {
+  margin-bottom: 20px;
 }
 
 .post-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
-.post-user {
+.user-info {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: bold;
 }
 
-.post-avatar-small {
+.user-info img {
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  border: 2px solid #222;
+  border: 2px solid var(--black);
 }
 
-.post-content p {
-  margin: 5px 0;
-  line-height: 1.5;
+.user-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin: 0;
 }
 
-.img-placeholder {
-  width: 80px;
-  height: 50px;
-  background-color: #ffd1cc;
-  border: 2px solid #222;
-  border-radius: 8px;
-  margin-top: 10px;
+.post-time {
+  font-size: 0.7rem;
+  color: #666;
+  margin: 0;
 }
 
-/* =========================================
-   Right Panel (ฝั่งขวา)
-========================================= */
-.right-panel {
+.post-stats {
   display: flex;
-  justify-content: center; /* จัดรูปให้กึ่งกลางคอลัมน์ */
-  align-items: flex-start; /* ให้รูปอยู่ระดับเดียวกับ Profile ด้านบน */
-  padding-top: 20px; /* ดันลงมานิดนึงให้สวย */
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
-.card-stack {
+.post-content {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.hashtag {
+  color: #ea580c;
+}
+
+.post-image-placeholder {
+  width: 70px;
+  height: 40px;
+  border: 2px solid var(--black);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* ================= RIGHT PANEL ================= */
+.right-panel {
+  width: 280px;
+  margin-top: 150px;
+}
+
+.photo-stack {
   position: relative;
-  width: 220px;
-  height: 280px;
+  width: 100%;
+  height: 320px;
 }
 
-.photo-card {
+.stacked-img {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 3px solid #222;
-  background-color: white;
-  border-radius: 20px;
-  box-shadow: 6px 6px 0px #222;
-  overflow: hidden;
-  transition: transform 0.3s;
-}
-
-/* เอฟเฟกต์ตอนเอาเมาส์ไปโดนรูป */
-.card-stack:hover .card-front {
-  transform: rotate(0deg) scale(1.05);
-  z-index: 10;
-}
-
-.photo-card img {
-  width: 100%;
-  height: 100%;
+  border-radius: 40px;
+  border: 3px solid var(--black);
   object-fit: cover;
+  background: #fff;
 }
 
-.card-bg-2 { transform: rotate(10deg); z-index: 1; }
-.card-bg-1 { transform: rotate(5deg); z-index: 2; }
-.card-front { transform: rotate(-3deg); z-index: 3; }
+/* เรียงเลเยอร์รูปแมวซ้อนกัน */
+.img-back {
+  width: 90%;
+  height: 90%;
+  top: 20px;
+  right: -20px;
+  z-index: 1;
+  box-shadow: 4px 4px 0px var(--black);
+}
 
-/* =========================================
-   Responsive: จอเล็ก (มือถือ/แท็บเล็ต)
-========================================= */
-@media (max-width: 1024px) {
-  .profile-container {
-    grid-template-columns: 1fr; /* เปลี่ยนเป็นคอลัมน์เดียว */
-    max-width: 600px;
-  }
-  
-  .left-panel, .right-panel {
-    align-items: center; /* จัดกึ่งกลาง */
-  }
-  
-  .info-section {
-    flex-direction: column; /* Avatar อยู่บน ชื่ออยู่ล่าง */
-    text-align: center;
-  }
+.img-middle {
+  width: 95%;
+  height: 95%;
+  top: 10px;
+  right: -10px;
+  z-index: 2;
+  box-shadow: 4px 4px 0px var(--black);
+}
 
-  .right-panel {
-    display: none; /* ซ่อนรูปแมวถ้าจอเล็กเกินไป หรือจะเอาไว้ล่างสุดก็ได้ */
-  }
+.img-front {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  box-shadow: 5px 5px 0px var(--black);
 }
