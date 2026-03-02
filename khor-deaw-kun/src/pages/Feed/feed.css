@@ -20,15 +20,13 @@ body {
 /* --- Layout หลัก (คุมพื้นที่ทั้ง 3 คอลัมน์) --- */
 /* feed.css */
 .app-container {
-    display: flex;
+    
+    display: grid;
+    /* 🌟 ล็อก Sidebar ไว้ที่ 260px เป๊ะๆ */
+    grid-template-columns: 260px minmax(0, 1fr) 260px; 
+    gap: 30px;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
-    gap: 40px;
-    justify-content: center;
-    
-    /* 🌟 เพิ่มบรรทัดนี้ เพื่อปลดล็อกให้ Sidebar เลื่อนได้! */
-    align-items: flex-start; 
 }
 
 /* 🌟 --- สไตล์กล่องลายเส้นปากกา (คลาสกลางที่ใช้ร่วมกันทั้งเว็บ) --- */
@@ -70,28 +68,28 @@ body {
 }
 
 /* --- พื้นที่ Feed ตรงกลาง --- */
+/* ================= ส่วนตรงกลาง (เนื้อหาโพสต์) ================= */
 .feed-content {
-    flex: 1;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px; /* ระยะห่างระหว่างกล่องโพสต์แต่ละอัน */
+  width: 100%;
 }
 
 .feed-title {
-    font-size: 2.5rem; /* ขยายให้ใหญ่ขึ้นนิดนึงจะได้เด่นๆ */
-    font-weight: bold;
-    display: inline-block;
-    position: relative; /* สำคัญมาก: เพื่อให้แถบสีมาเกาะกับข้อความนี้ */
-    padding: 0 10px;
-    margin-bottom: 10px;
-    color: #111;
-    z-index: 1; /* ดันข้อความให้อยู่บนสุด */
-    
-    /* ทริค: ใส่ text-shadow สีขาวบางๆ ให้ตัวหนังสือตัดกับเส้นกรอบรอบๆ */
-    text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff;
+  margin-top : 20px;
+  font-family: 'Mali', cursive, sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  text-align: center;
+  background-color: #fff;
+  padding: 15px;
+  margin: 0;
+  /* ตกแต่งให้เข้ากับสไตล์ Doodle */
+  border: 3px solid #222;
+  border-radius: 60px 40px 50px 40px / 40px 50px 40px 60px;
+  box-shadow: 5px 5px 0px #222;
 }
-
 /* 🌟 สร้างแถบสีไฮไลต์ด้วย ::after (ไม่ต้องแก้ HTML เลย) */
 .feed-title::after {
     content: '';
