@@ -3,6 +3,7 @@ import InputField from '../Component/InputField'
 import ButtonLetGo from '../Component/ButtonLetGo'
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { apiRequest } from '../../../service/api' // นำเข้า apiRequest จากไฟล์ api.js
 
 import './Signup.css'
 
@@ -13,6 +14,16 @@ function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [email, setEmail] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
+
+  const handlesignup = async (e) => {
+    e.preventDefault(); // กันหน้าเว็บรีเฟรชเอง
+    try {
+      const data = await apiRequest('/signup', 'POST', { username, password, confirmPassword, email });
+      console.log('Signup Success:', data);
+    } catch (error) {
+      alert(error.message || 'Signup Failed!');
+    }
+  }
 
 
   return (
@@ -58,7 +69,7 @@ function SignUp() {
               I agree to the <a href="/terms">Terms & Conditions</a> and <a href="/privacy">Privacy Policy</a>
             </span>
           </label>
-          <ButtonLetGo disabled={!termsAccepted} />
+          <ButtonLetGo disabled={!termsAccepted} onClick={handlesignup} />
           <span className='have-account'>
             Have an account? <Link to="/signin">Sign in</Link>
           </span>

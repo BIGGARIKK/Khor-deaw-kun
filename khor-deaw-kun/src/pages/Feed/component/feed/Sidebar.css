@@ -1,83 +1,93 @@
-/* Sidebar.css */
+@import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap');
 
 .sidebar {
+    /* 🌟 ล็อกความกว้างให้คงที่ ไม่ให้ล้นและไม่ให้ยืดหด */
+    flex: 0 0 260px; 
+    
     display: flex;
     flex-direction: column;
-    padding: 25px 20px;
+    padding: 25px;
     background-color: #ffffff;
-    border: 3px solid #111;
-    border-radius: 30px;
-    box-shadow: 4px 4px 0px #111;
     
-    /* 🌟 1. สั่งให้เกาะติดหน้าจอ */
-    position: sticky; 
+    /* 🌟 สไตล์ Doodle แบบกลมมนขั้นสุด */
+    border: 3px solid #222;
+    border-radius: 20px;
+    box-shadow: 6px 6px 0px #222;
     
-    /* 🌟 2. ให้เว้นระยะจากขอบจอด้านบน 20px เวลาเลื่อนตาม */
-    top: 20px; 
+    /* การจัดการตำแหน่ง */
+    position: sticky;
+    top: 40px;
+    height: calc(100vh - 80px);
     
-    /* 🌟 3. บังคับความสูงให้พอดีกับหน้าจอ (ลบระยะเผื่อขอบบน-ล่าง) */
-    height: calc(60vh); 
+    /* 🌟 แก้ปัญหาล้น: กำหนดให้ทุกอย่างที่เกินกรอบถูกตัดทิ้ง */
+    overflow: hidden; 
     
-    /* 🌟 4. ซ่อนแถบเลื่อน แต่ถ้าเมนูใน Sidebar เยอะเกินไป จะให้เลื่อนเฉพาะข้างในได้ */
-    overflow-y: auto; 
+    font-family: 'Mali', cursive, sans-serif;
 }
 
-/* 🌟 (แถม) เพื่อความสวยงาม ซ่อนแถบ Scrollbar เดิมๆ ของเบราว์เซอร์ใน Sidebar */
-.sidebar::-webkit-scrollbar {
-    display: none;
+/* ส่วนบน: จัดการให้ Profile อยู่ตรงกลางและไม่ล้น */
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    height: 100%;
 }
 
-/* ส่วนของโลโก้ */
 .logo {
-    font-size: 2.2rem;
-    font-weight: bold;
-    margin-bottom: 25px;
-    letter-spacing: -1px;
-    text-align: center; /* จัดให้อยู่ตรงกลาง */
-    text-shadow: 2px 2px 0px #FFA237; /* แอบใส่ไฮไลต์สีเหลืองหลังตัวหนังสือ */
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-align: center;
+    color: #222;
+    margin-bottom: 5px;
 }
 
-/* ปรับแต่ง Profile ที่อยู่ใน Sidebar */
+/* 🌟 Container โปรไฟล์: บังคับให้ขนาดพอดีกับ Sidebar */
 .profile-container {
-    margin-bottom: 25px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px dashed #ccc;
+    padding-bottom: 15px;
+    /* ย่อส่วนโปรไฟล์ลงนิดนึงถ้ามันดูใหญ่ไป */
+    transform: scale(0.9);
 }
 
-/* ---------------------------------
-   สไตล์ของเมนูนำทาง (Navigation Links)
----------------------------------- */
+/* เมนู */
 .nav-links {
     list-style: none;
     padding: 0;
     margin: 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 8px; /* ระยะห่างระหว่างบรรทัดเมนู */
+    gap: 12px;
 }
 
-/* สไตล์พื้นฐานของแต่ละเมนู */
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    padding: 12px 15px; /* เพิ่มพื้นที่ให้ตัวหนังสือกับไอคอน */
+    gap: 15px;
+    padding: 12px 20px;
     font-size: 1.2rem;
     font-weight: bold;
-    border-radius: 15px;
-    border: 2px solid transparent; /* ซ่อนขอบไว้ก่อนรอ Hover */
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* แอนิเมชันเด้งๆ */
+    color: #333;
+    cursor: pointer;
+    
+    /* ปรับขอบให้เป็น Doodle */
+    border: 2px solid transparent;
+    border-radius: 50px;
+    transition: all 0.3s ease;
 }
 
-/* 🌟 ลูกเล่นเวลาเอาเมาส์ไปวาง (Hover Effect) */
 .nav-item:hover {
-    transform: translateX(8px) rotate(-2deg) scale(1.02); /* ขยับขวา เอียงนิดๆ */
-    background-color: #FFA237; /* สีเหลืองไฮไลต์ */
-    border: 2px solid #111; /* เส้นขอบปากกาโผล่ */
-    box-shadow: 3px 3px 0px #111; /* มีเงาเล็กๆ ตัวของปุ่มเมนูเอง */
+    background-color: #FFA237;
+    border: 2px solid #222;
+    box-shadow: 3px 3px 0px #222;
+    transform: translateX(5px);
 }
 
-/* ให้ไอคอนขยับนิดๆ ตอน Hover */
 .nav-item:hover svg {
-    transform: scale(1.15) rotate(5deg);
-    transition: transform 0.2s ease;
+    color: #ff6b81;
+    transform: scale(1.1);
 }

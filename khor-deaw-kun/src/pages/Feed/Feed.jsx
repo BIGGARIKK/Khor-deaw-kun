@@ -78,7 +78,7 @@ function Feed() {
                     />
                 ))}
                 </div>
-
+                
                 <RightSidebar />
             </div>
         </div>

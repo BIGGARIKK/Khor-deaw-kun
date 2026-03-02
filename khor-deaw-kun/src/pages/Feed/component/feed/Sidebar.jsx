@@ -1,51 +1,39 @@
 import React from 'react';
-import './Sidebar.css'; // 🌟 อย่าลืม import ไฟล์ CSS เข้ามา
+import './Sidebar.css';
 import Profile from './Profile';
-import { TbHome, TbCompass, TbBell, TbSettings, TbPencilPlus } from "react-icons/tb";
+import { TbHome, TbCompass, TbBell, TbSettings } from "react-icons/tb";
+import { useNavigate } from 'react-router-dom'; 
 
 function Sidebar() {
+    const navigate = useNavigate();
     const iconSize = 28; 
-    const strokeWidth = 2;
 
     return (
         <div className="sidebar">
-            
-            {/* --- ส่วนบน (โลโก้ + โปรไฟล์ + เมนู) --- */}
             <div className="sidebar-top">
                 <div className="logo">Khor Deaw Kun</div>
 
-                {/* 🌟 ย้าย Profile มาไว้ใต้โลโก้ตามโค้ดที่คุณส่งมา */}
-                <div className="profile-container">
+                {/* กดที่รูปโปรไฟล์เพื่อไปหน้า Profile */}
+                <div className="profile-container" onClick={() => navigate('/profile')}>
                     <Profile />
                 </div>
 
                 <ul className="nav-links">
-                    <li className="nav-item">
-                        <TbHome size={iconSize} strokeWidth={strokeWidth} />
-                        <span>Feed</span>
+                    <li className="nav-item" onClick={() => navigate('/feed')}>
+                        <TbHome size={iconSize} /> <span>Feed</span>
                     </li>
-                    
                     <li className="nav-item">
-                        <TbCompass size={iconSize} strokeWidth={strokeWidth} />
-                        <span>Explore</span>
+                        <TbCompass size={iconSize} /> <span>Explore</span>
                     </li>
-                    
                     <li className="nav-item">
-                        <TbBell size={iconSize} strokeWidth={strokeWidth} />
-                        <span>Notifications</span>
+                        <TbBell size={iconSize} /> <span>Notifications</span>
                     </li>
-                    
                     <li className="nav-item">
-                        <TbSettings size={iconSize} strokeWidth={strokeWidth} />
-                        <span>Settings</span>
+                        <TbSettings size={iconSize} /> <span>Settings</span>
                     </li>
                 </ul>
-
-
             </div>
-            
         </div>
     );
 }
-
 export default Sidebar;

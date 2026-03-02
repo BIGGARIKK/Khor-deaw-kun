@@ -1,7 +1,23 @@
 import React from 'react';
 import './Profile.css'; // 🌟 Import ไฟล์ CSS เข้ามา
+import { useState, useEffect } from 'react';
+import { apiRequest } from '../../../../service/api'; // นำเข้า apiRequest จากไฟล์ api.js
 
 function Profile() {
+
+    const [userData, setUserData] = useState(null);
+
+    useEffect(() => {
+        const loadProfile = async () => {
+          try {
+            const data = await apiRequest("/profile", "GET");
+            setUserData(data);
+           } catch (error) {
+            alert(error.message || 'Failed to fetch profile data!');
+           }
+        };
+        loadProfile();
+   },[]);
   return (
     <div className="profile-card">
         
@@ -11,7 +27,7 @@ function Profile() {
       {/* 🌟 ชื่อและสถานะ */}
       <div className="profile-info">
         <strong className="profile-name">
-          Doodle_King
+          {userData ? userData.username : 'Loading...'}
         </strong>
         <span className="profile-badge">
           PRO SKETCHER
