@@ -1,17 +1,77 @@
 @import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
 
-.body {
-    font-family: 'Playpen Sans Thai', sans-serif;
-    font-family: 'Schoolbell', cursive;
+/* ถ้าตั้งใจเล็งไปที่ tag body ให้ลบจุด (.) ข้างหน้าออกนะครับ */
+body {
+    /* รวมฟอนต์ไว้บรรทัดเดียว: ใช้ Schoolbell เป็นหลัก ถ้าเจอภาษาไทยจะสลับไป Playpen อัตโนมัติ */
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive, sans-serif;
 }
 
-.input-field input {
-    font-family: 'Playpen Sans Thai', sans-serif;
-    font-family: 'Schoolbell', cursive;
-    border-radius: 30px;
-    border : 3px solid #000000;
-    padding: 10px 20px;
-    font-size: 1.5rem;
-    filter: drop-shadow(6px 6px 0px rgba(0, 0, 0, 0.20));
-    width: 350px;
+.input-field-container {
+    position: relative;
+    width: 100%;
+    /* ปรับความสูงให้พอดีกับรูปกรอบหยักของคุณ */
+    height: 60px; 
+    margin-bottom: 15px;
+}
+
+/* 🌟 คลาสใหม่สำหรับ Input ขอบหยัก */
+.wavy-input {
+    width: 100%;
+    height: 100%;
+    
+    /* 🌟 สำคัญ 1: ลบขอบและพื้นหลังเดิมทิ้งให้หมด */
+    border: none !important;
+    background-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important; /* ลบเงาที่เคยเขียนด้วย CSS ทิ้ง */
+
+    /* 🌟 สำคัญ 2: เอารูปกรอบหยักมาใส่เป็นพื้นหลังแทน */
+    /* เปลี่ยนชื่อไฟล์ตรง URL ให้ตรงกับรูปที่คุณ Export มา */
+    background-image: url('../../../assets/UI/inputfield.png'); 
+    background-size: 100% 100%; /* ให้รูปยืดพอดีกล่อง */
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* 🌟 ปรับ Padding ให้ตัวหนังสือไม่ทับเส้นขอบ */
+    padding: 0 40px 0 25px !important; 
+    box-sizing: border-box;
+
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive;
+    font-size: 1.2rem;
+    color: #5C4033;
+}
+
+/* ปรับสี Placeholder ให้อ่อนลงนิดนึง */
+.wavy-input::placeholder {
+    color: #8C6A4F;
+    opacity: 0.8;
+}
+
+/* =========================================
+   สถานะ Valid (ถูก) / Invalid (ผิด)
+   ========================================= */
+/* ถ้าจะให้เปลี่ยนสีกรอบเวลาผิด คุณต้องมีรูปกรอบสีแดงเตรียมไว้อีกรูปครับ */
+.wavy-input.invalid {
+    /* สมมติว่ามีรูปกรอบแดง */
+    /* background-image: url('../../../assets/input-wavy-border-red.png'); */
+    
+    /* หรือถ้าไม่มีรูปใหม่ ให้เปลี่ยนแค่สีตัวอักษรแทนครับ */
+    color: #dc3545; 
+}
+
+/* ไอคอนสถานะ (เครื่องหมายถูก/ผิด) */
+.status-icon-container {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none; /* กดทะลุไอคอนไปโดน input ได้ */
+}
+
+.icon-check, .icon-error {
+    width: 24px;
+    height: 24px;
 }
