@@ -1,0 +1,31 @@
+.color-grid { 
+  display: grid; 
+  grid-template-columns: repeat(4, 1fr); 
+  gap: 25px; /* ขยายระยะห่างระหว่างวงกลมให้กว้างขึ้น */
+  padding: 20px 10px; 
+  width: 100%; /* ให้กริดกว้างเต็มพื้นที่ของ Modal */
+}
+
+.color-option {
+  width: 70px; /* ✨ กำหนดขนาดวงกลมให้ใหญ่และคงที่ */
+  height: 70px; /* ✨ กำหนดขนาดวงกลมให้ใหญ่และคงที่ */
+  border-radius: 50%; 
+  border: 3px solid #222;
+  cursor: pointer; 
+  position: relative;
+  overflow: hidden; 
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin: 0 auto; /* จัดให้วงกลมอยู่ตรงกลางของแต่ละช่อง (Grid Cell) */
+}
+
+.color-option:hover { 
+  transform: translateY(-5px) scale(1.1); 
+  box-shadow: 6px 6px 0px #222; 
+}
+
+.color-option.selected { 
+  border: 4px solid #fff; 
+  outline: 4px solid #222; 
+  box-shadow: 4px 4px 0px #222; 
+  transform: scale(1.1); 
+}

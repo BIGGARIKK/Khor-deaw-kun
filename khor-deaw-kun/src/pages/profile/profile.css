@@ -1,11 +1,12 @@
+/* profile-main.css */
 @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap');
 
 * { box-sizing: border-box; }
 
-/* ================= 1. BASE LAYOUT ================= */
+/* ================= BASE LAYOUT ================= */
 .profile-page {
   background-color: #ffe6e6; 
-  background-image: url('../../assets/bg.png'); /* 📌 เปลี่ยน path ให้ตรงกับของคุณ */
+  background-image: url('../../assets/bg.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -27,7 +28,9 @@
   margin: 0 auto;
 }
 
-/* ================= 2. DOODLE BOX (สไตล์หลัก) ================= */
+.center-panel { display: flex; flex-direction: column; gap: 30px; }
+
+/* ================= DOODLE BOX (Shared) ================= */
 .doodle-box {
   background-color: #ffffff;
   border: 3px solid #222222;
@@ -35,7 +38,6 @@
   box-shadow: 5px 5px 0px #222222;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   margin: 5px;
-  
 }
 
 .doodle-box:hover {
@@ -50,268 +52,117 @@
   font-weight: bold;
 }
 
-/* ================= 3. LEFT PANEL ================= */
-.left-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px; 
+/* ================= SHARED MODAL BACKGROUND & BOX ================= */
+.ig-story-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9); z-index: 9999;
+  display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+  animation: fadeInOverlay 0.3s ease;
 }
 
-/* ปุ่ม Back to Feed */
-.back-btn {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 1.1rem;
-  font-weight: 800;
+.avatar-modal-box {
+  background-color: #fffdf5;
+  background-image: radial-gradient(#e5e0d0 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+  padding: 20px 30px 25px 30px; 
+  border-radius: 30px;
+  border: 4px solid #222;
+  width: 95%;
+  max-width: 480px; 
+  position: relative;
+  box-shadow: 12px 12px 0px #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transform-origin: center;
+}
+
+.avatar-title-wrapper { text-align: center; margin-bottom: 25px; }
+
+.avatar-modal-title {
+  font-size: 1.8rem;
+  margin-top: 10px;      
+  margin-bottom: 10px;   
   color: #222;
-  background-color: #fff;
-  cursor: pointer;
-  margin-bottom: 10px;
-  border: 3px solid #222;
-  display: flex;
-  justify-content: flex-start;
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 2px 2px 0px #fffdf5;
+  position: relative;
 }
 
-.back-btn:hover {
-  background-color: #e0f7fa; 
-  transform: translate(-3px, -3px);
-  box-shadow: 6px 6px 0px #222;
+.avatar-modal-title::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: -5px;
+  right: -5px;
+  height: 14px;
 }
 
-.back-btn .icon-flex { gap: 12px; }
-
-/* สถิติแบบแนวนอน */
-.stats-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 15px;
-  background-color: #ffffff;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1; 
-  gap: 10px;
-  padding: 5px 10px;
-}
-
-
-.stat-number { font-size: 1.6rem; font-weight: 800; color: #FF9F43; }
-.stat-label { font-size: 0.95rem; font-weight: bold; color: #555; text-transform: uppercase; }
-.stat-divider { width: 5px; height: 40px; background-color: #222; border-radius: 5px; opacity: 0.2; }
-
-/* ส่วนการติดต่อ */
-.contact-section { display: flex; flex-direction: column; gap: 12px; }
-.contact-main-btn {
-  width: 100%; padding: 16px; font-size: 1.2rem; font-weight: 800; color: #222;
-  background-color: #84E045; cursor: pointer; border: 3px solid #222;
-}
-.contact-main-btn.active { background-color: #ffb8b8; }
-.contact-main-btn:hover { transform: translate(-2px, -2px) rotate(-1deg); box-shadow: 7px 7px 0px #222; }
-
-.contact-links-wrapper {
-  display: flex; flex-direction: column; gap: 12px;
-  max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out, opacity 0.3s ease; opacity: 0;
-}
-.contact-links-wrapper.open { max-height: 300px; opacity: 1; }
-.contact-link {
-  display: flex; align-items: center; gap: 15px; padding: 12px 20px;
-  font-size: 1.1rem; font-weight: bold; text-decoration: none; color: #222;
-  background-color: #fff; transition: transform 0.2s, background-color 0.2s, color 0.2s;
-}
-.contact-link:hover { transform: scale(1.03) translateX(5px); }
-.line-link:hover { background-color: #00B900; color: #fff; } 
-.fb-link:hover { background-color: #1877F2; color: #fff; } 
-.ig-link:hover { background-color: #db2480; color: #fff;}
-
-/* ================= 4. CENTER PANEL ================= */
-.center-panel { display: flex; flex-direction: column; gap: 30px; }
-
-/* Profile Header Card */
-.profile-header-card { width: 100%; overflow: hidden; display: flex; flex-direction: column; border-radius: 30px; }
-.profile-cover { width: 100%; height: 120px; background-color: #ffb8b8; border-bottom: 3px solid #222; }
-.profile-header-content { display: flex; padding: 0 30px 30px 30px; gap: 20px; align-items: flex-end; margin-top: -50px; }
-
-.avatar-wrapper { position: relative; flex-shrink: 0; z-index: 2; }
-.avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #222; box-shadow: 4px 4px 0px #222; background-color: #fff; object-fit: cover; }
-.online-dot { position: absolute; bottom: 8px; right: 8px; width: 22px; height: 22px; background-color: #84E045; border: 2px solid #222; border-radius: 50%; }
-
-.profile-text-info { display: flex; flex-direction: column; gap: 15px; padding-bottom: 10px; width: 100%; }
-.profile-name { margin: 0; font-size: 2rem; font-weight: 800; display: flex; align-items: center; gap: 15px; }
-.profile-bio { margin: 0; font-size: 1.1rem; color: #555; line-height: 1.4; }
-
-.feed-section { display: flex; flex-direction: column; gap: 25px; }
-
-/* ICONS & HELPERS */
-.icon-flex { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.action-icon { cursor: pointer; color: #555; transition: all 0.2s; }
-.action-icon:hover { color: #222; transform: scale(1.1); }
-.edit-icon:hover { color: #4A90E2; }
-
-/* ================= 5. RIGHT PANEL ================= */
-.right-panel { display: flex; flex-direction: column; gap: 30px; padding-top: 10px; }
-
-/* รูปโพลารอยด์ */
-.polaroid-wrapper {
-  position: relative; padding: 15px 15px 25px 15px; 
-  background-color: #fff; transform: rotate(3deg); 
-  display: flex; flex-direction: column; align-items: center;
-}
-
-.tape {
-  position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-4deg);
-  width: 90px; height: 28px; background-color: rgba(255, 235, 150, 0.85); 
-  border: 2px solid rgba(0, 0, 0, 0.1); box-shadow: 1px 1px 3px rgba(0,0,0,0.1); z-index: 2;
-}
-
-.polaroid-img { width: 100%; height: 200px; object-fit: cover; border: 3px solid #222; border-radius: 4px; }
-.polaroid-caption { margin-top: 15px; font-size: 1.2rem; font-weight: bold; color: #333; font-family: 'Mali', cursive; }
-
-/* กล่องความสนใจ */
-.interests-box { padding: 20px; display: flex; flex-direction: column; gap: 15px; background-color: #fff; }
-.box-title { margin: 0; font-size: 1.3rem; font-weight: 800; border-bottom: 3px dashed #ddd; padding-bottom: 10px; }
-.tags-container { display: flex; flex-wrap: wrap; gap: 10px; }
-.doodle-tag {
-  padding: 8px 15px; font-size: 0.95rem; font-weight: bold; background-color: #f0f8ff; 
-  border: 2px solid #222; border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; 
-  cursor: pointer; transition: all 0.2s ease;
-}
-.doodle-tag:hover { background-color: #ffe066; transform: translateY(-3px); box-shadow: 3px 3px 0px #222; }
-
-/* ================= 6. IG STORY SYSTEM (ขอบสีรุ้งหมุนเนียนๆ) ================= */
-
-/* ประกาศตัวแปรสำหรับให้มุม (องศา) ของสีหมุนได้ */
+/* ================= SHARED STORY ANIMATIONS ================= */
 @property --story-angle {
   syntax: '<angle>';
   initial-value: 0deg;
   inherits: false;
 }
 
-.story-trigger {
-  cursor: pointer;
-  
-  /* ทำให้ขอบเดิมโปร่งใส เพื่อเว้นที่ให้สีรุ้ง */
-  border: 4px solid transparent !important;
-
-  /* เนื้อในสีขาว (padding-box) + ขอบสีรุ้งแบบวงกลม (border-box) */
-  background:
-    linear-gradient(#ffffff, #ffffff) padding-box,
-    conic-gradient(
-      from var(--story-angle),
-      #ff6b81, #FF9F43, #ffe066, #84E045, #4A90E2, #ff6b81
-    ) border-box !important;
-
-  /* สั่งให้องศาการไล่สีหมุนไปเรื่อยๆ */
-  animation: spinStoryBorder 2.5s linear infinite;
-}
-
-/* แอนิเมชันสำหรับหมุนองศา (จาก 0 ถึง 360) */
 @keyframes spinStoryBorder {
   0% { --story-angle: 0deg; }
   100% { --story-angle: 360deg; }
 }
 
-/* ตอนเอาเมาส์ชี้ ให้ขอบเปลี่ยนเป็นสีเขียวและตั้งตรง */
-.polaroid-wrapper.story-trigger:hover {
-  background:
-    linear-gradient(#ffffff, #ffffff) padding-box,
-    linear-gradient(#84E045, #84E045) border-box !important;
-  transform: rotate(0deg) scale(1.05);
-  animation: none; /* หยุดหมุนตอนเอาเมาส์ชี้ */
-}
-
-/* IG Story Overlay & UI */
-.ig-story-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.9); z-index: 9999;
-  display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);
-}
-
-.ig-story-container {
-  position: relative; width: 100%; max-width: 420px; height: 85vh;
-  background-color: #111; border-radius: 20px; overflow: hidden;
-  box-shadow: 0px 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-}
-
-.story-progress-container {
-  position: absolute; top: 15px; left: 15px; right: 15px; height: 4px;
-  background-color: rgba(255, 255, 255, 0.3); border-radius: 10px; z-index: 10; overflow: hidden;
-}
-.story-progress-bar { height: 100%; background-color: #ffffff; border-radius: 10px; }
-
-.story-header { position: absolute; top: 30px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-.story-user-info { display: flex; align-items: center; gap: 10px; }
-.story-avatar-small { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; background-color: #fff; }
-.story-username { color: #fff; font-weight: bold; font-size: 1rem; }
-.story-time { color: rgba(255,255,255,0.7); font-size: 0.85rem; }
-.story-full-img { width: 100%; height: 100%; object-fit: cover; }
-.story-text-overlay { position: absolute; bottom: 60px; left: 0; right: 0; text-align: center; z-index: 10; }
-
-/* ================= 7. RESPONSIVE (ต้องอยู่ล่างสุดเสมอ) ================= */
-@media (max-width: 1024px) {
-  .profile-container { grid-template-columns: 1fr; max-width: 600px; }
-  .profile-header-content { flex-direction: column; align-items: center; text-align: center; margin-top: -60px; }
-  .right-panel { display: none; }
-}
-
-/* ================= 8. SCROLL TO TOP BUTTON ================= */
+/* ================= SCROLL TO TOP BUTTON ================= */
 .scroll-top-btn {
   position: fixed;
   bottom: 40px;
   right: 40px;
   width: 60px;
   height: 60px;
-  background-color: #84E045; /* สีเขียวเด่นๆ */
+  background-color: #84E045; 
   color: #222;
   cursor: pointer;
-  z-index: 999; /* ให้อยู่บนสุด (แต่ใต้ Modal) */
+  z-index: 999; 
   display: flex;
   justify-content: center;
   align-items: center;
-  
-  /* ทำให้เป็นวงกลมสไตล์ Doodle */
   border: 3px solid #222;
   border-radius: 50% 40% 50% 40% / 40% 50% 40% 50%; 
-  
-  /* แอนิเมชันตอนปุ่มโผล่ขึ้นมา */
   animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .scroll-top-btn:hover {
-  background-color: #ffe066; /* เปลี่ยนเป็นสีเหลืองตอนเอาเมาส์ชี้ */
+  background-color: #ffe066; 
   transform: translateY(-5px) rotate(5deg);
   box-shadow: 5px 5px 0px #222;
 }
 
-/* ทำให้รู้ว่าคลิกแก้ได้ */
-.profile-cover, .avatar-wrapper, .profile-bio {
-  cursor: pointer;
-  transition: filter 0.2s;
-}
-
-.profile-cover:hover {
-  filter: brightness(0.9); /* มืดลงนิดนึงตอนชี้ */
-}
-
-.avatar-wrapper:hover .avatar {
-  border-color: #84E045; /* เปลี่ยนสีขอบอวตารตอนชี้ */
-}
-
-.edit-icon {
-  cursor: pointer;
-  color: #888;
-  margin-left: 10px;
-}
-
-.edit-icon:hover {
-  color: #222;
-}
-
-/* แอนิเมชันเด้งดึ๋งตอนโหลด */
+/* ================= GLOBAL KEYFRAMES ================= */
 @keyframes popIn {
   0% { transform: scale(0) translateY(20px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
+
+@keyframes modalPop {
+  0% { opacity: 0; transform: scale(0.5) translateY(50px); }
+  70% { transform: scale(1.05) translateY(-5px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popBubble {
+  0% { transform: scale(0) translateY(10px) rotate(-10deg); opacity: 0; }
+  100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .profile-container { grid-template-columns: 1fr; max-width: 600px; }
+  .profile-header-content { flex-direction: column; align-items: center; text-align: center; margin-top: -60px; }
+  .right-panel { display: none; }
+}
+
