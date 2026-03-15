@@ -1,101 +1,246 @@
 @import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
 
-
-/* html, body {
-    font-family: 'Playpen Sans Thai', sans-serif;
-    font-family: 'Schoolbell', cursive;
+body {
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive, sans-serif;
     margin: 0;
-    padding: 0;
-    
+    overflow: hidden; 
+}
 
-} */
-
-
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: auto;
-  width: 100%;
-  border: 3px solid #000000;
-  border-radius: 30px;
-  filter: drop-shadow(6px 6px 0px #00000020);
-  background-color: #ffffff;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 500px;
+/* =========================================
+   1. Background & Layout หลัก
+   ========================================= */
+.signin-bg {
+    background-image: url('../../../assets/image.png');
+    background-color: #f7a072; 
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: cover;
 }
 
 .container-all {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
-  background-color: #F5F4E9;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    min-height: 100vh;
+    width: 100vw;
+    padding: 0 5% 0 10%; 
+    box-sizing: border-box;
 }
 
-.Icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  mix-blend-mode: multiply;
-  margin-left: auto;
+/* =========================================
+   2. ฝั่งซ้าย (Logo)
+   ========================================= */
+.logo-section {
+    position: relative;
+    width: 45%;
+    display: flex;
+    justify-content: center;
+    margin-top: -150px; 
 }
 
-.inputbox {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 20px;
+.curved-text-svg {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    filter: drop-shadow(2px 2px 0px rgba(255, 255, 255, 0.5));
 }
 
-.header {
-    color: #FF9A52;
-    font-size: 2rem;
+text {
+    font-family: 'Schoolbell', cursive;
+    font-size: 55px;
     font-weight: bold;
-    letter-spacing: 10px;
 }
 
-
-h1 {
-  color: #FF9A52;
+/* =========================================
+   3. ฝั่งขวา (Sign Section & ป้ายไม้)
+   ========================================= */
+.sign-section {
+    position: relative;
+    width: 45%; 
+    max-width: 650px; /* ปรับขนาดให้พอดี ไม่กว้างเทอะทะเกินไป */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: flex-end; 
+    margin-bottom: 0; 
 }
-.forgot-password {
-  display: block;
-  text-align: right;
-  width: 80%; 
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-  margin-right: 50px;
+
+/* 🌟 1. หดความสูงของป้ายไม้ลง ให้พอดีกับ 2 ช่อง */
+/* 🌟 1. ล็อกเป้าให้ wood-board-bg ทำงานเฉพาะในหน้า signin-bg */
+.signin-bg .wood-board-bg {
+    background-image: url('../../../assets/UI/sign.png'); 
+    background-size: 100% 100%; 
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    
+    width: 100%;
+    /* ปรับความสูงสำหรับหน้า Sign In */
+    min-height: 800px; 
+    
+    padding: 70px 50px 50px 50px; 
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1; 
+}
+
+/* 🌟 2. ดันช่องพิมพ์ให้ห่างจากหัวข้อ */
+.signin-bg .board-header {
+    font-size: 4.5rem; 
+    font-weight: bold;
+    /* 🌟 1. สีตัวหนังสือด้านใน (จากรูปคุณเป็นสีเหลือง/ส้มอ่อนๆ) */
+    color: #d18400; 
+    
+    /* 🌟 2. คำสั่งสร้างเส้นขอบ! (ความหนาเส้น 3px สีน้ำตาลเข้มเกือบดำ) */
+    -webkit-text-stroke: 1px #3E2723; 
+    
+    /* 🌟 3. (แถม) ถ้าอยากให้ตัวหนังสือดูหนาและลอยขึ้นมาอีก เพิ่มเงาตกกระทบด้านล่างนิดๆ */
+    text-shadow: 2px 4px 0px rgba(0, 0, 0, 0.4); 
+
+    margin: 0 0 20px 0; 
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* 🌟 3. ถ่างระยะห่างระหว่างช่อง */
+.signin-bg .board-inputs {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* ถ่างให้กว้างขึ้นเฉพาะหน้า Sign In */
+}
+
+/* 🌟 4. เพิ่มระยะห่างให้ปุ่ม */
+.signin-bg .signin-options {
+    width: 100%;
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: 35px; 
+}
+/* =========================================
+   ช่อง Input สไตล์ Sunken (ยุบจมลึกลงไปในไม้)
+   ========================================= */
+.board-inputs input {
+    background-image: none !important;
+    
+    /* สีพื้นหลังของหลุม (ปรับให้อมน้ำตาลกลืนกับไม้มากขึ้น) */
+    background-color: #B88655 !important; 
+    
+    /* ขอบบน/ซ้าย เป็นสีเงาเข้มๆ ไม่ติดส้มจัด */
+    border-top: 3px solid #6E4627 !important;
+    border-left: 3px solid #6E4627 !important;
+    
+    /* ขอบล่าง/ขวา เป็นสีสว่างรับแสง */
+    border-bottom: 3px solid #E8C8A3 !important;
+    border-right: 3px solid #E8C8A3 !important;
+    
+    /* 🌟 เปิดใช้งานความโค้ง เพื่อให้หลุมดูเป็นธรรมชาติ ไม่แข็งทื่อ */
+    border-radius: 12px !important; 
+
+    /* เงาด้านใน */
+    box-shadow: 
+        inset 5px 5px 10px rgba(62, 39, 35, 0.6), 
+        inset -2px -2px 6px rgba(255, 255, 255, 0.15) !important; 
+
+    height: 60px !important;
+    padding: 0 20px !important;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2E1B10 !important; 
+    width: 100%;
+    box-sizing: border-box;
+    outline: none !important;
+    transition: all 0.2s ease;
+}
+
+/* เอฟเฟกต์ตอนกดพิมพ์ หลุมจะยุบลงไปอีกนิด */
+.board-inputs input:focus {
+    background-color: #A97645 !important; 
+    box-shadow: 
+        inset 7px 7px 12px rgba(62, 39, 35, 0.8), 
+        inset -2px -2px 4px rgba(255, 255, 255, 0.1) !important;
+}
+
+.board-inputs input::placeholder {
+    color: #5C3A21; 
+    opacity: 0.7;
+}
+
+/* =========================================
+   4. ลิงก์และปุ่ม
+   ========================================= */
+.signin-options {
+    width: 100%;
+    text-align: right;
+    margin-top: 5px;
+    margin-bottom: 25px; 
 }
 
 .forgot-password a {
-    color: #00000050;
+    color: #ffffff; /* ปรับสีน้ำตาลให้เข้มขึ้น อ่านง่ายบนไม้สว่าง */
+    font-size: 1.2rem; 
+    font-weight: bold;
     text-decoration: none;
+    /* text-shadow: 1px 1px 0px rgba(255,255,255,0.4);  */
+    transition: color 0.2s;
+    
 }
 
 .forgot-password a:hover {
-    text-decoration: underline;
+    color: #F48C2A; /* สีโฮเวอร์ใช้สีเดียวกับปุ่ม Let's go */
+}
+
+/* กล่องครอบปุ่ม */
+.action-section-inside {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.action-section-inside button {
+    background-color: #F48C2A !important; 
+    border: 4px solid #1A1A1A !important; 
+    border-radius: 50px !important; 
+    color: #1A1A1A !important;
+    font-size: 1.6rem !important;
+    font-weight: bold !important;
+    padding: 12px 0 !important;
+    width: 85% !important; 
+    max-width: 320px !important; 
+    box-shadow: 0px 6px 0px #1A1A1A !important; 
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.action-section-inside button:active {
+    transform: translateY(4px); 
+    box-shadow: 0px 2px 0px #1A1A1A !important;
+}
+
+/* =========================================
+   5. ข้อความ Sign up 
+   ========================================= */
+.bottom-links {
+    /* 🌟 เปลี่ยนเป็น relative ให้มันต่อแถวลงมาใต้ปุ่ม ไม่ลอยมั่วทับที่อื่น */
+    position: relative; 
+    margin-top: 20px; /* ดันลงมาจากปุ่ม Let's go นิดนึง */
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+    z-index: 10; 
 }
 
 .have-account {
-  display: block;
-  text-align: center;
-  width: 100%; 
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-top: 20px;
-  color: #00000050;
+    color: #4A3018; 
+    font-weight: bold;
+    text-shadow: 1px 1px 0px rgba(255,255,255,0.4); 
+    font-size: 1.5rem;
 }
 
 .have-account a {
-    color: #000000;
+    color: #ffffff; 
+    margin-left: 5px;
     text-decoration: none;
 }
 
@@ -103,70 +248,20 @@ h1 {
     text-decoration: underline;
 }
 
-.Icon {
-  position: relative; 
-  width: 600px; 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.Icon img {
-  width: 100%;
-  display: block;
-}
-
-.curved-text-svg {
-  position: absolute;
-  top: -70px; 
-  width: 100%;
-  height: auto;
-  pointer-events: none; 
-}
-
-text {
-  font-family: 'Playpen Sans Thai', sans-serif;
-  font-family: 'Schoolbell', cursive;
-  font-size: 50px;
-  font-weight: bold;
-  fill: #000; 
-}
-
-/* ใช้ CSS เดิมที่คุณมีอยู่แล้ว และเพิ่ม/ปรับตรงนี้ครับ */
-
-.signin-options {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end; /* ผลัก Forgot Password ไปทางขวา */
-    margin-bottom: 20px;
-}
-
-.forgot-password a {
-    font-family: 'Schoolbell', cursive;
+/* =========================================
+   6. กล่อง Error Message (ปรับสไตล์ให้เข้ากับเกม)
+   ========================================= */
+.error-message-text {
+    color: #FFFFFF;
+    background-color: #D9534F; /* แดงหม่นๆ */
+    border: 3px solid #8B0000; /* ขอบแดงเข้ม */
+    border-radius: 12px; /* โค้งเข้ากับช่อง Input */
+    padding: 8px 10px;
     font-size: 1rem;
-    color: #666;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-.forgot-password a:hover {
-    color: #FF9F43;
-    text-decoration: underline;
-}
-
-/* ปรับ Header Sign In ให้ดูขี้เล่นเหมือน Sign Up */
-.header {
-    font-size: 3rem;
-    color: #FF9A52;
-    margin-bottom: 20px;
-    letter-spacing: 5px; /* ปรับให้ไม่อ่านยากจนเกินไป */
-}
-
-
-.container {
-    transform: rotate(1deg); 
-}
-
-.container:hover {
-    transform: rotate(0deg);
+    font-weight: bold;
+    margin-top: 15px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
 }

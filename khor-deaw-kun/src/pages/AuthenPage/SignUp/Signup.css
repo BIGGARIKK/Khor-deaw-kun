@@ -1,173 +1,313 @@
 @import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
 
-
-/* html,
 body {
-  font-family: 'Playpen Sans Thai', sans-serif;
-  font-family: 'Schoolbell', cursive;
-  margin: 0;
-  padding: 0;
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive, sans-serif;
+    margin: 0;
+    overflow: hidden; 
+}
 
-} */
-
+/* =========================================
+   1. Background & Layout หลัก (เหมือน Sign In)
+   ========================================= */
+.signup-bg {
+    background-image: url('../../../assets/image.png'); /* เปลี่ยนเป็นรูปวิวทะเล */
+    background-color: #f7a072; 
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: cover;
+}
 
 .container-all {
-  background-color: #F5F4E9;
-  background-image: radial-gradient(#d1d0c5 0.5px, transparent 0.5px);
-  background-size: 20px 20px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    min-height: 100vh;
+    width: 100vw;
+    padding: 0 5% 0 10%; 
+    box-sizing: border-box;
 }
 
-
-.container {
-  border: 3px solid #000000;
-  border-radius: 40px 15px 45px 20px;
-  filter: drop-shadow(8px 8px 0px #000000);
-  transform: rotate(-1deg);
-  transition: transform 0.3s ease;
-}
-
-.container:hover {
-  transform: rotate(0deg);
-}
-
-
-.header {
-  font-size: 3rem;
-  color: #000000;
-  margin-bottom: 10px;
-}
-
-
-.terms-container {
-  background: #fdfdfd;
-  padding: 15px 20px;
-  border: 2px dashed #ccc;
-  border-radius: 15px;
-  margin: 20px 0;
-
-  /* ทำให้เป็น Flex เพื่อให้กล่องติ๊กกับตัวหนังสือเรียงกันสวยๆ */
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  user-select: none;
-  width: 85%;
-  /* ไม่ให้กล่องกว้างทะลุขอบ */
-}
-
-/* ซ่อน Checkbox มาตรฐาน */
-.hidden-checkbox {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-/* กล่อง Checkbox วาดเอง (ลายเส้น) */
-.custom-checkbox {
-  position: relative;
-  display: inline-block;
-  min-width: 22px;
-  height: 22px;
-  background-color: #ffffff;
-  border: 3px solid #000000;
-  border-radius: 6px;
-  box-shadow: 3px 3px 0px #000000;
-  transform: rotate(-3deg);
-  transition: all 0.2s ease;
-}
-
-/* ลูกเล่นตอนเอาเมาส์ชี้กล่องเงื่อนไข */
-.terms-container:hover .custom-checkbox {
-  transform: rotate(0deg) scale(1.1);
-}
-
-/* เมื่อติ๊กถูก เปลี่ยนเป็นสีส้ม */
-.hidden-checkbox:checked~.custom-checkbox {
-  background-color: #FF9F43;
-  transform: rotate(3deg);
-}
-
-/* วาดเครื่องหมายติ๊กถูก (ซ่อนไว้ก่อน) */
-/* วาดเครื่องหมายติ๊กถูก */
-.custom-checkbox::after {
-  content: "";
-  position: absolute;
-  display: none;
-  width: 6px;
-  height: 12px;
-  border: solid #000000;
-  border-width: 0 3px 3px 0;
-  /* ความหนาของเส้นติ๊กถูก */
-
-  /* 3 บรรทัดนี้คือสูตรดึงกึ่งกลางเป๊ะๆ */
-  top: 45%;
-  /* ใช้ 45% แทน 50% เพราะติ๊กถูกจะมีหางยาวลงมาด้านล่าง */
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-
-/* โชว์เครื่องหมายติ๊กถูกเมื่อถูกเลือก */
-.hidden-checkbox:checked~.custom-checkbox::after {
-  display: block;
-}
-
-.terms-text {
-  font-size: 1rem;
-  color: #333;
-}
-
-.terms-text a {
-  color: #FF9A52;
-  font-weight: bold;
-  text-decoration: none;
-  border-bottom: 2px dashed #FF9A52;
-}
-
-.terms-text a:hover {
-  color: #000000;
-  border-bottom: 2px solid #000000;
-}
-
-.have-account {
-  border-top: 2px solid #eee;
-  padding-top: 20px;
-  color: #666;
-  margin: 20px;
-}
-
-.have-account a {
-  color: #FF9A52;
-  font-weight: 800;
-  border-bottom: 2px solid transparent;
-}
-
-.have-account a:hover {
-  border-bottom: 2px solid #FF9A52;
+/* =========================================
+   2. ฝั่งซ้าย (Logo & Text Animation)
+   ========================================= */
+.logo-section {
+    position: relative;
+    width: 45%;
+    display: flex;
+    justify-content: center;
+    margin-top: -150px; 
 }
 
 .curved-text-svg {
-    position: absolute;
-    top: -90px;
     width: 100%;
+    max-width: 600px;
     height: auto;
-    pointer-events: none;
-    filter: drop-shadow(2px 2px 0px white); 
-
-    animation: floatText 3s ease-in-out infinite; 
+    filter: drop-shadow(2px 2px 0px rgba(255, 255, 255, 0.5));
 }
-/* สร้าง Keyframes ชื่อ floatText */
-@keyframes floatText {
 
-  0%,
-  100% {
-    /* จุดเริ่มต้นและจุดจบ: อยู่ที่เดิม */
-    transform: translateY(0);
-  }
-
-  50% {
-    /* ตรงกลาง: ลอยขึ้นไปข้างบน 15px (ปรับเลขได้ตามชอบ) */
-    transform: translateY(-15px);
-  }
+text {
+    font-family: 'Schoolbell', cursive;
+    font-size: 55px;
+    font-weight: bold;
 }
+
+/* =========================================
+   3. ฝั่งขวา (Sign Section & ป้ายไม้)
+   ========================================= */
+.sign-section {
+    position: relative;
+    width: 45%; 
+    max-width: 650px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: flex-end; 
+    /* bottom: -100px; */
+    margin-bottom: 0; 
+}
+
+.signup-bg .sign-section {
+    margin-bottom: -120px; /* 🌟 ใช้ margin-bottom จะดันเสาจมทรายได้เนียนกว่า bottom ครับ */
+}
+
+.wood-board-bg {
+    background-image: url('../../../assets/UI/sign.png'); 
+    background-size: 100% 100%; 
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    
+    width: 100%;
+    /* 🌟 ป้ายต้องสูงขึ้นกว่า Sign In เพราะมี 4 ช่อง + Checkbox */
+    min-height: 1000px; 
+    
+    padding: 70px 50px 40px 50px; 
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1; 
+}
+
+.board-header {
+    font-size: 4.5rem; 
+    font-weight: bold;
+    /* 🌟 1. สีตัวหนังสือด้านใน (จากรูปคุณเป็นสีเหลือง/ส้มอ่อนๆ) */
+    color: #d18400; 
+    
+    /* 🌟 2. คำสั่งสร้างเส้นขอบ! (ความหนาเส้น 3px สีน้ำตาลเข้มเกือบดำ) */
+    -webkit-text-stroke: 1px #3E2723; 
+    
+    /* 🌟 3. (แถม) ถ้าอยากให้ตัวหนังสือดูหนาและลอยขึ้นมาอีก เพิ่มเงาตกกระทบด้านล่างนิดๆ */
+    text-shadow: 2px 4px 0px rgba(0, 0, 0, 0.4); 
+
+    margin: 0 0 20px 0; 
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.board-inputs {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* ลดระยะห่างลงนิดนึงเพราะช่องเยอะ */
+}
+
+/* =========================================
+   ช่อง Input สไตล์ Sunken (ยุบจมลึกลงไปในไม้)
+   ========================================= */
+/* =========================================
+   สไตล์ 2: แผ่นไม้ตอกทับ (Raised Plank)
+   ========================================= */
+/* =========================================
+   สไตล์ 3: กระดานดำร้านริมหาด (Chalkboard)
+   ========================================= */
+.board-inputs input {
+    /* พื้นหลังสีกระดานดำ (เทาอมน้ำเงินเข้ม) */
+    background-color: #2C3E50 !important; 
+    
+    /* กรอบไม้สีน้ำตาลรอบกระดานดำ */
+    border: 4px solid #6E4627 !important; 
+    border-radius: 8px !important; 
+    
+    /* เงาด้านในนิดๆ ให้ดูเป็นกระดานจริง */
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.6) !important;
+
+    height: 60px !important;
+    padding: 0 20px !important;
+    font-size: 2.0rem;
+    font-weight: bold;
+    /* 🌟 สีตัวหนังสือแบบชอล์ก (สีขาวอมเหลือง) */
+    color: #F1C40F !important; 
+    width: 100%;
+    box-sizing: border-box;
+    outline: none !important;
+    transition: border-color 0.2s;
+}
+
+/* ตอนพิมพ์ กรอบไม้รอบกระดานดำจะสว่างขึ้น */
+.board-inputs input:focus {
+    border-color: #F48C2A !important; 
+    background-color: #34495E !important;
+}
+.board-inputs input::placeholder { color: #7F8C8D; }
+/* =========================================
+   4. กล่องเงื่อนไข (Terms Checkbox) 🌟 สไตล์กลมกลืนกับป้ายไม้
+   ========================================= */
+.terms-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.hidden-checkbox {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* กล่อง Checkbox ทำเป็นหลุมไม้ */
+.custom-checkbox {
+    position: relative;
+    display: inline-block;
+    min-width: 22px;
+    height: 22px;
+    background-color: #B88655; /* สีเดียวกับหลุมช่องพิมพ์ */
+    border-top: 2px solid #6E4627;
+    border-left: 2px solid #6E4627;
+    border-bottom: 2px solid #E8C8A3;
+    border-right: 2px solid #E8C8A3;
+    border-radius: 6px;
+    box-shadow: inset 3px 3px 5px rgba(62, 39, 35, 0.6);
+    transition: all 0.2s ease;
+}
+
+/* เมื่อติ๊กถูก เปลี่ยนเป็นสีส้มสว่างขึ้นมา */
+.hidden-checkbox:checked ~ .custom-checkbox {
+    background-color: #F48C2A;
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-checkbox::after {
+    content: "";
+    position: absolute;
+    display: none;
+    width: 6px;
+    height: 12px;
+    border: solid #2E1B10; /* ติ๊กถูกสีน้ำตาลเข้ม */
+    border-width: 0 3px 3px 0;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.hidden-checkbox:checked ~ .custom-checkbox::after {
+    display: block;
+}
+
+.terms-text {
+    font-size: 1.2rem;
+    color: #4A3018; /* ตัวหนังสือสีน้ำตาลเข้ม */
+    font-weight: bold;
+    /* text-shadow: 1px 1px 0px rgba(255,255,255,0.4); */
+}
+
+.terms-text a {
+    color: #e1f9ff;
+    text-decoration: none;
+}
+
+.terms-text a:hover {
+    text-decoration: underline;
+}
+
+/* =========================================
+   5. ปุ่ม Let's Go & ข้อความ Sign In
+   ========================================= */
+.action-section-inside {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.bottom-links {
+    position: relative; 
+    margin-top: 15px;
+    margin-bottom: 0px;
+    width: 100%;
+    text-align: center;
+    z-index: 10; 
+}
+
+.have-account {
+    color: #4A3018; 
+    font-weight: bold;
+    text-shadow: 1px 1px 0px rgba(255,255,255,0.4); 
+    font-size: 1.05rem;
+}
+
+.have-account a {
+    color: #ffffff; 
+    margin-left: 5px;
+    text-decoration: none;
+}
+
+.have-account a:hover {
+    text-decoration: underline;
+}
+
+/* =========================================
+   6. Custom Popup Styles (ของเดิม)
+   ========================================= */
+.custom-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+.custom-popup-box {
+    background-color: #ffffff;
+    border: 4px solid #000000;
+    border-radius: 30px;
+    padding: 40px 30px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    filter: drop-shadow(8px 8px 0px #000000);
+    transform: rotate(-1deg);
+    animation: popBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.popup-icon-container { display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
+.modern-svg-icon { width: 80px; height: 80px; border-radius: 50%; display: block; stroke-width: 4; stroke-miterlimit: 10; box-shadow: inset 0px 0px 0px #000; }
+.success-svg { stroke: #4caf50; }
+.error-svg { stroke: #f44336; }
+.svg-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 4; stroke-linecap: round; animation: strokeDraw 0.5s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+.svg-check, .svg-cross { stroke-dasharray: 48; stroke-dashoffset: 48; stroke-linecap: round; stroke-linejoin: round; animation: strokeDraw 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.4s forwards; }
+
+@keyframes strokeDraw { 100% { stroke-dashoffset: 0; } }
+
+.popup-title { font-family: 'Schoolbell', 'Playpen Sans Thai', cursive; font-size: 2.2rem; color: #000; margin: 0 0 15px 0; }
+.popup-message { font-family: 'Playpen Sans Thai', sans-serif; font-size: 1.1rem; color: #555; margin-bottom: 30px; line-height: 1.5; }
+.popup-btn { font-family: 'Schoolbell', 'Playpen Sans Thai', cursive; background-color: #FF9F43; color: #000; font-size: 1.5rem; font-weight: bold; padding: 10px 30px; border: 3px solid #000; border-radius: 20px; cursor: pointer; box-shadow: 4px 4px 0px #000; transition: all 0.2s ease; }
+.popup-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #000; background-color: #ffaa5e; }
+.popup-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popBounce { 0% { transform: scale(0.8) rotate(-5deg); opacity: 0; } 100% { transform: scale(1) rotate(-1deg); opacity: 1; } }
