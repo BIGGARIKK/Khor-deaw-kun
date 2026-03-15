@@ -62,6 +62,13 @@ def signin():
         return jsonify({'message': 'Invalid username or password!'}), 401
 
 
+@app.route('/check-username',methods=['GET'])
+def check_username():
+    username = request.args.get('username')
+    if mongo.db.users.find_one({'username': username}):
+        return jsonify({'exists': True}), 200
+    else:
+        return jsonify({'exists': False}), 200
 
 #--- DELETE USER ---
 

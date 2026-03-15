@@ -1,49 +1,70 @@
 @import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
 
-/* สถานะปุ่มปกติ (ที่ผู้ใช้ติ๊กยอมรับแล้ว) */
+/* =========================================
+   ปุ่ม Let's Go (สถานะพร้อมกด)
+   ========================================= */
 .btn-active {
-    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive; /* ปรับลำดับ font fallback */
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 20px;
-    font-size: 1.5rem;
+    padding: 12px 30px; /* เพิ่มความอวบอิ่มให้ปุ่ม */
+    font-size: 1.6rem;
     font-weight: bold;
-    color: #000000;
-    background-color: #FF9A52;
-    border: 3px solid #000000;
-    border-radius: 30px;
+    color: #1A1A1A; /* ตัวอักษรสีดำเข้ม */
+    background-color: #FF9A52; /* สีส้มสดใส */
+    
+    /* 🌟 เปลี่ยนขอบให้หนาขึ้นสไตล์การ์ตูน */
+    border: 4px solid #1A1A1A; 
+    border-radius: 50px; /* ทรงแคปซูลยา (Pill shape) */
+    
     cursor: pointer;
-    transition: all 0.2s ease; /* ใช้ all เพื่อให้ smooth ทั้งสีและเงา */
-    letter-spacing: 5px; /* ลดลงนิดนึงเพื่อความอ่านง่าย แต่ยังคงสไตล์เดิม */
-    filter: drop-shadow(6px 6px 0px rgba(0, 0, 0, 1)); /* ปรับเงาให้คมเข้มตามสไตล์รูปภาพ */
+    letter-spacing: 2px;
+    
+    /* 🌟 ใช้ box-shadow ทำเงาแข็งๆ ดูเป็นปุ่ม 3D แบบเกมการ์ตูน */
+    box-shadow: 0px 6px 0px #1A1A1A; 
+    
+    /* เวลา hover/active ให้มันสมูทแค่ตอนขยับและเปลี่ยนเงา */
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.2s ease;
+    width: 100%; /* ให้กว้างเต็มกล่องที่ครอบมันอยู่ */
 }
 
+/* ตอนเอาเมาส์ชี้: ให้ปุ่มลอยขึ้นนิดนึง และส้มเข้มขึ้น */
 .btn-active:hover {
-    background-color: #ff7513;
-    transform: translateY(-2px); /* เพิ่มลูกเล่นให้ปุ่มลอยขึ้นนิดนึงตอน hover */
-    filter: drop-shadow(8px 8px 0px rgba(0, 0, 0, 1));
+    background-color: #FF852A; 
+    transform: translateY(-2px); 
+    box-shadow: 0px 8px 0px #1A1A1A; /* เงายืดออกเพราะปุ่มลอยสูงขึ้น */
 }
 
+/* ตอนคลิกเมาส์ค้าง: ให้ปุ่มถูกกดจมลงไป */
 .btn-active:active {
-    transform: translateY(2px); /* กดแล้วปุ่มยุบลง */
-    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 1));
+    transform: translateY(4px); /* กดแล้วยุบลงไป */
+    box-shadow: 0px 2px 0px #1A1A1A; /* เงาหดลงเพราะปุ่มติดพื้น */
 }
 
-/* --- ส่วนที่เพิ่มใหม่: สถานะปุ่มที่ยังกดไม่ได้ --- */
+/* =========================================
+   ปุ่ม Let's Go (สถานะกดไม่ได้ / Disabled)
+   ========================================= */
 .btn-disabled {
-    font-family: 'Schoolbell', cursive;
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 20px;
-    font-size: 1.5rem;
-    color: #999; /* สีตัวอักษรจางลง */
-    background-color: #e0e0e0; /* สีพื้นหลังเทา */
-    border: 3px solid #ccc;
-    border-radius: 30px;
-    cursor: not-allowed; /* เปลี่ยนหัวลูกศรเป็นเครื่องหมายห้าม */
-    letter-spacing: 5px;
-    filter: none; /* เอาเงาออกเพื่อให้ดู "ปิดใช้งาน" */
-    opacity: 0.7;
+    padding: 12px 30px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    
+    /* ปรับโทนสีเป็นสีเทาตุ่นๆ ให้ดูเหมือนหินหรือพลาสติกเก่าๆ */
+    color: #8C8C8C; 
+    background-color: #D6D6D6; 
+    border: 4px solid #8C8C8C; 
+    border-radius: 50px;
+    
+    cursor: not-allowed; 
+    letter-spacing: 2px;
+    
+    /* เงาเทาๆ ดูไม่ค่อยมีมิติ */
+    box-shadow: 0px 4px 0px #A0A0A0; 
+    transition: all 0.2s ease;
+    width: 100%;
 }
