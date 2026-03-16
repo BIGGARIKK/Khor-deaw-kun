@@ -1,12 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom'; 
-import { apiRequest } from '../../service/api'; 
-import { TbEdit, TbMessageCircle, TbSend, TbX, TbArrowLeft, TbArrowUp} from "react-icons/tb";
-import { FaInstagram } from "react-icons/fa";
-import PostCard from '../Feed/component/feed/PostCard'; 
+import { useNavigate } from 'react-router-dom';
+import { apiRequest } from '../../service/api';
+import { TbArrowUp } from "react-icons/tb";
+import PostCard from '../Feed/component/feed/PostCard';
 import './profile.css';
 
+import LeftPanel from './component/LeftPanel';
+import ProfileHeader from './component/ProfileHeader';
+import RightPanel from './component/RightPanel';
+import AvatarModal from './component/AvatarModal';
+import StoryModal from './component/StoryModal';
+import BannerColorModal from './component/BannerColorModal';
+
+// นำเข้ารูป Avatar (เส้นทางตามเดิม)
 import myAv1 from '../../assets/avatars/1.png';
 import myAv2 from '../../assets/avatars/2.png';
 import myAv3 from '../../assets/avatars/3.png';
@@ -17,23 +23,47 @@ import myAv7 from '../../assets/avatars/7.png';
 import myAv8 from '../../assets/avatars/8.png';
 import myAv9 from '../../assets/avatars/9.png';
 
+export const BANNER_PRESETS = [
+  { id: 1, color: '#ffb8b8', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
+  { id: 2, color: '#ff9f43', pattern: 'radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%)', size: '20px 20px', position: '0 0, 10px 10px' },
+  { id: 3, color: '#ffe066', pattern: 'linear-gradient(rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.5) 2px, transparent 2px)', size: '20px 20px' },
+  { id: 4, color: '#84e045', pattern: 'linear-gradient(45deg, rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(-45deg, rgba(255,255,255,0.5) 2px, transparent 2px)', size: '15px 15px' },
+  { id: 5, color: '#50ade2', pattern: 'repeating-linear-gradient(-45deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
+  { id: 6, color: '#b088f9', pattern: 'radial-gradient(circle at 0 0, rgba(255,255,255,0.4) 50%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255,255,255,0.4) 50%, transparent 50%)', size: '30px 30px' },
+  { id: 7, color: '#ff99c8', pattern: 'repeating-radial-gradient(circle, transparent, transparent 10px, rgba(255,255,255,0.4) 10px, rgba(255,255,255,0.4) 20px)', size: '100% 100%' },
+  { id: 8, color: '#a0c4ff', pattern: 'linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.4) 75%, rgba(255,255,255,0.4)), linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.4) 75%, rgba(255,255,255,0.4))', size: '20px 20px', position: '0 0, 10px 10px' },
+  { id: 9, color: '#fdffb6', pattern: 'repeating-linear-gradient(transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px), repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px)', size: '100% 100%' },
+  { id: 10, color: '#caffbf', pattern: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0, rgba(255,255,255,0.5) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
+  { id: 11, color: '#ffd6a5', pattern: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0, rgba(255,255,255,0.4) 10px, transparent 10px, transparent 20px)', size: '100% 100%' },
+  { id: 12, color: '#222222', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)', size: '100% 100%' }
+];
+
 const Profile = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [bannerColor, setBannerColor] = useState('#50ade2'); 
+  const [bannerColor, setBannerColor] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * BANNER_PRESETS.length);
+    return BANNER_PRESETS[randomIndex];
+  });
   const colorInputRef = useRef(null);
+  const [stories, setStories] = useState([]);
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const fileInputRef = useRef(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isColorModalOpen, setIsColorModalOpen] = useState(false);
 
-  // ✅ แก้ไขบรรทัดที่ 26: ลบคอมม่าเกิน และใช้ชื่อตัวแปรที่ import มาจริง
   const avatarPresets = [myAv1, myAv2, myAv3, myAv4, myAv5, myAv6, myAv7, myAv8, myAv9];
-  
-  // ✅ แก้ไขบรรทัดที่ 27: เปลี่ยนจาก imgAv1 เป็น myAv1 ให้ตรงกับด้านบน
-  const [avatarImage, setAvatarImage] = useState(myAv1);
+  const [avatarImage, setAvatarImage] = useState(() => {
+  const randomIndex = Math.floor(Math.random() * avatarPresets.length);
+  return avatarPresets[randomIndex];
+});
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
-  
+  const pressTimer = useRef(0);
+
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyProgress, setStoryProgress] = useState(0);
-  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -47,44 +77,77 @@ const Profile = () => {
     loadProfile();
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const handlePointerDown = () => {
+    setIsPaused(true);
+    pressTimer.current = Date.now();
+  };
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+  const handlePointerUp = (e) => {
+    setIsPaused(false); // ปล่อยนิ้ว/เมาส์ ให้เวลาเดินต่อ
+    
+    // คำนวณว่ากดค้างไปกี่มิลลิวินาที
+    const holdDuration = Date.now() - pressTimer.current;
+    
+    // ถ้ากดไวๆ (น้อยกว่า 200ms) ถือว่าตั้งใจ "คลิก" เพื่อเปลี่ยนรูป
+    // แต่ถ้ากดแช่นานกว่านี้ จะแค่หยุด/เล่นเวลาต่อ โดยไม่เปลี่ยนรูปครับ
+    if (holdDuration < 200) {
+      handleStoryNavigation(e);
+    }
+  };
+
+  const handleAddStoryClick = () => {
+    setIsPaused(true); // สั่งหยุดเวลาทันที
+    fileInputRef.current.click(); // เปิดหน้าต่างเลือกรูป
+
+    // ดักจับว่าผู้ใช้ปิดหน้าต่างเลือกไฟล์แล้ว (เบราว์เซอร์กลับมา Active)
+    window.addEventListener('focus', () => {
+      // หน่วงเวลา 0.5 วินาที เพื่อเผื่อเวลาให้รูปอัปโหลดเสร็จก่อนค่อยให้เวลาเดินต่อ
+      setTimeout(() => {
+        setIsPaused(false); 
+      }, 500);
+    }, { once: true }); // { once: true } คือให้ดักจับแค่ครั้งเดียวแล้วยกเลิกไป ไม่ให้เปลืองเมมโมรี่
   };
 
   useEffect(() => {
     let timer;
-    if (isStoryOpen) {
-      setStoryProgress(0); 
+    if (isStoryOpen && !isPaused && stories.length > 0) {
       timer = setInterval(() => {
         setStoryProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(timer);
-            setIsStoryOpen(false); 
+          const nextProgress = prev + (100 / 30);
+          if (nextProgress >= 100) {
             return 100;
           }
-          return prev + 1; 
+          return nextProgress;
         });
-      }, 30); 
-    } else {
-      setStoryProgress(0); 
+      }, 100); 
     }
     return () => clearInterval(timer);
-  }, [isStoryOpen]);
+  }, [isStoryOpen, isPaused, currentStoryIndex, stories.length]);
+
+  useEffect(() => {
+    if (storyProgress >= 100) {
+      if (currentStoryIndex < stories.length - 1) {
+        setCurrentStoryIndex((prev) => prev + 1); // คราวนี้จะบวกแค่ 1 แน่นอน
+        setStoryProgress(0); // รีเซ็ตเวลาเริ่ม 0 ใหม่
+      } else {
+        // ถ้าเป็นรูปสุดท้ายแล้ว
+        setIsStoryOpen(false); // ปิดจอ
+        setCurrentStoryIndex(0); // กลับไปรูปแรก
+        setStoryProgress(0); // รีเซ็ตเวลา
+      }
+    }
+  }, [storyProgress, currentStoryIndex, stories.length]);
+
+  useEffect(() => {
+    if (isColorModalOpen || isAvatarModalOpen || isStoryOpen) {
+      document.body.style.overflow = 'hidden'; // ล็อกไม่ให้หน้าหลักเลื่อนได้
+    } else {
+      document.body.style.overflow = ''; // คืนค่าปกติ ให้หน้าหลักกลับมาเลื่อนได้
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isColorModalOpen, isAvatarModalOpen, isStoryOpen]);
 
   if (!userData) {
     return (
@@ -94,151 +157,159 @@ const Profile = () => {
     );
   }
 
+  const handleAddStory = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setStories([...stories, imageUrl]);
+      setCurrentStoryIndex(stories.length);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      
+      setStories((prev) => {
+        const newStories = [...prev, imageUrl];
+        setCurrentStoryIndex(newStories.length - 1); 
+        return newStories;
+      });
+      setStoryProgress(0); 
+      
+      setIsStoryOpen(true);
+    }
+  };
+
+  const handleDeleteStory = (e) => {
+    e.stopPropagation();
+    const newStories = stories.filter((_, index) => index !== currentStoryIndex);
+    setStories(newStories);
+    setStoryProgress(0);
+    if (currentStoryIndex > 0) {
+      setCurrentStoryIndex(currentStoryIndex - 1);
+    } else if (newStories.length === 0) {
+      setIsStoryOpen(false);
+    }
+  };
+
+  const handleStoryNavigation = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width / 2) {
+      if (currentStoryIndex > 0) setCurrentStoryIndex(currentStoryIndex - 1);
+      setStoryProgress(0);
+    } else {
+      if (currentStoryIndex < stories.length - 1) {
+        setCurrentStoryIndex(currentStoryIndex + 1);
+        setStoryProgress(0);
+      } else {
+        setIsStoryOpen(false);
+        setCurrentStoryIndex(0);
+        setStoryProgress(0);
+      }
+    }
+  };
+
+  const handleStoryClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+
+    if (x < rect.width / 2) {
+      if (currentStoryIndex > 0) setCurrentStoryIndex(currentStoryIndex - 1);
+    } else {
+      if (currentStoryIndex < stories.length - 1) {
+        setCurrentStoryIndex(currentStoryIndex + 1);
+      } else {
+        setIsStoryOpen(false);
+      }
+    }
+  };
+
   return (
     <div className="profile-page">
-
-      <input 
-        type="color" 
-        ref={colorInputRef} 
-        style={{ display: 'none' }} 
+      <input
+        type="color"
+        ref={colorInputRef}
+        style={{ display: 'none' }}
         onChange={(e) => setBannerColor(e.target.value)}
       />
+      
       <div className="profile-container">
-        
-        <div className="left-panel">  
-          <button className="doodle-box back-btn" onClick={() => navigate('/feed')}>
-            <div className="icon-flex">
-              <TbArrowLeft size={24} />
-              <span>Back to Feed</span>
-            </div>
-          </button>
-
-          <div className="doodle-box stats-container">
-            <div className="stat-item"><span className="stat-number">{userData?.stats?.postCount || 0}</span><span className="stat-label">Posts</span></div>
-            <div className="stat-divider"></div>
-            <div className="stat-item"><span className="stat-number">{userData?.stats?.followingCount || '2.1K'}</span><span className="stat-label">Following</span></div>
-            <div className="stat-divider"></div>
-            <div className="stat-item"><span className="stat-number">{userData?.stats?.followerCount || '1.4K'}</span><span className="stat-label">Followers</span></div>
-          </div>
-          
-          <div className="contact-section">
-            <button className={`doodle-box contact-main-btn ${isContactOpen ? 'active' : ''}`} onClick={() => setIsContactOpen(!isContactOpen)}>
-              <div className="icon-flex">{isContactOpen ? <TbX size={24} /> : <TbSend size={24} />} {isContactOpen ? 'Close Contact' : 'Contact Me ! '}</div>
-            </button>
-            <div className={`contact-links-wrapper ${isContactOpen ? 'open' : ''}`}>
-              <a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" rel="noreferrer" className="doodle-box contact-link line-link">
-              <TbMessageCircle size={24} /> <span>Line</span>
-            </a>
-              <a href="https://www.facebook.com/YOUR_USERNAME" target="_blank" rel="noreferrer" className="doodle-box contact-link fb-link">
-              <TbSend size={24} /> <span>Facebook</span>
-            </a>
-              <a href="https://www.instagram.com/YOUR_USERNAME" target="_blank" rel="noreferrer" className="doodle-box contact-link ig-link">
-            <FaInstagram size={24} /> <span>Instagram</span>
-           </a>
-            </div>
-          </div>
-        </div>
+        <LeftPanel
+          navigate={navigate}
+          userData={userData}
+          isContactOpen={isContactOpen}
+          setIsContactOpen={setIsContactOpen}
+        />
 
         <div className="center-panel">
-          <div className="doodle-box profile-header-card">
-            <div 
-              className="profile-cover" 
-              onClick={() => colorInputRef.current.click()} 
-              style={{ 
-                cursor: 'pointer', 
-                backgroundColor: bannerColor, 
-                backgroundImage: 'none',
-                position: 'relative' 
-              }}
-            >
-            </div>
-            <div className="profile-header-content">
-              <div className="avatar-wrapper" onClick={() => setIsAvatarModalOpen(true)} style={{ cursor: 'pointer' }}>
-                <img src={avatarImage} alt="avatar" className="avatar" />
-                <div className="online-dot"></div>
-              </div>
-              <div className="profile-text-info">
-                <h1 className="profile-name">{userData.username} <TbEdit className="action-icon edit-icon" size={24} title="Edit Profile" /></h1>
-                <p className="profile-bio">{userData?.bio || "HELLO ✨ ยินดีที่ได้รู้จัก! รักการวาดรูปและเขียนโค้ด"}</p>
-              </div>
-            </div>
-          </div>
+          <ProfileHeader
+            userData={userData}
+            setUserData={setUserData} 
+            bannerColor={bannerColor}
+            setIsColorModalOpen={setIsColorModalOpen}
+            avatarImage={avatarImage}
+            setIsAvatarModalOpen={setIsAvatarModalOpen}
+            avatarPresets={avatarPresets}
+          />
 
           <div className="feed-section">
-            <PostCard 
-               author={userData.username} 
-               time="1 min ago" 
-               text="หยุดน่ารักได้มั้ย ใจเราก็แค่นี้อะ 🥺 #รักน้องแมวมาก" 
-               hasImage={true} 
-               imageUrl="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-               likes={105} 
-               comments={20} 
+            <PostCard
+              author={userData.username}
+              time="1 min ago"
+              text="หยุดน่ารักได้มั้ย ใจเราก็แค่นี้อะ 🥺 #รักน้องแมวมาก"
+              hasImage={true}
+              imageUrl="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+              likes={105}
+              comments={20}
             />
           </div>
         </div>
 
-        <div className="right-panel">
-          <div className="doodle-box polaroid-wrapper story-trigger" onClick={() => setIsStoryOpen(true)}>
-            <div className="tape"></div>
-            <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="My Cat" className="polaroid-img" />
-            <div className="polaroid-caption">My lovely cat 🐱</div>
-          </div>
-        </div>
+        <RightPanel setIsStoryOpen={() => {
+          setCurrentStoryIndex(0); // ✨ สั่งให้กลับไปเริ่มที่รูปแรกเสมอ (Index 0)
+          setStoryProgress(0);     // ✨ รีเซ็ตหลอดเวลาให้เริ่มที่ 0%
+          setIsStoryOpen(true);    // ✨ เปิดหน้าต่างสตอรี่
+        }} 
+      />
       </div>
 
-      {/* ✅ เพิ่มส่วน Modal เลือกรูปโปรไฟล์ก่อนหน้า Story Modal */}
-      {isAvatarModalOpen && createPortal(
-        <div className="ig-story-overlay" onClick={() => setIsAvatarModalOpen(false)} style={{ zIndex: 10000 }}>
-          <div className="doodle-box" onClick={(e) => e.stopPropagation()} style={{ background: 'white', padding: '20px', maxWidth: '450px', width: '90%', borderRadius: '25px' }}>
-            <h2 style={{ textAlign: 'center', marginBottom: '15px' }}>Choose your avatar</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', maxHeight: '350px', overflowY: 'auto' }}>
-              {avatarPresets.map((img, idx) => (
-                <img 
-                  key={idx} 
-                  src={img} 
-                  onClick={() => { setAvatarImage(img); setIsAvatarModalOpen(false); }}
-                  style={{ 
-                    width: '100%', 
-                    cursor: 'pointer', 
-                    borderRadius: '50%', 
-                    border: avatarImage === img ? '4px solid #84E045' : '2px solid #eee' 
-                  }} 
-                />
-              ))}
-            </div>
-            <h4 className="doodle-box" onClick={() => setIsAvatarModalOpen(false)} style={{ width: '100%', marginTop: '15px', padding: '10px', cursor: 'pointer', textAlign: 'center' }}>Close</h4>
-          </div>
-        </div>,
-        document.body
+      {isColorModalOpen && (
+        <BannerColorModal
+          setIsColorModalOpen={setIsColorModalOpen}
+          bannerColor={bannerColor}
+          setBannerColor={setBannerColor}
+          bannerPresets={BANNER_PRESETS}
+        />
       )}
 
-      {/* ================= ส่วนแสดงผล IG Story (Modal) ================= */}
-      {isStoryOpen && createPortal(
-        <div className="ig-story-overlay" onClick={() => setIsStoryOpen(false)}>
-          <div className="ig-story-container" onClick={(e) => e.stopPropagation()}>
-            <div className="story-progress-container">
-              <div className="story-progress-bar" style={{ width: `${storyProgress}%` }}></div>
-            </div>
-            <div className="story-header">
-              <div className="story-user-info">
-                <img src={avatarImage} alt="avatar" className="story-avatar-small" />
-                <span className="story-username">{userData.username}</span>
-                <span className="story-time">2h</span>
-              </div>
-              <TbX size={26} color="#fff" style={{ cursor: 'pointer' }} onClick={() => setIsStoryOpen(false)} />
-            </div>
-            <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Story" className="story-full-img" />
-          </div>
-        </div>,
-        document.body
+      {isAvatarModalOpen && (
+        <AvatarModal
+          setIsAvatarModalOpen={setIsAvatarModalOpen}
+          avatarPresets={avatarPresets}
+          avatarImage={avatarImage}
+          setAvatarImage={setAvatarImage}
+        />
       )}
 
-      {showScrollTop && (
-        <button className="doodle-box scroll-top-btn" onClick={scrollToTop}>
-          <TbArrowUp size={28} strokeWidth={3} />
-        </button>
+      {isStoryOpen && (
+        <StoryModal
+          setIsStoryOpen={setIsStoryOpen}
+          stories={stories}
+          currentStoryIndex={currentStoryIndex}
+          fileInputRef={fileInputRef}
+          handleDeleteStory={handleDeleteStory}
+          handleStoryNavigation={handleStoryNavigation}
+          handleFileChange={handleFileChange}
+          storyProgress={storyProgress}
+          handlePointerDown={handlePointerDown}
+          handlePointerUp={handlePointerUp}
+          setIsPaused={setIsPaused}
+          handleAddStoryClick={handleAddStoryClick}
+        />
       )}
-
     </div>
   );
 };

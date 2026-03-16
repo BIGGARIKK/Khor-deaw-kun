@@ -1,0 +1,36 @@
+.right-panel { display: flex; flex-direction: column; gap: 30px; padding-top: 10px; }
+
+.polaroid-wrapper {
+  position: relative; padding: 15px 15px 25px 15px; 
+  background-color: #fff; transform: rotate(3deg); 
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.tape {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-4deg);
+  width: 90px; height: 28px; background-color: rgba(255, 235, 150, 0.85); 
+  border: 2px solid rgba(0, 0, 0, 0.1); box-shadow: 1px 1px 3px rgba(0,0,0,0.1); z-index: 2;
+}
+
+.polaroid-img { width: 100%; height: 200px; object-fit: cover; border: 3px solid #222; border-radius: 4px; }
+.polaroid-caption { margin-top: 15px; font-size: 1.2rem; font-weight: bold; color: #333; font-family: 'Mali', cursive; }
+
+.story-trigger {
+  cursor: pointer;
+  border: 4px solid transparent !important;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    conic-gradient(
+      from var(--story-angle),
+      #ff6b81, #FF9F43, #ffe066, #84E045, #4A90E2, #ff6b81
+    ) border-box !important;
+  animation: spinStoryBorder 2.5s linear infinite;
+}
+
+.polaroid-wrapper.story-trigger:hover {
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(#84E045, #84E045) border-box !important;
+  transform: rotate(0deg) scale(1.05);
+  animation: none; 
+}
