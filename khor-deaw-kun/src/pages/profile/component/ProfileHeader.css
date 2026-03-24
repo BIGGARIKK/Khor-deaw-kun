@@ -1,0 +1,325 @@
+.profile-header-card { 
+  width: 100%; 
+  display: flex; 
+  flex-direction: column; 
+  border-radius: 30px; 
+  position: relative;
+}
+
+.profile-cover { 
+  width: 100%; 
+  height: 120px; 
+  border-radius: 27px 27px 0 0; 
+  border-bottom: 3px solid #222; 
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.profile-cover:hover { filter: brightness(0.9); }
+
+.profile-header-content { 
+  display: flex; 
+  padding: 0 30px 30px 30px; 
+  gap: 25px; 
+  align-items: flex-start; 
+  margin-top: -60px; 
+}
+
+.avatar-wrapper { position: relative; flex-shrink: 0; z-index: 2; cursor: pointer; }
+
+.avatar { 
+  width: 130px; 
+  height: 130px; 
+  border-radius: 50%; 
+  border: 4px solid transparent; 
+  box-shadow: 4px 4px 0px #222; 
+  background-color: #fff; 
+  object-fit: cover; 
+  transition: border-color 0.3s ease;
+}
+
+@keyframes doodleWiggle {
+  0%   { transform: rotate(0deg) scale(1); }
+  25%  { transform: rotate(-8deg) scale(1.05); }
+  50%  { transform: rotate(8deg) scale(1.05); }
+  75%  { transform: rotate(-8deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(1.05); } 
+}
+
+.avatar-wrapper:hover .avatar {
+  border-color: var(--status-color) !important; 
+  animation: doodleWiggle 0.4s ease-in-out forwards; 
+  box-shadow: 6px 6px 0px #222; 
+}
+
+.status-container {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  z-index: 10;
+  width: 26px;  
+  height: 26px; 
+}
+
+.online-dot { 
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26px; 
+  height: 26px; 
+  background-color: var(--status-color); 
+  border: 3px solid #222; 
+  border-radius: 50%; 
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #222;
+  transition: all 0.2s;
+}
+
+.online-dot:hover { transform: scale(1.2); }
+.avatar-wrapper:hover .online-dot { transform: scale(1.2); transition: all 0.2s; }
+
+.status-menu {
+  position: absolute;
+  bottom: 35px; 
+  left: -5px;  
+  background: white;
+  border: 3px solid #222;
+  border-radius: 15px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 4px 4px 0px #222;
+  animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  min-width: 120px;
+  z-index: 11;
+}
+
+.status-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+.status-option:hover { background: #f0f0f0; transform: translateX(3px); }
+.status-color-circle { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #222; }
+
+.profile-text-info { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 15px; 
+  margin-top: 70px; 
+  width: 100%; 
+}
+
+.profile-name { 
+  margin: 0; 
+  font-size: 3rem; 
+  font-weight: 800; 
+  display: flex; 
+  align-items: center; 
+  gap: 15px; 
+  color: #222; 
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.1); 
+}
+
+.highlight-text {
+  font-size: 2.8rem; 
+  font-weight: 800; 
+  color: #222; 
+  position: relative; 
+  z-index: 1; 
+  transition: transform 0.2s; /* ✨ เพิ่มให้แอนิเมชันนุ่มนวล */
+  display: inline-block; /* ✨ สำคัญมาก! ต้องใส่เพื่อให้ข้อความเด้งขึ้น-ลงได้ */
+  cursor: pointer; /* ✨ เปลี่ยนเมาส์เป็นรูปนิ้วชี้เหมือนตรงคำอธิบาย */
+}
+
+.highlight-text::after {
+  content: '';
+  position: absolute;
+  bottom: 8px; 
+  left: -5px;
+  right: -5px;
+  height: 18px;
+  z-index: -1;
+  border-radius: 5px;
+}
+
+.highlight-text:hover { 
+  transform: translateY(-2px); 
+}
+
+.profile-bio { 
+  margin: 0; 
+  font-size: 1.2rem; 
+  color: #555; 
+  line-height: 1.6; 
+  word-break: break-word; 
+  font-weight: 700;
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.2s;
+  white-space: pre-wrap;
+}
+.profile-bio:hover { transform: translateY(-2px); }
+
+.edit-icon {
+  cursor: pointer;
+  color: #888;
+  margin-left: 10px;
+}
+
+.profile-name .edit-icon {
+  background-color: #fff;
+  border: 3px solid #222;
+  border-radius: 50%;
+  padding: 6px;
+  width: 42px; 
+  height: 42px; 
+  box-shadow: 3px 3px 0px #222;
+  color: #222;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.profile-name .edit-icon:hover {
+  background-color: #ffb8b8; 
+  transform: translateY(-5px) rotate(15deg) scale(1.1); 
+  box-shadow: 5px 5px 0px #222; 
+}
+
+.main-avatar-speech-bubble {
+  position: absolute;
+  top: -30px; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  background-color: #fff;
+  border: 3px solid #222;
+  border-radius: 15px 15px 15px 0px; 
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #222;
+  box-shadow: 3px 3px 0px #222;
+  z-index: 20;
+  white-space: nowrap; 
+  pointer-events: none; 
+  animation: popBubble 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.edit-profile-form { display: flex; flex-direction: column; gap: 12px; width: 100%; animation: popIn 0.3s ease; }
+
+.doodle-input {
+  font-family: 'Mali', cursive; 
+  font-size: 1rem; 
+  padding: 10px 15px;
+  border: 3px solid #222; 
+  border-radius: 15px; /* ✨ เปลี่ยนตรงนี้ให้มนขึ้น (จากเดิมที่เป็นตัวเลขยาวๆ) */
+  outline: none; 
+  background: #fff; 
+  transition: 0.2s;
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.1); /* ✨ แถมเงาเบาๆ ให้เข้ากับปุ่ม */
+}
+
+.doodle-input:focus { border-color: #84E045; box-shadow: 4px 4px 0px #222; transform: translateY(-2px); }
+
+.edit-name-input { font-size: 1.5rem; font-weight: 800; color: #222; }
+
+.edit-bio-input { 
+  resize: none; 
+  min-height: 80px; 
+  overflow: hidden; /* ✨ เพิ่มบรรทัดนี้เพื่อซ่อนแถบ Scrollbar ทิ้งไป */
+}
+
+.edit-actions { display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
+.doodle-btn {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 8px 15px; font-family: 'Mali', cursive; font-weight: bold;
+  border: 3px solid #222; border-radius: 10px; cursor: pointer; transition: 0.2s;
+}
+.btn-save { background: #84E045; color: #222; }
+.btn-save:hover { background: #6cc933; transform: translate(-2px, -2px); box-shadow: 3px 3px 0px #222; }
+.btn-clear { background: #ffb8b8; color: #222; }
+.btn-clear:hover { background: #ff9999; transform: translate(-2px, -2px); box-shadow: 3px 3px 0px #222; }
+.btn-cancel { background: #ffb8b8; color: #222; } /* ✨ เปลี่ยนพื้นหลังเป็นสีแดง */
+.btn-cancel:hover { background: #ff9999; transform: translate(-2px, -2px); box-shadow: 3px 3px 0px #222; }
+
+/* ================= ตัวนับจำนวนอักษร ================= */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.char-counter {
+  position: absolute;
+  bottom: 12px;
+  right: 15px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #aaa;
+  pointer-events: none; /* เพื่อไม่ให้ตัวเลขขวางการคลิกเมาส์ */
+}
+
+/* ================= จัด Padding กันข้อความทับตัวเลข ================= */
+.edit-name-input { 
+  font-size: 1.5rem; 
+  font-weight: 800; 
+  color: #222; 
+  width: 100%;
+  padding-right: 65px; /* เว้นที่ด้านขวาให้ตัวเลข */
+}
+
+.edit-bio-input { 
+  resize: none; 
+  min-height: 80px; 
+  width: 100%;
+  padding-right: 15px;
+  padding-bottom: 35px; /* เว้นที่ด้านล่างให้ตัวเลข */
+}
+
+/* ================= สไตล์เมื่อกรอกเต็ม (สีแดง) ================= */
+.doodle-input.input-full {
+  border-color: #ff4d4d !important;
+}
+
+.doodle-input.input-full:focus {
+  border-color: #ff4d4d !important;
+  box-shadow: 4px 4px 0px rgba(255, 77, 77, 0.2) !important; /* เงาก็เปลี่ยนเป็นสีแดงเบาๆ */
+}
+
+.char-counter.text-red {
+  color: #ff4d4d;
+}
+
+/* ================= ส่วนของคอลัมน์ซ้าย (Avatar + ปุ่มแก้ไข) ================= */
+.left-profile-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  z-index: 2; /* ให้อยู่เหนือพื้นหลัง */
+}
+
+/* ================= ปุ่มแก้ไขโปรไฟล์ด้านล่างซ้าย ================= */
+.btn-edit-profile {
+  position: absolute;
+  bottom: 25px; /* ดันขึ้นจากขอบล่าง */
+  right: 30px;  /* ดันเข้าจากขอบขวา */
+  background-color: #ffffff;
+  font-size: 1rem;
+  padding: 8px 15px;
+  color: #222;
+  z-index: 10;
+}
+
+.btn-edit-profile:hover {
+  background-color: #ffe066; 
+  transform: translate(-3px, -3px);
+  box-shadow: 4px 4px 0px #222;
+}

@@ -1,0 +1,65 @@
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px 30px; 
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  padding: 0; 
+}
+
+.avatar-grid::-webkit-scrollbar { width: 12px; }
+.avatar-grid::-webkit-scrollbar-track { background: #fdfdfd; border-radius: 10px; border: 2px solid #ddd; }
+.avatar-grid::-webkit-scrollbar-thumb { background: #ffb8b8; border-radius: 10px; border: 2px solid #222; }
+.avatar-grid::-webkit-scrollbar-thumb:hover { background: #FF9F43; }
+
+.avatar-item-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 120px; 
+  height: 120px;
+}
+
+.avatar-option {
+  width: 110px; 
+  height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #eee;  
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.avatar-option:hover { transform: scale(1.1); border-color: #222; }
+
+.avatar-option.selected {
+  border: 4px solid #FF9F43; 
+  box-shadow: 0 0 15px rgba(255, 159, 67, 0.5), 4px 4px 0px #222;
+  transform: scale(1.05);
+}
+
+.avatar-speech-bubble {
+  position: absolute;
+  top: -30px; 
+  left: 50%;
+  transform: translateX(-50%); 
+  background: white;
+  border: 3px solid #222;
+  padding: 5px 12px;       
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  white-space: nowrap; 
+  box-shadow: 4px 4px 0px #222;
+  z-index: 10;
+  pointer-events: none;
+  animation: popBubble 0.3s ease forwards;
+}
+
+.avatar-speech-bubble.selected-bubble {
+  background-color: #FF9F43; 
+  color: #fff; 
+  border-color: #222;
+}
