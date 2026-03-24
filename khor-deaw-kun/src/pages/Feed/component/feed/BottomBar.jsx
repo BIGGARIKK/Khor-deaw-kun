@@ -5,6 +5,7 @@ import { TbSunset, TbMap2, TbBell, TbSettings, TbX, TbChevronRight } from "react
 import { apiRequest } from '../../../../service/api';
 import './BottomBar.css';
 
+
 function BottomBar() {
     const navigate = useNavigate();
     const [showProfileSheet, setShowProfileSheet] = useState(false);
@@ -30,15 +31,15 @@ function BottomBar() {
 
     return (
         <>
-            <div className="bottom-nav-container">
-                <div className="nav-item active">
+            <div className="bottom-nav-container" >
+                <div className="nav-item active" onClick={() => navigate("/beach")}>
                     <TbSunset size={28} />
                     <span className="nav-label">Beach</span>
                 </div>
 
-                <div className="nav-item">
+                <div className="nav-item" onClick={() => navigate("/hub")}>
                     <TbMap2 size={28} />
-                    <span className="nav-label">Hub</span>
+                    <span className="nav-label" >Hub</span>
                 </div>
 
                 {/* 🌟 ปุ่ม Profile ตรงกลาง */}

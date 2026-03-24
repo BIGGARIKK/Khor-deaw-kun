@@ -33,7 +33,7 @@
 }
 
 
-.profile-frame img { width: 100%; height: 100%; object-fit: cover; }
+.profile-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 /* ใส่ลายไม้จางๆ ให้แผ่นป้าย */
 .profile-sheet-content::before {
     content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;

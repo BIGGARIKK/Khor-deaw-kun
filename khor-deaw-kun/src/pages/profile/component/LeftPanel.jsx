@@ -2,10 +2,8 @@ import './LeftPanel.css'
 import { TbArrowLeft, TbX, TbSend, TbMessageCircle, TbBrandFacebook, TbBrandInstagram } from "react-icons/tb";
 import { useState } from 'react';
 
-// เปลี่ยนมาใช้ LeftPanel เลย (ลบ YourComponent ทิ้งไป)
 const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
   
-  // 1. นำ State และฟังก์ชันมาไว้ข้างใน LeftPanel โดยตรง
   const [isEditingContact, setIsEditingContact] = useState(false);
   const [socials, setSocials] = useState({ 
     line: '', 
@@ -13,44 +11,40 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
     instagram: '' 
   });
 
-  // 2. ฟังก์ชันสำหรับเปิดลิงก์ไปแอปต่างๆ
   const openLink = (platform) => {
-    let id = socials[platform]; // เปลี่ยนจาก const เป็น let เพื่อให้แก้ไขค่าได้
+    let id = socials[platform]; 
     
     if (!id) {
       alert('Input your Contact !');
       return;
     }
 
-    // ✨ --- โค้ดส่วนที่เพิ่มเข้ามาเพื่อจัดการข้อความ --- ✨
-    // 1. ตัดช่องว่างที่เผลอพิมพ์ติดมาด้านหน้าและด้านหลังทิ้งไปก่อน
     id = id.trim(); 
 
-    // 2. ถ้าเป็น Facebook หรือ IG แล้วมีการพิมพ์ "เว้นวรรค" ตรงกลาง ให้เปลี่ยนเป็น "จุด (.)" อัตโนมัติ
     if (platform === 'facebook' || platform === 'instagram') {
       id = id.replace(/\s+/g, '.'); 
     }
-    // ✨ ------------------------------------------- ✨
     
-    // สร้าง URL อัตโนมัติจาก ID ที่ผ่านการทำความสะอาดแล้ว
     let url = '';
     if (platform === 'line') url = `https://line.me/ti/p/~${id}`;
     else if (platform === 'facebook') url = `https://www.facebook.com/${id}`;
     else if (platform === 'instagram') url = `https://www.instagram.com/${id}`;
     
-    window.open(url, '_blank'); // เปิดแท็บใหม่
+    window.open(url, '_blank'); 
   };
 
   return (
     <div className="left-panel">
-      <button className="doodle-box back-btn" onClick={() => navigate('/feed')}>
+      {/* 🌟 เปลี่ยนจาก doodle-box เป็น wooden-box เพื่อดึงลายไม้มาใช้ */}
+      <button className="wooden-box back-btn" onClick={() => navigate('/beach')}>
         <div className="icon-flex">
           <TbArrowLeft size={24} />
           <span>Back to Feed</span>
         </div>
       </button>
 
-      <div className="doodle-box stats-container">
+      {/* 🌟 เปลี่ยนจาก doodle-box เป็น wooden-box */}
+      <div className="wooden-box stats-container">
         <div className="stat-item">
           <span className="stat-number">{userData?.stats?.postCount || 0}</span>
           <span className="stat-label">Posts</span>
@@ -68,8 +62,9 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
       </div>
 
       <div className="contact-section">
+        {/* 🌟 เปลี่ยนจาก doodle-box เป็น wooden-box */}
         <button 
-          className={`doodle-box contact-main-btn ${isContactOpen ? 'active' : ''}`} 
+          className={`wooden-box contact-main-btn ${isContactOpen ? 'active' : ''}`} 
           onClick={() => setIsContactOpen(!isContactOpen)}
         >
           <div className="icon-flex">
@@ -81,9 +76,7 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
         <div className={`contact-links-wrapper ${isContactOpen ? 'open' : ''}`}>
 
           {isEditingContact ? (
-            /* ================= โหมดแก้ไข (เป็นช่องกรอกข้อมูล) ================= */
             <>
-              {/* 👉 เติมคลาส line-input */}
               <div className="contact-input-box line-input">
                 <TbMessageCircle size={28} />
                 <input 
@@ -93,7 +86,6 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
                 />
               </div>
 
-              {/* 👉 เติมคลาส fb-input */}
               <div className="contact-input-box fb-input">
                 <TbBrandFacebook size={28} />
                 <input 
@@ -103,7 +95,6 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
                 />
               </div>
 
-              {/* 👉 เติมคลาส ig-input */}
               <div className="contact-input-box ig-input">
                 <TbBrandInstagram size={28} />
                 <input 
@@ -114,7 +105,6 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
               </div>
             </>
           ) : (
-            /* ================= โหมดปกติ (เป็นปุ่มกดเปิดลิงก์) ================= */
             <>
               <button className="contact-link line-link" onClick={() => openLink('line')}>
                 <div className="icon-flex">

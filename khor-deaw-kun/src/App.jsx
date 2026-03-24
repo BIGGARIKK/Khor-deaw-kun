@@ -24,7 +24,7 @@ function App() {
         
         {/* 3. หน้า Sign Up */}
         <Route path="/Signup" element={<SignUp />} />
-        <Route path="/Feed" element={<Feed />} />
+        <Route path="/Beach" element={<Feed />} />
 
         <Route path="/Hub" element={<Hub />} />
       </Routes>

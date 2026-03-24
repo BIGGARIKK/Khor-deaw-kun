@@ -24,7 +24,7 @@ function SignIn() {
   const closePopup = () => {
     if (popup.type === 'success') {
       // ถ้าเข้าสู่ระบบสำเร็จ พอกดปิด Popup จะพาไปหน้า Feed
-      navigate('/Feed'); 
+      navigate('/beach'); 
     } else {
       setPopup({ ...popup, isOpen: false }); 
     }

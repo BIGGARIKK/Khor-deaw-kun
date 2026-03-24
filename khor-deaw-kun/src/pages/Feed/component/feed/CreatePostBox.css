@@ -1,6 +1,22 @@
 .create-post-premium { margin-bottom: 20px; padding: 20px 25px !important; }@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
 .create-post-top { display: flex; gap: 15px; align-items: flex-start; }
-.author-avatar-large { width: 55px; height: 55px; flex-shrink: 0; background: #ffffff; border: 3px solid #3E2723; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 2px 2px 0px #3E2723; margin-top: 5px; }
+/* 🌟 แก้ไข: เติม overflow: hidden; เข้าไป */
+.author-avatar-large { 
+    width: 55px; height: 55px; flex-shrink: 0; 
+    background: #ffffff; border: 3px solid #3E2723; 
+    border-radius: 50%; display: flex; align-items: center; 
+    justify-content: center; font-size: 2rem; 
+    box-shadow: 2px 2px 0px #3E2723; margin-top: 5px; 
+    overflow: hidden; /* ✂️ หั่นส่วนที่ล้นกรอบทิ้ง */
+}
+
+/* 🌟 เพิ่มใหม่: บังคับให้รูปกางเต็มและไม่เบี้ยว */
+.author-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
 .premium-textarea { flex: 1; min-height: 80px; resize: none; background: rgba(253, 245, 230, 0.9); border: 3px solid #3E2723; border-radius: 15px; padding: 15px; font-size: 1.3rem; font-family: 'Patrick Hand', "Playpen Sans Thai" ,cursive; color: #3E2723; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.15); transition: all 0.2s ease; outline: none; line-height: 1.5; }
 .premium-textarea:focus { background: #ffffff; border-color: #F48C2A; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), 0 0 10px rgba(244, 140, 42, 0.3); }
 

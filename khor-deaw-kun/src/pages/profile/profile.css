@@ -1,16 +1,18 @@
 /* profile-main.css */
-@import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&family=Playpen+Sans+Thai:wght@100..800&display=swap');
 
 * { box-sizing: border-box; }
 
 /* ================= BASE LAYOUT ================= */
 .profile-page {
-  background-color: #ffe6e6; 
-  background-image: url('../../assets/bg.png');
+  /* ใช้สีโทนทราย/ทะเล เป็นพื้นหลังเผื่อรูปโหลดไม่ขึ้น */
+  background-color: #F4CE9B; 
+  background-image: url('../../assets/Hub/bg.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  font-family: 'Mali', cursive, sans-serif; 
+  /* เพิ่ม Playpen เข้ามาเป็นตัวเลือกเผื่ออยากใช้ฟอนต์เดียวกับ Feed */
+  font-family: 'Playpen Sans Thai', 'Mali', cursive, sans-serif; 
   min-height: 100vh;
   width: 100%;
   display: flex;
@@ -30,19 +32,24 @@
 
 .center-panel { display: flex; flex-direction: column; gap: 30px; }
 
-/* ================= DOODLE BOX (Shared) ================= */
+/* ================= WOODEN BOX (แทนที่ Doodle Box เดิม) ================= */
 .doodle-box {
-  background-color: #ffffff;
-  border: 3px solid #222222;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 5px 5px 0px #222222;
+  /* สีครีมกระดาษ/ไม้สว่าง */
+  background-color: #FDF5E6; 
+  /* ขอบสีน้ำตาลเข้มแบบไม้ */
+  border: 3px solid #3E2723; 
+  /* ปรับให้ขอบมนนิดๆ คล้าย PostCard */
+  border-radius: 15px; 
+  /* เงาสีน้ำตาลเข้ม */
+  box-shadow: 5px 5px 0px #3E2723;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   margin: 5px;
+  color: #3E2723;
 }
 
 .doodle-box:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0px #222222;
+  box-shadow: 7px 7px 0px #3E2723;
 }
 
 .loading-box {
@@ -50,27 +57,29 @@
   font-size: 1.5rem;
   text-align: center;
   font-weight: bold;
+  color: #3E2723;
 }
 
 /* ================= SHARED MODAL BACKGROUND & BOX ================= */
 .ig-story-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.9); z-index: 9999;
-  display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+  background-color: rgba(62, 39, 35, 0.8); /* หรี่พื้นหลังด้วยสีน้ำตาลเข้มแทนสีดำ */
+  z-index: 9999;
+  display: flex; justify-content: center; align-items: center; 
+  backdrop-filter: blur(5px);
   animation: fadeInOverlay 0.3s ease;
 }
 
 .avatar-modal-box {
-  background-color: #fffdf5;
-  background-image: radial-gradient(#e5e0d0 1.5px, transparent 1.5px);
-  background-size: 20px 20px;
+  background-color: #FDF5E6;
+  /* เพิ่มลวดลายเส้นไม้จางๆ (ถ้ามี) หรือใช้สีครีมเรียบๆ ก็สวยแล้ว */
   padding: 20px 30px 25px 30px; 
-  border-radius: 30px;
-  border: 4px solid #222;
+  border-radius: 20px;
+  border: 4px solid #3E2723;
   width: 95%;
   max-width: 480px; 
   position: relative;
-  box-shadow: 12px 12px 0px #222;
+  box-shadow: 12px 12px 0px #3E2723;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -84,10 +93,11 @@
   font-size: 1.8rem;
   margin-top: 10px;      
   margin-bottom: 10px;   
-  color: #222;
+  color: #3E2723; /* ตัวหนังสือสีน้ำตาลเข้ม */
   font-weight: 900;
   text-align: center;
-  text-shadow: 2px 2px 0px #fffdf5;
+  /* เงาไฮไลต์สีส้ม/ไม้สว่างๆ */
+  text-shadow: 2px 2px 0px #FFD285; 
   position: relative;
 }
 
@@ -119,22 +129,25 @@
   right: 40px;
   width: 60px;
   height: 60px;
-  background-color: #84E045; 
-  color: #222;
+  /* เปลี่ยนเป็นสีส้มให้เข้ากับปุ่ม Shout! */
+  background-color: #F48C2A; 
+  color: #1A1A1A;
   cursor: pointer;
   z-index: 999; 
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 3px solid #222;
+  border: 3px solid #3E2723;
   border-radius: 50% 40% 50% 40% / 40% 50% 40% 50%; 
+  box-shadow: 3px 3px 0px #3E2723;
   animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.2s ease;
 }
 
 .scroll-top-btn:hover {
-  background-color: #ffe066; 
+  background-color: #FF9F43; 
   transform: translateY(-5px) rotate(5deg);
-  box-shadow: 5px 5px 0px #222;
+  box-shadow: 5px 5px 0px #3E2723;
 }
 
 /* ================= GLOBAL KEYFRAMES ================= */
@@ -165,4 +178,3 @@
   .profile-header-content { flex-direction: column; align-items: center; text-align: center; margin-top: -60px; }
   .right-panel { display: none; }
 }
-

@@ -5,6 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
 import random # 🌟 นำเข้า random มาใช้สุ่มรูป
 from datetime import datetime # 🌟 นำเข้า datetime มาใช้เก็บเวลาของ Quest
+from bson.objectid import ObjectId
+import uuid
 
 app = Flask(__name__)
 CORS(app)
@@ -139,6 +141,114 @@ def delete_user(username):
         return jsonify({'message': 'User deleted successfully!'}), 200
     else:
         return jsonify({'message': 'User not found!'}), 404
+
+
+#------ CREATE POST --------
+@app.route('/posts' , methods=['POST'])
+@jwt_required()
+def create_post():
+
+    current_user = get_jwt_identity()
+    data = request.get_json()
+    text = data.get('text' , '').strip()
+    image_url = data.get('image_url' , None)
+    user = mongo.db.users.find_one({'username': current_user})
+    author_image = user.get('profile_image', '1.png') if user else '1.png'
+    if not text and not image_url:
+        return jsonify({'message' : 'Post cannot be empty!'}) , 400
     
+    new_post = {
+        'author_username' : current_user,
+        'author_image': author_image,
+        'text' : text,
+        'image_url' : image_url,
+        'likes' : [],
+        'comment' : [],
+        'create_at' : datetime.utcnow()
+    }
+
+    result = mongo.db.posts.insert_one(new_post)
+
+    mongo.db.users.update_one(
+        {'username' : current_user},
+        {'$inc': {'stats.postCount': 1}}
+    )
+
+    print(new_post)
+    return jsonify({
+        'message': 'Shout successful!',
+        'post_id': str(result.inserted_id)
+    }), 201
+
+
+#--------- GET POST ------------
+@app.route('/posts' ,methods=['GET'])
+@jwt_required()
+def get_posts():
+    
+    posts_cursor = mongo.db.posts.find().sort("create at" ,-1)
+
+    posts_list = []
+    for post in posts_cursor:
+        post["_id"] = str(post['_id'])
+        posts_list.append(post)
+
+    return jsonify(posts_list) , 200
+    
+# ==========================================
+# 💬 COMMENT ON A POST (คอมเมนต์ใต้โพสต์)
+# ==========================================
+@app.route('/posts/<post_id>/comment' ,  methods=['POST'])
+@jwt_required()
+def add_comment(post_id):
+    current_user = get_jwt_identity()
+    data = request.get_json()
+    comment_text = data.get('text' , '').strip()
+
+    if not comment_text:
+        return jsonify({'message' : 'Comment cannot be empty!'}) , 400
+    
+    new_comment = {
+        'comment_id' : str(uuid.uuid4()),
+        'author' : current_user,
+        'text': comment_text,
+        'create_at' : datetime.utcnow()
+    }
+
+    result = mongo.db.posts.update_one(
+        {'_id' : ObjectId(post_id)},
+        {'$push' : {'comment' : new_comment}}
+    )
+
+    if result.matched_count == 0 :
+        return jsonify({'message' : 'Post not fond'});
+    
+    return jsonify({'message': 'Comment added successfully!', 'comment': new_comment}), 201
+
+# ==========================================
+# 🛠️ UPDATE PROFILE (อัปเดตข้อมูลโปรไฟล์)
+# ==========================================
+@app.route('/profile', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    current_user = get_jwt_identity()
+    data = request.get_json()
+    new_image = data.get('profile_image')
+    
+    if new_image:
+        # 1. เปลี่ยนรูปในโปรไฟล์หลัก (Collection: users)
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$set': {'profile_image': new_image}}
+        )
+        
+        # ✨ 2. ความลับอยู่ตรงนี้! สั่งให้อัปเดต "ทุกโพสต์" ที่คนนี้เคยเขียนไว้ด้วยรูปใหม่ทันที!
+        mongo.db.posts.update_many(
+            {'author_username': current_user},
+            {'$set': {'author_image': new_image}}
+        )
+        
+        return jsonify({'message': 'Profile updated everywhere!'}), 200
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import BottomBar from '../Feed/component/feed/BottomBar';
+import Beach from '../Feed/Feed';
 import './Hub.css';
 
 function Hub() {
@@ -91,20 +93,7 @@ function Hub() {
             </div>
 
             {/* ⚓ Bottom Navigation Bar - New Design */}
-            <div className="bottom-nav-container">
-                <div className="nav-item">🌴<span className="nav-label">Beach</span></div>
-                <div className="nav-item">🍻<span className="nav-label">Buddies</span></div>
-
-                {/* 🌟 เปลี่ยนจากปุ่ม + เป็น Profile กลางบาร์ */}
-                <div className="nav-profile-center">
-                    <div className="profile-frame">
-                        <div className="profile-img">🥥</div> {/* ใส่รูปจริงหรือ Avatar ตรงนี้ */}
-                    </div>
-                </div>
-
-                <div className="nav-item">🔔<span className="nav-label">Shouts</span></div>
-                <div className="nav-item">⚙️<span className="nav-label">Gear</span></div>
-            </div>
+            <BottomBar />
         </div>
     );
 }

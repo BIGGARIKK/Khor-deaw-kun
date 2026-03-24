@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './feed.css';
 import Sidebar from './component/feed/Sidebar';
 import RightSidebar from './component/feed/RightSidebar';
@@ -6,28 +6,59 @@ import BottomBar from './component/feed/BottomBar';
 import CreatePostBox from './component/feed/CreatePostBox';
 import PostCard from './component/feed/PostCard';
 
-function Feed() {
-    const [posts, setPosts] = useState([
-        {
-            id: 1, author: "Beach_Bum_99", time: "2 HOURS AGO",
-            text: "บรรยากาศดีมาก คลื่นลมเย็นสบาย ใครอยู่แถวหาดทรายขาวบ้าง มาชนแก้วกันหน่อย! 🍻🌊",
-            hasImage: true, imageUrl: "https://images.unsplash.com/photo-1541225547634-1188fb986161?q=80&w=600&auto=format&fit=crop", 
-            likes: 124, comments: 18
-        },
-        {   
-            id: 2, author: "Night_Owl", time: "5 HOURS AGO",
-            text: "เพิ่งเลิกงาน เหนื่อยมากกกก ต้องการเบียร์เย็นๆ ด่วน มีร้านไหนเปิดเพลงชิลล์ๆ แนะนำบ้างครับ?",
-            hasImage: false, likes: 56, comments: 4
-        }
-    ]);
+// 🌟 อย่าลืม import apiRequest
+import { apiRequest } from '../../service/api'; 
 
-    const handleAddPost = (newText, newImage) => {
-        const newPost = {
-            id: Date.now(), author: "Coconuto_Kun", time: "JUST NOW",
-            text: newText, hasImage: !!newImage, imageUrl: newImage,   
-            likes: 0, comments: 0
-        };
-        setPosts([newPost, ...posts]);
+// 🌟 ย้ายฟังก์ชันมาไว้ข้างนอก จะได้ไม่ถูกสร้างใหม่ทุกครั้งที่โหลดหน้าเว็บ
+const getTimeAgo = (dateString) => {
+    if (!dateString) return "JUST NOW";
+
+    let date = new Date(dateString);
+    if (isNaN(date.getTime()) && typeof dateString === 'string') {
+        date = new Date(dateString.replace(' ', 'T') + 'Z'); 
+    }
+
+    if (isNaN(date.getTime())) return "UNKNOWN TIME";
+
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return "JUST NOW"; 
+    
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} MINS AGO`; 
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} HOURS AGO`; 
+    
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} DAYS AGO`; 
+
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+};
+
+function Feed() {
+    const [posts, setPosts] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchPosts = async () => {
+        try {
+            setIsLoading(true);
+            const data = await apiRequest('/posts', 'GET');
+            setPosts(data); 
+        } catch (error) {
+            console.error("โหลดฟีดไม่สำเร็จ:", error);
+        } finally {
+            setIsLoading(false); 
+        }
+    };
+
+    useEffect(() => {
+        fetchPosts();
+    }, []);
+
+    const handleAddPost = () => {
+        fetchPosts(); 
     };
 
     return (
@@ -39,12 +70,39 @@ function Feed() {
             <div className="main-content-wrapper">
                 <Sidebar />
                 <div className="feed-content">
+                    
                     <CreatePostBox onPost={handleAddPost} />
+                    
                     <div className="post-list-container">
-                        {posts.map((post) => (
-                            <PostCard key={post.id} {...post} />
-                        ))}
+                        {isLoading ? (
+                            <div style={{ textAlign: 'center', marginTop: '40px', color: '#fff', fontSize: '1.2rem' }}>
+                                กำลังโหลดเสียงคลื่น... 🌊⏳
+                            </div>
+                        ) : posts.length === 0 ? (
+                            <div style={{ textAlign: 'center', marginTop: '40px', color: '#fff', fontSize: '1.2rem' }}>
+                                ยังไม่มีใคร Shout เลย เริ่มเปิดตี้สิ! 🍻
+                            </div>
+                        ) : (
+                            posts.map((post) => {
+                                // 🌟 จุดที่แก้ไข: เพิ่ม postId และเปลี่ยน comments ให้เป็น Array
+                                const formattedPost = {
+                                    id: post._id,
+                                    postId: post._id, // ✨ ต้องมีตัวนี้ส่งไปให้ PostCard ใช้ยิง API คอมเมนต์
+                                    author: post.author_username,
+                                    image_author: post.author_image,
+                                    time: getTimeAgo(post.created_at),
+                                    text: post.text,
+                                    hasImage: !!post.image_url,
+                                    imageUrl: post.image_url,
+                                    likes: post.likes ? post.likes.length : 0,
+                                    comments: post.comments || [] // ✨ ส่งไปทั้ง Array เลย ถ้าไม่มีให้เป็น Array ว่าง []
+                                };
+
+                                return <PostCard key={formattedPost.id} {...formattedPost} />;
+                            })
+                        )}
                     </div>
+
                 </div>
                 <RightSidebar />
             </div>

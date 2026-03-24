@@ -12,7 +12,7 @@ import AvatarModal from './component/AvatarModal';
 import StoryModal from './component/StoryModal';
 import BannerColorModal from './component/BannerColorModal';
 
-// นำเข้ารูป Avatar (เส้นทางตามเดิม)
+// นำเข้ารูป Avatar
 import myAv1 from '../../assets/avatars/1.png';
 import myAv2 from '../../assets/avatars/2.png';
 import myAv3 from '../../assets/avatars/3.png';
@@ -55,21 +55,33 @@ const Profile = () => {
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
 
   const avatarPresets = [myAv1, myAv2, myAv3, myAv4, myAv5, myAv6, myAv7, myAv8, myAv9];
-  const [avatarImage, setAvatarImage] = useState(() => {
-  const randomIndex = Math.floor(Math.random() * avatarPresets.length);
-  return avatarPresets[randomIndex];
-});
+  
+  // ตอนแรกให้เป็นค่าเริ่มต้นไว้ก่อน เดี๋ยว useEffect จะมาดึงจาก DB ให้
+  const [avatarImage, setAvatarImage] = useState(avatarPresets[0]);
+  
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const pressTimer = useRef(0);
 
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyProgress, setStoryProgress] = useState(0);
 
+  // 🌟 1. ดึงข้อมูล User จาก Database ตอนเปิดหน้าเว็บ
   useEffect(() => {
     const loadProfile = async () => {
       try {
         const data = await apiRequest('/profile', 'GET');
         setUserData(data);
+
+        // ดึงรูปที่เซฟไว้ใน DB มาโชว์ (ถ้ามี)
+        if (data && data.profile_image) {
+          const match = data.profile_image.match(/\d+/); // ดึงตัวเลขจาก '3.png'
+          if (match) {
+            const index = parseInt(match[0], 10) - 1; // ลบ 1 เพื่อให้ตรงกับ index ของ Array
+            if (index >= 0 && index < avatarPresets.length) {
+              setAvatarImage(avatarPresets[index]);
+            }
+          }
+        }
       } catch (error) {
         alert(error.message || 'Failed to fetch profile data!');
       }
@@ -77,35 +89,49 @@ const Profile = () => {
     loadProfile();
   }, []);
 
+  // 🌟 2. ฟังก์ชันอัปเดตรูป Avatar ไปยัง Database
+  const handleUpdateAvatar = async (selectedAvatar) => {
+    setAvatarImage(selectedAvatar); // เปลี่ยนรูปบนหน้าเว็บให้ดูก่อนทันที (ลื่นไหล)
+
+    try {
+      // ค้นหาว่ารูปที่เลือกคือไฟล์ชื่ออะไร (เช่น 1.png, 2.png)
+      const avatarIndex = avatarPresets.indexOf(selectedAvatar);
+      const fileName = avatarIndex !== -1 ? `${avatarIndex + 1}.png` : '1.png';
+
+      // ยิง API (PUT) ไปบอก Backend ให้เซฟรูปนี้
+      await apiRequest('/profile', 'PUT', {
+        profile_image: fileName
+      });
+      console.log("Avatar updated in Database:", fileName);
+
+    } catch (error) {
+      console.error("Failed to update avatar:", error);
+      alert("บันทึกรูปไม่สำเร็จ ลองใหม่อีกครั้งนะครับ 😅");
+    }
+  };
+
   const handlePointerDown = () => {
     setIsPaused(true);
     pressTimer.current = Date.now();
   };
 
   const handlePointerUp = (e) => {
-    setIsPaused(false); // ปล่อยนิ้ว/เมาส์ ให้เวลาเดินต่อ
-    
-    // คำนวณว่ากดค้างไปกี่มิลลิวินาที
+    setIsPaused(false); 
     const holdDuration = Date.now() - pressTimer.current;
-    
-    // ถ้ากดไวๆ (น้อยกว่า 200ms) ถือว่าตั้งใจ "คลิก" เพื่อเปลี่ยนรูป
-    // แต่ถ้ากดแช่นานกว่านี้ จะแค่หยุด/เล่นเวลาต่อ โดยไม่เปลี่ยนรูปครับ
     if (holdDuration < 200) {
       handleStoryNavigation(e);
     }
   };
 
   const handleAddStoryClick = () => {
-    setIsPaused(true); // สั่งหยุดเวลาทันที
-    fileInputRef.current.click(); // เปิดหน้าต่างเลือกรูป
+    setIsPaused(true); 
+    fileInputRef.current.click(); 
 
-    // ดักจับว่าผู้ใช้ปิดหน้าต่างเลือกไฟล์แล้ว (เบราว์เซอร์กลับมา Active)
     window.addEventListener('focus', () => {
-      // หน่วงเวลา 0.5 วินาที เพื่อเผื่อเวลาให้รูปอัปโหลดเสร็จก่อนค่อยให้เวลาเดินต่อ
       setTimeout(() => {
         setIsPaused(false); 
       }, 500);
-    }, { once: true }); // { once: true } คือให้ดักจับแค่ครั้งเดียวแล้วยกเลิกไป ไม่ให้เปลืองเมมโมรี่
+    }, { once: true }); 
   };
 
   useEffect(() => {
@@ -114,9 +140,7 @@ const Profile = () => {
       timer = setInterval(() => {
         setStoryProgress((prev) => {
           const nextProgress = prev + (100 / 30);
-          if (nextProgress >= 100) {
-            return 100;
-          }
+          if (nextProgress >= 100) return 100;
           return nextProgress;
         });
       }, 100); 
@@ -127,22 +151,21 @@ const Profile = () => {
   useEffect(() => {
     if (storyProgress >= 100) {
       if (currentStoryIndex < stories.length - 1) {
-        setCurrentStoryIndex((prev) => prev + 1); // คราวนี้จะบวกแค่ 1 แน่นอน
-        setStoryProgress(0); // รีเซ็ตเวลาเริ่ม 0 ใหม่
+        setCurrentStoryIndex((prev) => prev + 1); 
+        setStoryProgress(0); 
       } else {
-        // ถ้าเป็นรูปสุดท้ายแล้ว
-        setIsStoryOpen(false); // ปิดจอ
-        setCurrentStoryIndex(0); // กลับไปรูปแรก
-        setStoryProgress(0); // รีเซ็ตเวลา
+        setIsStoryOpen(false); 
+        setCurrentStoryIndex(0); 
+        setStoryProgress(0); 
       }
     }
   }, [storyProgress, currentStoryIndex, stories.length]);
 
   useEffect(() => {
     if (isColorModalOpen || isAvatarModalOpen || isStoryOpen) {
-      document.body.style.overflow = 'hidden'; // ล็อกไม่ให้หน้าหลักเลื่อนได้
+      document.body.style.overflow = 'hidden'; 
     } else {
-      document.body.style.overflow = ''; // คืนค่าปกติ ให้หน้าหลักกลับมาเลื่อนได้
+      document.body.style.overflow = ''; 
     }
     return () => {
       document.body.style.overflow = '';
@@ -170,14 +193,12 @@ const Profile = () => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      
       setStories((prev) => {
         const newStories = [...prev, imageUrl];
         setCurrentStoryIndex(newStories.length - 1); 
         return newStories;
       });
       setStoryProgress(0); 
-      
       setIsStoryOpen(true);
     }
   };
@@ -208,21 +229,6 @@ const Profile = () => {
         setIsStoryOpen(false);
         setCurrentStoryIndex(0);
         setStoryProgress(0);
-      }
-    }
-  };
-
-  const handleStoryClick = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-
-    if (x < rect.width / 2) {
-      if (currentStoryIndex > 0) setCurrentStoryIndex(currentStoryIndex - 1);
-    } else {
-      if (currentStoryIndex < stories.length - 1) {
-        setCurrentStoryIndex(currentStoryIndex + 1);
-      } else {
-        setIsStoryOpen(false);
       }
     }
   };
@@ -269,9 +275,9 @@ const Profile = () => {
         </div>
 
         <RightPanel setIsStoryOpen={() => {
-          setCurrentStoryIndex(0); // ✨ สั่งให้กลับไปเริ่มที่รูปแรกเสมอ (Index 0)
-          setStoryProgress(0);     // ✨ รีเซ็ตหลอดเวลาให้เริ่มที่ 0%
-          setIsStoryOpen(true);    // ✨ เปิดหน้าต่างสตอรี่
+          setCurrentStoryIndex(0); 
+          setStoryProgress(0);     
+          setIsStoryOpen(true);    
         }} 
       />
       </div>
@@ -285,12 +291,13 @@ const Profile = () => {
         />
       )}
 
+      {/* 🌟 3. ส่งฟังก์ชัน handleUpdateAvatar ไปให้ Modal แทน */}
       {isAvatarModalOpen && (
         <AvatarModal
           setIsAvatarModalOpen={setIsAvatarModalOpen}
           avatarPresets={avatarPresets}
           avatarImage={avatarImage}
-          setAvatarImage={setAvatarImage}
+          setAvatarImage={handleUpdateAvatar} 
         />
       )}
 
