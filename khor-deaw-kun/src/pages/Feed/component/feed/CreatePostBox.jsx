@@ -1,87 +1,66 @@
 import React, { useState, useRef } from 'react';
+import { TbPhoto, TbMoodSmile, TbSend, TbX } from "react-icons/tb";
 import './CreatePostBox.css';
-import { TbPhoto, TbPencil, TbMoodSmile, TbX } from "react-icons/tb"; // 🌟 เพิ่ม TbX สำหรับปุ่มลบรูป
 
 function CreatePostBox({ onPost }) {
     const [text, setText] = useState('');
-    const [imagePreview, setImagePreview] = useState(null); // 🌟 State เก็บรูปพรีวิว
-    const fileInputRef = useRef(null); // 🌟 ตัวอ้างอิงไปหา input file ที่ซ่อนอยู่
+    const [imagePreview, setImagePreview] = useState(null);
+    const fileInputRef = useRef(null);
 
-    // 🌟 ฟังก์ชันเมื่อมีการเลือกไฟล์รูปภาพ
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            // สร้าง URL ชั่วคราวเพื่อเอามาแสดงเป็นพรีวิว
-            const imageUrl = URL.createObjectURL(file);
-            setImagePreview(imageUrl);
-        }
+        if (e.target.files[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
     };
 
-    // 🌟 ฟังก์ชันลบรูปพรีวิวทิ้ง
     const handleRemoveImage = () => {
         setImagePreview(null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = ''; // เคลียร์ค่าไฟล์ที่เลือกไว้
-        }
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const handlePost = () => {
-        // เช็คว่ามีข้อความ หรือ มีรูปภาพ อย่างใดอย่างหนึ่งก็โพสต์ได้
         if (text.trim() || imagePreview) {
-            onPost(text, imagePreview); // 🌟 ส่งทั้งข้อความและรูปลงไปให้ Feed
+            onPost(text, imagePreview);
             setText('');
-            handleRemoveImage(); // เคลียร์รูปหลังจากโพสต์เสร็จ
+            handleRemoveImage();
         }
     };
 
-    return (
-        <div className="doodle-box create-post-container">
-            <input 
-                className="create-post-input"
-                type="text" 
-                placeholder="What's on your sketchbook?" 
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handlePost()}
-            />
+    // 🌟 ฟังก์ชันพิมพ์ข้อความด่วนเวลาคลิกเครื่องมือ
+    const insertText = (str) => setText((prev) => prev + " " + str);
 
-            {/* 🌟 พื้นที่แสดงรูปพรีวิว (จะโผล่มาก็ต่อเมื่อเลือกรูปแล้ว) */}
+    return (
+        <div className="wooden-box create-post-premium">
+            <div className="create-post-top">
+                <div className="author-avatar-large">🥥</div>
+                <textarea 
+                    className="premium-textarea" placeholder="คืนนี้ชิลล์ไหนดี? ส่งเสียงหน่อย! 🍻🌊" 
+                    value={text} onChange={(e) => setText(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handlePost(); } }}
+                />
+            </div>
+
             {imagePreview && (
-                <div className="preview-container">
-                    <img src={imagePreview} alt="Preview" className="preview-image" />
-                    <button className="remove-image-btn" onClick={handleRemoveImage}>
-                        <TbX size={18} strokeWidth={3} />
-                    </button>
+                <div className="polaroid-preview-wrapper">
+                    <div className="polaroid-card">
+                        <img src={imagePreview} alt="Preview" className="polaroid-img" />
+                        <button className="polaroid-remove-btn" onClick={handleRemoveImage}><TbX size={20} strokeWidth={3} /></button>
+                    </div>
                 </div>
             )}
             
-            <div className="post-actions-row">
-                <div className="icon-group">
-                    {/* 🌟 ซ่อน input file ไว้ และใช้ ref */}
-                    <input 
-                        type="file" 
-                        accept="image/*" 
-                        style={{ display: 'none' }} 
-                        ref={fileInputRef}
-                        onChange={handleImageChange}
-                    />
-                    
-                    {/* 🌟 พอกดปุ่มนี้ ให้ไปสั่งคลิกที่ input file ที่ซ่อนอยู่ */}
-                    <div className="icon-button" title="Add Photo" onClick={() => fileInputRef.current.click()}>
-                        <TbPhoto size={24} strokeWidth={2.2} />
+            <div className="premium-actions-row">
+                <div className="premium-tools">
+                    <input type="file" accept="image/*" style={{ display: 'none' }} ref={fileInputRef} onChange={handleImageChange} />
+                    <div className="tool-btn" title="Add Photo" onClick={() => fileInputRef.current.click()}><TbPhoto size={24} /></div>
+                    {/* 🌟 กดแล้วเพิ่มข้อความแท็กโต๊ะ */}
+                    <div className="tool-btn" title="Check In Table" onClick={() => insertText('[📍 โต๊ะ 1001]')}>
+                        <span style={{ fontSize: '1.2rem' }}>📍</span>
                     </div>
-                    
-                    <div className="icon-button" title="Draw Something">
-                        <TbPencil size={24} strokeWidth={2.2} />
-                    </div>
-                    <div className="icon-button" title="Add Emoji">
-                        <TbMoodSmile size={24} strokeWidth={2.2} />
+                    {/* 🌟 กดแล้วเพิ่มอิโมจิเบียร์ */}
+                    <div className="tool-btn" title="Feeling" onClick={() => insertText('🍻')}>
+                        <TbMoodSmile size={24} />
                     </div>
                 </div>
-
-                <button className="btn-yellow btn-post" onClick={handlePost}>
-                    Post!
-                </button>
+                <button className="shout-btn" onClick={handlePost}><TbSend size={20} /> Shout!</button>
             </div>
         </div>
     );

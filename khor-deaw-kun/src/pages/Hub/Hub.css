@@ -1,0 +1,305 @@
+@import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
+
+.room-selection-bg {
+    background-image: url('src/assets/Hub/bg.png'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px 120px 20px; /* เว้นล่างไว้ให้ Bottom Bar */
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* 👤 User Profile Bar */
+.user-profile-bar {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(62, 39, 35, 0.85);
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 2px solid #FFD285;
+    color: white;
+    z-index: 100;
+}
+.user-info { display: flex; align-items: center; gap: 10px; }
+.user-avatar { font-size: 1.4rem; background: white; border-radius: 50%; padding: 4px; }
+
+.header-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: clamp(3rem, 8vw, 4.5rem);
+    color: #FFD285;
+    text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+    margin: 0;
+}
+
+.page-subtitle {
+    font-size: 1.3rem;
+    color: white;
+    text-shadow: 2px 2px 0px #3E2723;
+}
+
+/* 🪵 Search Area (ปรับแก้ตามที่คุณส่งมา) */
+.search-room-area {
+    width: 100%;
+    max-width: 700px;
+    margin: 20px 0 40px 0;
+    display: flex;
+    justify-content: center;
+    z-index: 10;
+}
+
+.search-board {
+    position: relative;
+    background-color: #5C4033; 
+    border: 4px solid #3E2723;
+    border-radius: 15px;
+    padding: 15px 35px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0px 8px 0px #2A1B15;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.search-board::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('src/assets/Hub/cartoon-wood-pattern.avif'); 
+    background-repeat: repeat;
+    background-size: 250px;
+    z-index: -1; 
+    opacity: 0.35; 
+    pointer-events: none;
+}
+
+.search-label {
+    font-size: 1.6rem;
+    color: #FFD285;
+    font-weight: bold;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+}
+
+.search-form { display: flex; gap: 12px; }
+
+.search-input {
+    width: 150px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid #3E2723;
+    border-radius: 12px;
+    padding: 0 15px;
+    font-family: 'Schoolbell', cursive;
+    font-size: 1.2rem;
+    color: #3E2723;
+    outline: none;
+    box-shadow: inset 0px 4px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    background: #ffffff;
+    border-color: #F48C2A;
+    box-shadow: 0 0 10px rgba(244, 140, 42, 0.5);
+    transform: translateY(-2px);
+}
+
+.search-btn {
+    background-color: #F48C2A;
+    border: 3px solid #1A1A1A;
+    border-radius: 12px;
+    color: #1A1A1A;
+    font-size: 1.4rem;
+    font-weight: bold;
+    padding: 0 25px;
+    cursor: pointer;
+    box-shadow: 0px 4px 0px #1A1A1A;
+    font-family: 'Schoolbell', cursive;
+    transition: all 0.1s;
+}
+
+/* 📋 Room Cards List */
+.room-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    max-width: 900px;
+}
+
+.room-item-row {
+    position: relative;
+    background-color: #3E2723;
+    border-radius: 20px;
+    padding-bottom: 8px;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.room-item-row:hover { transform: scale(1.02); }
+
+.room-card-inner {
+    position: relative;
+    background-color: #D29A62; 
+    border: 4px solid #3E2723;
+    border-radius: 18px;
+    padding: 20px 30px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.room-card-inner::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('src/assets/Hub/cartoon-wood-pattern.avif'); 
+    background-repeat: repeat;
+    background-size: 250px;
+    z-index: -1;
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.room-content-flex { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.room-main-info { display: flex; align-items: center; gap: 20px; flex: 2; min-width: 250px; }
+.room-icon { font-size: 3.5rem; filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.2)); }
+.room-name { font-size: 1.8rem; color: #FFFFFF; margin: 0; }
+.room-desc { margin: 5px 0 0 0; color: #5C4033; font-weight: bold; }
+
+.room-status-group { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
+.detail-item { font-size: 1.3rem; color: #3E2723; font-weight: bold; }
+
+.badge {
+    padding: 3px 15px; border-radius: 20px; font-size: 1rem; color: white;
+    border: 2px solid #3E2723; box-shadow: 2px 2px 0px #3E2723;
+}
+.badge.public { background-color: #4CAF50; }
+.badge.private { background-color: #F44336; }
+
+.join-btn-small {
+    background-color: #F48C2A; border: 3px solid #1A1A1A; border-radius: 15px;
+    color: #1A1A1A; font-size: 1.4rem; font-weight: bold; padding: 8px 25px;
+    box-shadow: 0px 4px 0px #1A1A1A; cursor: pointer; font-family: 'Schoolbell', cursive;
+    transition: all 0.1s;
+}
+
+/* ⚓ Bottom Nav Bar */
+.bottom-nav-container {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 600px; height: 75px;
+    background: #3E2723; border-radius: 20px 20px 0 0;
+    display: flex; justify-content: space-around; align-items: center;
+    z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+}
+/* ⚓ New Bottom Nav Bar - ปรับให้ใหญ่และเป็นลายไม้ */
+.bottom-nav-container {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 750px; /* ขยายให้กว้างขึ้น */
+    height: 90px;    /* ขยายให้สูงขึ้น */
+    background-color: #5C4033; /* ไม้เข้มเหมือนป้าย Search */
+    border-top: 5px solid #3E2723;
+    border-radius: 30px 30px 0 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.4);
+    overflow: visible; /* ยอมให้ Profile ลอยทะลุบาร์ */
+}
+
+/* 🪵 ใส่ลายไม้ให้ Bottom Bar */
+.bottom-nav-container::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('src/assets/Hub/cartoon-wood-pattern.avif'); 
+    background-repeat: repeat;
+    background-size: 300px;
+    border-radius: 30px 30px 0 0 ;
+    opacity: 0.25;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.nav-item {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #FFD285;
+    font-size: 1.8rem; /* ไอคอนใหญ่ขึ้น */
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.nav-item:hover {
+    transform: translateY(-5px) scale(1.1);
+}
+
+.nav-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #FFD285;
+    margin-top: 2px;
+}
+
+/* 🥥 Profile กลางบาร์ที่ลอยเด่น */
+.nav-profile-center {
+    position: relative;
+    top: -40px; /* ดันขึ้นไปให้ลอยเหนือพ้นบาร์ไม้ */
+    z-index: 10;
+}
+
+.profile-frame {
+    width: 90px;
+    height: 90px;
+    /* background-color: #D29A62; สีไม้สว่าง */
+    border: 5px solid #3E2723;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 0 #1A1A1A, 0 10px 20px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.profile-frame:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.profile-frame:active {
+    transform: scale(0.9) translateY(5px);
+}
+
+.profile-img {
+    font-size: 3.5rem;
+    /* หากใช้รูปจริงให้ใส่ background-image และ background-size: cover */
+}
+
+/* ปรับระยะห่างรายการห้องไม่ให้โดน Bottom Bar บัง */
+.room-selection-bg {
+    padding-bottom: 150px;
+}
+
+/* Theme Colors */
+.moograta-theme .room-card-inner { background-color: #E2A069; }
+.cafe-theme .room-card-inner { background-color: #D1BFA4; }

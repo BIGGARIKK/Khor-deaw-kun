@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
+
+/* =========================================
+   🌟 Profile Bottom Sheet (เมนูเด้งขอบล่าง)
+========================================= */
+
+/* พื้นหลังสีดำโปร่งแสง */
+.profile-sheet-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9998; 
+    display: flex;
+    align-items: flex-end; 
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* ตัวแผ่นป้ายไม้ */
+.profile-sheet-content {
+    width: 100%;
+    max-width: 600px;
+    background-color: #D29A62; 
+    border: 5px solid #3E2723;
+    border-bottom: none; 
+    border-radius: 30px 30px 0 0;
+    padding: 20px 30px 40px 30px; 
+    position: relative;
+    box-shadow: 0px -10px 30px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 9999;
+}
+
+
+.profile-frame img { width: 100%; height: 100%; object-fit: cover; }
+/* ใส่ลายไม้จางๆ ให้แผ่นป้าย */
+.profile-sheet-content::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('../../assets/Hub/cartoon-wood-pattern.avif'); 
+    background-size: 250px; opacity: 0.25; pointer-events: none;
+    border-radius: 25px 25px 0 0;
+}
+
+/* ขีดจับสำหรับเลื่อน (Visual effect) */
+.sheet-drag-handle {
+    width: 60px; height: 6px;
+    background-color: rgba(62, 39, 35, 0.5);
+    border-radius: 10px;
+    margin: 0 auto 20px auto;
+}
+
+/* ปุ่มปิด X สไตล์หมุดไม้ */
+.sheet-close-btn {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: #FF4D4F; color: white;
+    border: 3px solid #3E2723; border-radius: 50%;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 2px 2px 0px #3E2723;
+    transition: 0.2s;
+}
+.sheet-close-btn:active { transform: translateY(3px); box-shadow: 0px 0px 0px #3E2723; }
+
+/* 👤 ข้อมูลด้านบน */
+.sheet-header {
+    display: flex; align-items: center; gap: 20px;
+    margin-bottom: 25px; position: relative; z-index: 2;
+}
+
+/* 🌟 รูปในแผ่นไม้ที่เลื่อนขึ้นมาจากข้างล่าง */
+.sheet-avatar {
+    width: 80px;
+    height: 80px;
+    background: white;
+    border: 4px solid #3E2723;
+    border-radius: 50%;
+    overflow: hidden; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 4px 0px #3E2723;
+}
+
+.sheet-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center;
+}
+
+.sheet-user-info h2 { 
+    font-size: 1.8rem; color: #1A1A1A; margin-bottom: 5px; 
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+}
+.profile-badge { 
+    background: #F48C2A; color: white; padding: 4px 10px; 
+    border-radius: 12px; font-weight: bold; border: 2px solid #3E2723; 
+    font-size: 0.9rem; box-shadow: 2px 2px 0px #3E2723;
+}
+
+/* 🚥 Vibe Check Section */
+.vibe-check-section {
+    background: rgba(255,255,255,0.4);
+    border: 3px solid #3E2723; border-radius: 20px;
+    padding: 15px; margin-bottom: 20px; position: relative; z-index: 2;
+}
+.section-title { font-size: 1.1rem; color: #3E2723; margin-bottom: 10px; text-align: center;}
+.vibe-options { display: flex; gap: 10px; justify-content: center; }
+.vibe-btn {
+    flex: 1; padding: 10px 5px; font-size: 1.1rem; 
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive;
+    font-weight: bold; color: #3E2723; background: white; border: 2px solid #3E2723;
+    border-radius: 12px; cursor: pointer; box-shadow: 2px 2px 0px #3E2723; transition: 0.15s;
+}
+.vibe-btn:hover { transform: translateY(-2px); }
+
+/* สีตอนถูกเลือก */
+.vibe-btn.active-chill { background: #4CAF50; color: white; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2), 0 0 0 #3E2723; transform: translateY(2px); }
+.vibe-btn.active-tipsy { background: #FFC107; color: #1A1A1A; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2), 0 0 0 #3E2723; transform: translateY(2px); }
+.vibe-btn.active-wasted { background: #FF4D4F; color: white; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2), 0 0 0 #3E2723; transform: translateY(2px); }
+
+/* 📊 Quick Stats */
+.quick-stats {
+    display: flex; justify-content: space-between; gap: 15px;
+    margin-bottom: 25px; position: relative; z-index: 2;
+}
+.stat-box {
+    flex: 1; background: rgba(92, 64, 51, 0.8); color: white;
+    border: 3px solid #3E2723; border-radius: 15px;
+    padding: 15px 10px; display: flex; flex-direction: column; align-items: center;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+}
+.stat-box strong { font-size: 1.5rem; color: #FFD285; }
+.stat-box span { font-size: 0.9rem; margin-top: 5px; font-weight: bold;}
+
+/* ➡️ ปุ่ม Full Profile */
+.full-profile-btn {
+    width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px;
+    background: #F48C2A; color: #1A1A1A; 
+    font-family: 'Schoolbell', 'Playpen Sans Thai', cursive;
+    font-size: 1.3rem; font-weight: bold; padding: 15px;
+    border: 3px solid #3E2723; border-radius: 15px; cursor: pointer;
+    box-shadow: 0px 5px 0px #3E2723; transition: 0.15s; position: relative; z-index: 2;
+}
+.full-profile-btn:hover { background: #FF9F43; transform: translateY(-2px); box-shadow: 0px 7px 0px #3E2723; }
+.full-profile-btn:active { transform: translateY(5px); box-shadow: 0px 0px 0px #3E2723; }
+
+/* 🎬 Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { 
+    from { transform: translateY(100%); opacity: 0; } 
+    to { transform: translateY(0); opacity: 1; } 
+}

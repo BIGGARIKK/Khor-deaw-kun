@@ -1,102 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
-/* CreatePostBox.css */
+.create-post-premium { margin-bottom: 20px; padding: 20px 25px !important; }@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Playpen+Sans+Thai:wght@100..800&family=Schoolbell&display=swap');
+.create-post-top { display: flex; gap: 15px; align-items: flex-start; }
+.author-avatar-large { width: 55px; height: 55px; flex-shrink: 0; background: #ffffff; border: 3px solid #3E2723; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 2px 2px 0px #3E2723; margin-top: 5px; }
+.premium-textarea { flex: 1; min-height: 80px; resize: none; background: rgba(253, 245, 230, 0.9); border: 3px solid #3E2723; border-radius: 15px; padding: 15px; font-size: 1.3rem; font-family: 'Patrick Hand', "Playpen Sans Thai" ,cursive; color: #3E2723; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.15); transition: all 0.2s ease; outline: none; line-height: 1.5; }
+.premium-textarea:focus { background: #ffffff; border-color: #F48C2A; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), 0 0 10px rgba(244, 140, 42, 0.3); }
 
-.create-post-container {
-    margin-bottom: 20px;
-    filter: drop-shadow(2px 2px 0px #111); /* เงาแบบการ์ตูน */
-    transition: all 0.2s ease-in-out;
-}
+.polaroid-preview-wrapper { margin: 15px 0 0 70px; }
+.polaroid-card { position: relative; display: inline-block; background: #fff; padding: 8px 8px 25px 8px; border-radius: 5px; border: 2px solid #3E2723; box-shadow: 4px 4px 10px rgba(0,0,0,0.3); transform: rotate(-2deg); transition: 0.2s; }
+.polaroid-card:hover { transform: rotate(0deg) scale(1.02); }
+.polaroid-img { max-height: 180px; border: 2px solid #3E2723; border-radius: 3px; object-fit: cover; }
+.polaroid-remove-btn { position: absolute; top: -12px; right: -12px; background: #ff4d4f; color: white; border: 3px solid #3E2723; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 2px 2px 0px #3E2723; transition: 0.2s; }
+.polaroid-remove-btn:hover { transform: scale(1.15) rotate(15deg); }
 
-.create-post-input {
-    width: 100%;
-    border: none;
-    outline: none;
-    font-size: 1.2rem;
-    padding: 10px 0;
-    margin-bottom: 15px;
-    background: transparent;
-    font-family: 'Schoolbell', cursive;
+.premium-actions-row { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 2px dashed rgba(62, 39, 35, 0.4); margin-left: 70px; }
+.premium-tools { display: flex; gap: 15px; }
+.tool-btn { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.5); border: 2px solid #3E2723; border-radius: 12px; cursor: pointer; box-shadow: 0px 3px 0px #3E2723; transition: 0.15s; }
+.tool-btn:hover { background: #FFD285; transform: translateY(-2px); box-shadow: 0px 5px 0px #3E2723; }
+.tool-btn:active { transform: translateY(3px); box-shadow: 0px 0px 0px #3E2723; }
 
+.shout-btn { display: flex; align-items: center; gap: 8px; background: #F48C2A; color: #1A1A1A; font-family: 'Schoolbell', "Playpen Sans Thai" ,cursive; font-size: 1.3rem; font-weight: bold; padding: 8px 25px; border: 3px solid #3E2723; border-radius: 15px; cursor: pointer; box-shadow: 0px 5px 0px #3E2723; transition: 0.15s; }
+.shout-btn:hover { background: #FF9F43; transform: translateY(-2px); box-shadow: 0px 7px 0px #3E2723; }
+.shout-btn:active { transform: translateY(5px); box-shadow: 0px 0px 0px #3E2723; }
 
-
-}
-
-.post-actions-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 2px solid #111; /* เส้นคั่นปากกา */
-    padding-top: 15px;
-}
-
-.icon-group {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.icon-button {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-    border-radius: 50%;
-    transition: all 0.2s ease-in-out;
-}
-
-/* เอฟเฟกต์เวลาเอาเมาส์ไปชี้ไอคอน */
-.icon-button:hover {
-    background-color: #fcbf65; /* ไฮไลต์สีเหลือง */
-    transform: scale(1.1) rotate(-5deg);
-    box-shadow: 2px 2px 0px #111;
-}
-
-.btn-post {
-    padding: 6px 25px;
-    font-size: 1.1rem;
-}
-/* เพิ่มในไฟล์ CSS */
-.post-actions-row div div:hover {
-    transform: scale(1.2) rotate(5deg); /* ขยายและหมุนนิดๆ ให้ดูขี้เล่น */
-    color: #fcbf65; /* เปลี่ยนสีเป็นเหลืองตามธีม */
-}
-
-/* เพิ่มต่อท้ายไฟล์ CreatePostBox.css เดิมของคุณ */
-
-.preview-container {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 15px;
-}
-
-.preview-image {
-    max-height: 200px; /* จำกัดความสูงไม่ให้พรีวิวใหญ่เกินไป */
-    border-radius: 15px;
-    border: 3px solid #111; /* ขอบปากกา */
-    box-shadow: 4px 4px 0px #111; /* เงาสไตล์ Doodle */
-    object-fit: cover;
-}
-
-/* ปุ่ม (X) สำหรับลบรูปออกแบบให้เหมือนสติกเกอร์แปะทับ */
-.remove-image-btn {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background-color: #ff4d4f; /* สีแดง */
-    color: white;
-    border: 2px solid #111;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 2px 2px 0px #111;
-    transition: transform 0.1s ease;
-}
-
-.remove-image-btn:hover {
-    transform: scale(1.1) rotate(10deg);
-}
+@media (max-width: 768px) { .polaroid-preview-wrapper, .premium-actions-row { margin-left: 0; } }
