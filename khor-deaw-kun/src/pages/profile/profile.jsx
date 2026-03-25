@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../service/api';
-import { TbArrowUp } from "react-icons/tb";
+import { TbArrowUp, TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import PostCard from '../Feed/component/feed/PostCard';
 import './profile.css';
 
@@ -12,7 +12,6 @@ import AvatarModal from './component/AvatarModal';
 import StoryModal from './component/StoryModal';
 import BannerColorModal from './component/BannerColorModal';
 
-// นำเข้ารูป Avatar (เส้นทางตามเดิม)
 import myAv1 from '../../assets/avatars/1.png';
 import myAv2 from '../../assets/avatars/2.png';
 import myAv3 from '../../assets/avatars/3.png';
@@ -35,7 +34,7 @@ export const BANNER_PRESETS = [
   { id: 9, color: '#fdffb6', pattern: 'repeating-linear-gradient(transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px), repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px)', size: '100% 100%' },
   { id: 10, color: '#caffbf', pattern: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0, rgba(255,255,255,0.5) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
   { id: 11, color: '#ffd6a5', pattern: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0, rgba(255,255,255,0.4) 10px, transparent 10px, transparent 20px)', size: '100% 100%' },
-  { id: 12, color: '#222222', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)', size: '100% 100%' }
+  { id: 12, color: '#30795d', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)', size: '100% 100%' }
 ];
 
 const Profile = () => {
@@ -51,19 +50,39 @@ const Profile = () => {
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const fileInputRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
 
   const avatarPresets = [myAv1, myAv2, myAv3, myAv4, myAv5, myAv6, myAv7, myAv8, myAv9];
   const [avatarImage, setAvatarImage] = useState(() => {
-  const randomIndex = Math.floor(Math.random() * avatarPresets.length);
-  return avatarPresets[randomIndex];
-});
+    const randomIndex = Math.floor(Math.random() * avatarPresets.length);
+    return avatarPresets[randomIndex];
+  });
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const pressTimer = useRef(0);
 
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyProgress, setStoryProgress] = useState(0);
+
+  const [currentPostIndex, setCurrentPostIndex] = useState(0);
+
+  const userPosts = [
+    { id: 1, time: "1 min ago", text: "หยุดน่ารักได้มั้ย ใจเราก็แค่นี้อะ 🥺 #รักน้องแมวมาก", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 105, comments: 20 },
+    { id: 2, time: "2 hours ago", text: "วันนี้เขียนโค้ดทั้งวันเลย สมองเบลอไปหมดแล้ววว 💻😵‍💫", hasImage: false, imageUrl: "", likes: 42, comments: 5 },
+    { id: 3, time: "Yesterday", text: "แวะมากินของอร่อยๆ เยียวยาจิตใจ 🍜✨", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 210, comments: 45 },
+    { id: 4, time: "3 days ago", text: "บางทีการได้พักผ่อนเงียบๆ โง่ๆ ก็ชาร์จพลังได้ดีนะ 🔋😴", hasImage: false, imageUrl: "", likes: 89, comments: 12 },
+    { id: 5, time: "Last week", text: "รอคอยให้ถึงวันหยุดเสาร์อาทิตย์ไม่ไหวแล้ววว อยากนอนนน", hasImage: false, imageUrl: "", likes: 55, comments: 2 },
+    { id: 6, time: "2 weeks ago", text: "ช่วงนี้ติดดูอนิเมะหนักมาก ดูโต้รุ่งมา 2 วันติดแล้ว 🎬🍿", hasImage: false, imageUrl: "", likes: 112, comments: 18 },
+    { id: 7, time: "3 weeks ago", text: "อยากกินชาบูเยียวยาจิตใจจังเลยยยยยยยยย 🥓🔥", hasImage: false, imageUrl: "", likes: 230, comments: 55 },
+    { id: 8, time: "1 month ago", text: "ฝนตกหนักมาก รักษาสุขภาพกันด้วยนะครับทุกคน 🌧️🤧", hasImage: false, imageUrl: "", likes: 78, comments: 4 },
+    { id: 9, time: "1 month ago", text: "เริ่มวันใหม่ด้วยกาแฟหอมๆ สักแก้ว ☕️🌿", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 145, comments: 22 },
+    { id: 10, time: "2 months ago", text: "นานๆ ทีได้ออกมารับอากาศบริสุทธิ์ ธรรมชาติบำบัดสุดๆ ⛰️🌲", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 320, comments: 45 },
+    { id: 11, time: "2 months ago", text: "มุมโปรดเวลาปั่นงาน จัดโต๊ะใหม่เรียบร้อย น่านั่งขึ้นเยอะ 💻✨", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 88, comments: 14 },
+    { id: 12, time: "3 months ago", text: "เจอเจ้านี่เดินเตาะแตะอยู่แถวบ้าน น่ารักเกินต้านทาน 🐶❤️", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 412, comments: 65 },
+    { id: 13, time: "3 months ago", text: "เติมน้ำตาลให้ร่างกายหน่อย เค้กร้านนี้อร่อยมากกกก 🍰🍓", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 275, comments: 38 }
+  ];
+
+  const imagePosts = userPosts.filter(post => post.hasImage);
+  const textPosts = userPosts.filter(post => !post.hasImage);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -83,29 +102,22 @@ const Profile = () => {
   };
 
   const handlePointerUp = (e) => {
-    setIsPaused(false); // ปล่อยนิ้ว/เมาส์ ให้เวลาเดินต่อ
-    
-    // คำนวณว่ากดค้างไปกี่มิลลิวินาที
+    setIsPaused(false);
     const holdDuration = Date.now() - pressTimer.current;
-    
-    // ถ้ากดไวๆ (น้อยกว่า 200ms) ถือว่าตั้งใจ "คลิก" เพื่อเปลี่ยนรูป
-    // แต่ถ้ากดแช่นานกว่านี้ จะแค่หยุด/เล่นเวลาต่อ โดยไม่เปลี่ยนรูปครับ
     if (holdDuration < 200) {
       handleStoryNavigation(e);
     }
   };
 
   const handleAddStoryClick = () => {
-    setIsPaused(true); // สั่งหยุดเวลาทันที
-    fileInputRef.current.click(); // เปิดหน้าต่างเลือกรูป
+    setIsPaused(true);
+    fileInputRef.current.click();
 
-    // ดักจับว่าผู้ใช้ปิดหน้าต่างเลือกไฟล์แล้ว (เบราว์เซอร์กลับมา Active)
     window.addEventListener('focus', () => {
-      // หน่วงเวลา 0.5 วินาที เพื่อเผื่อเวลาให้รูปอัปโหลดเสร็จก่อนค่อยให้เวลาเดินต่อ
       setTimeout(() => {
-        setIsPaused(false); 
+        setIsPaused(false);
       }, 500);
-    }, { once: true }); // { once: true } คือให้ดักจับแค่ครั้งเดียวแล้วยกเลิกไป ไม่ให้เปลืองเมมโมรี่
+    }, { once: true });
   };
 
   useEffect(() => {
@@ -114,12 +126,10 @@ const Profile = () => {
       timer = setInterval(() => {
         setStoryProgress((prev) => {
           const nextProgress = prev + (100 / 30);
-          if (nextProgress >= 100) {
-            return 100;
-          }
+          if (nextProgress >= 100) return 100;
           return nextProgress;
         });
-      }, 100); 
+      }, 100);
     }
     return () => clearInterval(timer);
   }, [isStoryOpen, isPaused, currentStoryIndex, stories.length]);
@@ -127,26 +137,23 @@ const Profile = () => {
   useEffect(() => {
     if (storyProgress >= 100) {
       if (currentStoryIndex < stories.length - 1) {
-        setCurrentStoryIndex((prev) => prev + 1); // คราวนี้จะบวกแค่ 1 แน่นอน
-        setStoryProgress(0); // รีเซ็ตเวลาเริ่ม 0 ใหม่
+        setCurrentStoryIndex((prev) => prev + 1);
+        setStoryProgress(0);
       } else {
-        // ถ้าเป็นรูปสุดท้ายแล้ว
-        setIsStoryOpen(false); // ปิดจอ
-        setCurrentStoryIndex(0); // กลับไปรูปแรก
-        setStoryProgress(0); // รีเซ็ตเวลา
+        setIsStoryOpen(false);
+        setCurrentStoryIndex(0);
+        setStoryProgress(0);
       }
     }
   }, [storyProgress, currentStoryIndex, stories.length]);
 
   useEffect(() => {
     if (isColorModalOpen || isAvatarModalOpen || isStoryOpen) {
-      document.body.style.overflow = 'hidden'; // ล็อกไม่ให้หน้าหลักเลื่อนได้
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = ''; // คืนค่าปกติ ให้หน้าหลักกลับมาเลื่อนได้
-    }
-    return () => {
       document.body.style.overflow = '';
-    };
+    }
+    return () => document.body.style.overflow = '';
   }, [isColorModalOpen, isAvatarModalOpen, isStoryOpen]);
 
   if (!userData) {
@@ -157,27 +164,21 @@ const Profile = () => {
     );
   }
 
-  const handleAddStory = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setStories([...stories, imageUrl]);
-      setCurrentStoryIndex(stories.length);
-    }
-  };
-
   const handleFileChange = (e) => {
+    if (stories.length >= 10) {
+      alert("You can upload up to 10 stories only! 📸");
+      return;
+    }
+
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      
       setStories((prev) => {
         const newStories = [...prev, imageUrl];
-        setCurrentStoryIndex(newStories.length - 1); 
+        setCurrentStoryIndex(newStories.length - 1);
         return newStories;
       });
-      setStoryProgress(0); 
-      
+      setStoryProgress(0);
       setIsStoryOpen(true);
     }
   };
@@ -212,21 +213,6 @@ const Profile = () => {
     }
   };
 
-  const handleStoryClick = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-
-    if (x < rect.width / 2) {
-      if (currentStoryIndex > 0) setCurrentStoryIndex(currentStoryIndex - 1);
-    } else {
-      if (currentStoryIndex < stories.length - 1) {
-        setCurrentStoryIndex(currentStoryIndex + 1);
-      } else {
-        setIsStoryOpen(false);
-      }
-    }
-  };
-
   return (
     <div className="profile-page">
       <input
@@ -235,19 +221,24 @@ const Profile = () => {
         style={{ display: 'none' }}
         onChange={(e) => setBannerColor(e.target.value)}
       />
-      
-      <div className="profile-container">
-        <LeftPanel
-          navigate={navigate}
-          userData={userData}
-          isContactOpen={isContactOpen}
-          setIsContactOpen={setIsContactOpen}
-        />
 
+      <div className="profile-container">
+        
+        {/* ✨ คอลัมน์ซ้าย (1fr) */}
+        <div className="left-panel-wrapper">
+          <LeftPanel
+            navigate={navigate}
+            userData={userData}
+            isContactOpen={isContactOpen}
+            setIsContactOpen={setIsContactOpen}
+          />
+        </div>
+
+        {/* ✨ คอลัมน์กลาง (2.2fr ใหญ่สุด) */}
         <div className="center-panel">
           <ProfileHeader
             userData={userData}
-            setUserData={setUserData} 
+            setUserData={setUserData}
             bannerColor={bannerColor}
             setIsColorModalOpen={setIsColorModalOpen}
             avatarImage={avatarImage}
@@ -255,61 +246,83 @@ const Profile = () => {
             avatarPresets={avatarPresets}
           />
 
-          <div className="feed-section">
-            <PostCard
-              author={userData.username}
-              time="1 min ago"
-              text="หยุดน่ารักได้มั้ย ใจเราก็แค่นี้อะ 🥺 #รักน้องแมวมาก"
-              hasImage={true}
-              imageUrl="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-              likes={105}
-              comments={20}
-            />
+          <div className="feed-carousel-section">
+            {currentPostIndex > 0 && imagePosts.length > 0 && (
+              <button
+                type="button"
+                className="carousel-btn prev-btn"
+                onClick={() => setCurrentPostIndex(prev => prev - 1)}
+              >
+                <TbChevronLeft size={28} />
+              </button>
+            )}
+
+            <div className="carousel-content">
+              {imagePosts.length > 0 ? (
+                <PostCard
+                  author={userData.username}
+                  time={imagePosts[currentPostIndex].time}
+                  text={imagePosts[currentPostIndex].text}
+                  hasImage={imagePosts[currentPostIndex].hasImage}
+                  imageUrl={imagePosts[currentPostIndex].imageUrl}
+                  likes={imagePosts[currentPostIndex].likes}
+                  comments={imagePosts[currentPostIndex].comments}
+                />
+              ) : (
+                <div className="doodle-box loading-box">No image posts yet 📸</div>
+              )}
+            </div>
+
+            {currentPostIndex < imagePosts.length - 1 && imagePosts.length > 0 && (
+              <button
+                type="button"
+                className="carousel-btn next-btn"
+                onClick={() => setCurrentPostIndex(prev => prev + 1)}
+              >
+                <TbChevronRight size={28} />
+              </button>
+            )}
           </div>
         </div>
 
-        <RightPanel setIsStoryOpen={() => {
-          setCurrentStoryIndex(0); // ✨ สั่งให้กลับไปเริ่มที่รูปแรกเสมอ (Index 0)
-          setStoryProgress(0);     // ✨ รีเซ็ตหลอดเวลาให้เริ่มที่ 0%
-          setIsStoryOpen(true);    // ✨ เปิดหน้าต่างสตอรี่
-        }} 
-      />
+        {/* ✨ คอลัมน์ขวา (1fr) */}
+        <div className="right-panel-wrapper">
+          <RightPanel
+            stories={stories}
+            setIsStoryOpen={() => {
+              setCurrentStoryIndex(0);
+              setStoryProgress(0);
+              setIsStoryOpen(true);
+            }}
+          />
+
+          {/* ส่วนของ My Post (ถูกดันลงมาด้วย CSS margin-top: 250px เพื่อให้ขนานกับ Carousel กลาง) */}
+          {textPosts.length > 0 && (
+            <div className="text-posts-feed">
+              <h3 className="text-feed-title">My Post 💭</h3>
+              <div className="text-posts-scrollable">
+                {textPosts.map(post => (
+                  <div className="text-post-item" key={post.id}>
+                    <PostCard
+                      author={userData.username}
+                      time={post.time}
+                      text={post.text}
+                      hasImage={false}
+                      likes={post.likes}
+                      comments={post.comments}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
       </div>
 
-      {isColorModalOpen && (
-        <BannerColorModal
-          setIsColorModalOpen={setIsColorModalOpen}
-          bannerColor={bannerColor}
-          setBannerColor={setBannerColor}
-          bannerPresets={BANNER_PRESETS}
-        />
-      )}
-
-      {isAvatarModalOpen && (
-        <AvatarModal
-          setIsAvatarModalOpen={setIsAvatarModalOpen}
-          avatarPresets={avatarPresets}
-          avatarImage={avatarImage}
-          setAvatarImage={setAvatarImage}
-        />
-      )}
-
-      {isStoryOpen && (
-        <StoryModal
-          setIsStoryOpen={setIsStoryOpen}
-          stories={stories}
-          currentStoryIndex={currentStoryIndex}
-          fileInputRef={fileInputRef}
-          handleDeleteStory={handleDeleteStory}
-          handleStoryNavigation={handleStoryNavigation}
-          handleFileChange={handleFileChange}
-          storyProgress={storyProgress}
-          handlePointerDown={handlePointerDown}
-          handlePointerUp={handlePointerUp}
-          setIsPaused={setIsPaused}
-          handleAddStoryClick={handleAddStoryClick}
-        />
-      )}
+      {isColorModalOpen && <BannerColorModal setIsColorModalOpen={setIsColorModalOpen} bannerColor={bannerColor} setBannerColor={setBannerColor} bannerPresets={BANNER_PRESETS} />}
+      {isAvatarModalOpen && <AvatarModal setIsAvatarModalOpen={setIsAvatarModalOpen} avatarPresets={avatarPresets} avatarImage={avatarImage} setAvatarImage={setAvatarImage} />}
+      {isStoryOpen && <StoryModal setIsStoryOpen={setIsStoryOpen} stories={stories} currentStoryIndex={currentStoryIndex} fileInputRef={fileInputRef} handleDeleteStory={handleDeleteStory} handleStoryNavigation={handleStoryNavigation} handleFileChange={handleFileChange} storyProgress={storyProgress} handlePointerDown={handlePointerDown} handlePointerUp={handlePointerUp} setIsPaused={setIsPaused} handleAddStoryClick={handleAddStoryClick} />}
     </div>
   );
 };

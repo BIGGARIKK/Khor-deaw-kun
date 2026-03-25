@@ -15,9 +15,9 @@ const BannerColorModal = ({ setIsColorModalOpen, bannerColor, setBannerColor, ba
     { id: 9, color: '#fdffb6', pattern: 'none', size: '100% 100%' }, // สีล้วน
     { id: 10, color: '#caffbf', pattern: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0, rgba(255,255,255,0.5) 15px, transparent 15px, transparent 30px)', size: '100% 100%' }, // ลายทางตั้ง
     { id: 11, color: '#ffd6a5', pattern: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0, rgba(255,255,255,0.4) 10px, transparent 10px, transparent 20px)', size: '100% 100%' }, // ลายทางขวาง
-    { id: 12, color: '#222222', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)', size: '100% 100%' } // ลายเส้นบางดำ
+    { id: 12, color: '#30795d', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)', size: '100% 100%' } // ลายเส้นบางดำ
   ];
-
+  
   return createPortal(
     <div className="ig-story-overlay" onClick={() => setIsColorModalOpen(false)} style={{ zIndex: 10000 }}>
       <div className="avatar-modal-box" onClick={(e) => e.stopPropagation()}>

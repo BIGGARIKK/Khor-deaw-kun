@@ -1,168 +1,287 @@
-/* profile-main.css */
+/* profile.css */
 @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Itim&family=Mali:wght@400;600;700&display=swap');
 
-* { box-sizing: border-box; }
+/* ================= CSS VARIABLES (ปรับ Spacing และสีให้คุมง่าย) ================= */
+:root {
+  --border-thin: 2px solid #222222;
+  --border-radius-main: 16px;
+  --border-radius-sm: 12px;
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.12);
+  --gap-main: 28px; /* ✨ ระยะห่างระหว่างคอลัมน์ 24-32px */
+}
 
-/* ================= BASE LAYOUT ================= */
+* {
+  box-sizing: border-box;
+}
+
+/* ================= BACKGROUND ================= */
 .profile-page {
-  background-color: #ffe6e6; 
-  background-image: url('../../assets/bg.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  font-family: 'Mali', cursive, sans-serif; 
+  background:url('../../assets/bg.png') center/cover fixed;
+  font-family: 'Mali', cursive, sans-serif;
   min-height: 100vh;
   width: 100%;
+  padding: 10px 24px;
   display: flex;
   justify-content: center;
-  align-items: flex-start; 
-  padding: 20px 20px;
 }
 
+/* ================= 1. LAYOUT หลัก (3 คอลัมน์ 1fr : 2.2fr : 1fr) ================= */
 .profile-container {
   display: grid;
-  grid-template-columns: 280px 1fr 280px; 
-  gap: 40px; 
+  grid-template-columns: 1fr 2.2fr 1fr; /* ✨ สัดส่วนซ้าย-กลาง-ขวา */
+  gap: var(--gap-main);
   width: 100%;
-  max-width: 1400px; 
+  max-width: 1350px; /* ✨ กว้างคุ้มพื้นที่ 1300-1400px แต่อยู่กึ่งกลาง */
   margin: 0 auto;
+  align-items: start; /* ✨ ให้ทุกคอลัมน์เริ่มจากขอบบนสุด */
 }
 
-.center-panel { display: flex; flex-direction: column; gap: 30px; }
+.center-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-main);
+  min-width: 0; 
+}
 
-/* ================= DOODLE BOX (Shared) ================= */
+/* ================= BORDER & SHADOW (Doodle Box) ================= */
 .doodle-box {
   background-color: #ffffff;
-  border: 3px solid #222222;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 5px 5px 0px #222222;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin: 5px;
+  border: var(--border-thin);
+  border-radius: var(--border-radius-main);
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .doodle-box:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0px #222222;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
 }
 
-.loading-box {
-  padding: 30px;
-  font-size: 1.5rem;
-  text-align: center;
-  font-weight: bold;
-}
+.loading-box { padding: 30px; font-size: 1.5rem; text-align: center; font-weight: bold; }
 
-/* ================= SHARED MODAL BACKGROUND & BOX ================= */
-.ig-story-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.9); z-index: 9999;
-  display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);
-  animation: fadeInOverlay 0.3s ease;
-}
+/* ================= MODALS (ย่อไว้) ================= */
+.ig-story-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); animation: fadeInOverlay 0.3s ease; }
 
 .avatar-modal-box {
-  background-color: #fffdf5;
-  background-image: radial-gradient(#e5e0d0 1.5px, transparent 1.5px);
-  background-size: 20px 20px;
-  padding: 20px 30px 25px 30px; 
-  border-radius: 30px;
-  border: 4px solid #222;
-  width: 95%;
-  max-width: 480px; 
+  background-color: #ebd6bb;
+  max-width: 500px; 
+  
+  
+  padding: 40px; 
+  border-radius: 24px;
+  border: var(--border-thin);
+  width: 95%; 
   position: relative;
-  box-shadow: 12px 12px 0px #222;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  transform-origin: center;
+  animation: modalPop 0.3s ease forwards;
 }
 
-.avatar-title-wrapper { text-align: center; margin-bottom: 25px; }
+.avatar-title-wrapper { text-align: center; margin-bottom: 20px; }
+.avatar-modal-title { font-size: 1.5rem; margin: 10px 0; color: #222; font-weight: 800; }
+@property --story-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes spinStoryBorder { 0% { --story-angle: 0deg; } 100% { --story-angle: 360deg; } }
+@keyframes popIn { 0% { transform: scale(0.95) translateY(10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes modalPop { 0% { opacity: 0; transform: scale(0.9) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popBubble { 0% { transform: scale(0.8) translateY(10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
-.avatar-modal-title {
-  font-size: 1.8rem;
-  margin-top: 10px;      
-  margin-bottom: 10px;   
-  color: #222;
-  font-weight: 900;
-  text-align: center;
-  text-shadow: 2px 2px 0px #fffdf5;
+/* ================= POST หลัก (ตรงกลาง) ================= */
+.feed-carousel-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   position: relative;
 }
 
-.avatar-modal-title::after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: -5px;
-  right: -5px;
-  height: 14px;
-}
-
-/* ================= SHARED STORY ANIMATIONS ================= */
-@property --story-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes spinStoryBorder {
-  0% { --story-angle: 0deg; }
-  100% { --story-angle: 360deg; }
-}
-
-/* ================= SCROLL TO TOP BUTTON ================= */
-.scroll-top-btn {
-  position: fixed;
-  bottom: 40px;
-  right: 40px;
-  width: 60px;
-  height: 60px;
-  background-color: #84E045; 
-  color: #222;
-  cursor: pointer;
-  z-index: 999; 
+.carousel-content {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  border: 3px solid #222;
-  border-radius: 50% 40% 50% 40% / 40% 50% 40% 50%; 
-  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: fadeSlide 0.3s ease;
 }
 
-.scroll-top-btn:hover {
-  background-color: #ffe066; 
-  transform: translateY(-5px) rotate(5deg);
-  box-shadow: 5px 5px 0px #222;
+.carousel-content > div {
+  width: 100%;
+  padding: 18px !important; 
+  /* ✨ เพิ่มความมนให้เท่ากับกล่อง Doodle อื่นๆ */
+  border-radius: 24px !important; 
+  border: var(--border-thin) !important;
+  box-shadow: var(--shadow-soft) !important;
+  background-color: #fff;
+  margin-bottom: 20px;
 }
 
-/* ================= GLOBAL KEYFRAMES ================= */
-@keyframes popIn {
-  0% { transform: scale(0) translateY(20px); opacity: 0; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+.carousel-content img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  height: auto; 
+  object-fit: cover; 
+  object-position: center;
+  /* ✨ ปรับความมนของรูปภาพด้านในให้โค้งล้อไปกับกรอบด้านนอก */
+  border-radius: 16px; 
+  border: 1px solid #eaeaea;
+  display: block;
 }
 
-@keyframes modalPop {
-  0% { opacity: 0; transform: scale(0.5) translateY(50px); }
-  70% { transform: scale(1.05) translateY(-5px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+.carousel-btn { 
+  position: absolute; 
+  /* ✨ ขยับลงมานิดนึงให้อยู่กึ่งกลางรูปภาพพอดี (ชดเชยพื้นที่ส่วนหัวโพสต์) */
+  top: 55%; 
+  transform: translateY(-50%); 
+  
+  /* ✨ ปรับพื้นหลังให้ทึบ 100% เวลาทับรูปจะได้เห็นปุ่มชัดๆ */
+  background-color: #ffffff; 
+  border: var(--border-thin); 
+  border-radius: 50%; 
+  width: 44px; 
+  height: 44px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  cursor: pointer; 
+  box-shadow: 3px 3px 0px #222222; 
+  color: #222222; 
+  z-index: 20; /* ดันให้อยู่บนสุด ไม่โดนรูปทับ */
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
 
-@keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.prev-btn { left: 0px; }
+.next-btn { right: 0px; }
+
+.carousel-btn:hover { 
+  background-color: #84E045; /* สีเขียวเวลานำเมาส์ไปชี้ */
+  transform: translateY(-50%) scale(1.15); 
+  box-shadow: 4px 4px 0px #222222; 
 }
 
-@keyframes popBubble {
-  0% { transform: scale(0) translateY(10px) rotate(-10deg); opacity: 0; }
-  100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+@keyframes fadeSlide { from { opacity: 0.5; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ================= SIDEBAR ขวา (Post ย่อย & Stacked Cards) ================= */
+.right-panel-wrapper { 
+  display: flex; 
+  flex-direction: column; 
+  min-width: 0; 
 }
 
-/* ================= RESPONSIVE ================= */
+.text-posts-feed { 
+  display: flex; 
+  flex-direction: column; 
+  margin-top: 50px;
+  animation: popIn 0.5s ease; 
+}
+
+.text-feed-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #222;
+  margin: 0 0 16px 0;
+  text-align: center;
+  background-color: #ffffff;
+  
+  border: 3px solid #222222;
+  border-radius: 50px; 
+  padding: 12px 20px;
+
+  box-shadow: 4px 4px 0px #222222; 
+  
+  z-index: 100;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+
+/* ✨ เอฟเฟกต์ตอนเอาเมาส์ชี้: เด้งขึ้นและขยายเงานิดหน่อย */
+.text-feed-title:hover {
+  background-color: #ffe066; /* สีเหลืองเวลานำเมาส์ไปชี้ */
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 6px 6px 0px #222222; 
+}
+
+.text-posts-scrollable {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 680px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 15px 25px 40px 10px;
+
+  /* ✨ เพิ่ม 2 บรรทัดนี้เข้าไปเพื่อให้ขอบล่างค่อยๆ จางเนียนๆ */
+  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+.text-posts-scrollable::-webkit-scrollbar { width: 6px; }
+.text-posts-scrollable::-webkit-scrollbar-track { background: transparent; }
+.text-posts-scrollable::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+.text-posts-scrollable::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
+/* ================= เอฟเฟกต์ซ้อนไพ่ฝั่งขวา (My Post) ================= */
+.text-post-item { 
+  width: 100%; 
+  position: relative; 
+  /* ✨ ลดระยะที่ซ้อนทับกันลง เพื่อให้เห็นความโค้งมนของขอบกล่องแต่ละใบชัดเจนขึ้น */
+  margin-top: -15px; 
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  z-index: 1; 
+}
+
+.text-post-item:first-child { 
+  margin-top: 0; 
+}
+
+.text-post-item:hover { 
+  transform: translateY(-8px) scale(1.02); 
+  z-index: 50; 
+}
+
+/* ✨ หัวใจหลัก: ปรับเป็นสี่เหลี่ยมมน ขอบดำ และมีมิติทรง 3D */
+.text-post-item > div { 
+  padding: 15px !important; 
+  border-radius: 20px !important;         /* ✨ ทำให้ขอบมนขึ้นแบบแคปซูล/กล่องการ์ตูน */
+  border: 2px solid #222222 !important;   /* ✨ ขอบสีดำหนาชัดเจน */
+  box-shadow: 4px 4px 0px #222222 !important; /* ✨ เพิ่มเงาดำทึบ ให้กล่องดูลอยมีมิติ */
+  background-color: #ffffff; 
+  transition: all 0.3s ease; 
+}
+
+/* เอฟเฟกต์ตอนนำเมาส์ไปชี้ */
+.text-post-item:hover > div { 
+  box-shadow: 6px 6px 0px #222222 !important; /* เงาใหญ่ขึ้นตอนกล่องเด้ง */
+}
+
+/* ปรับระยะห่างของตัวอักษรด้านในนิดหน่อยให้อ่านง่าย */
+.text-post-item p { 
+  font-size: 0.85rem !important; 
+  line-height: 1.5 !important; 
+  margin: 6px 0 0 0 !important; 
+}
+
+/* ================= 10. RESPONSIVE ================= */
 @media (max-width: 1024px) {
-  .profile-container { grid-template-columns: 1fr; max-width: 600px; }
-  .profile-header-content { flex-direction: column; align-items: center; text-align: center; margin-top: -60px; }
-  .right-panel { display: none; }
-}
+  .profile-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: start; 
+  }
+  
+  .center-panel { order: 1; }
+  .left-panel-wrapper { order: 2; } 
+  .right-panel-wrapper { order: 3; }
 
+  .text-posts-feed { margin-top: 20px; } /* ล้าง margin-top ออกบนมือถือ */
+
+  .profile-header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .left-profile-col { margin-top: -80px; }
+  .profile-text-info { padding-right: 0; margin-top: 15px; }
+  .btn-edit-profile { position: relative; bottom: auto; right: auto; margin-top: 15px; }
+}

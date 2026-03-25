@@ -1,6 +1,7 @@
 import './LeftPanel.css'
 import { TbArrowLeft, TbX, TbSend, TbMessageCircle, TbBrandFacebook, TbBrandInstagram } from "react-icons/tb";
 import { useState } from 'react';
+import MyVibe from './MyVibe';
 
 // เปลี่ยนมาใช้ LeftPanel เลย (ลบ YourComponent ทิ้งไป)
 const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
@@ -66,6 +67,8 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
           <span className="stat-label">Followers</span>
         </div>
       </div>
+
+      <MyVibe />
 
       <div className="contact-section">
         <button 

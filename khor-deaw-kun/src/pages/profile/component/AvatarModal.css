@@ -8,11 +8,6 @@
   padding: 0; 
 }
 
-.avatar-grid::-webkit-scrollbar { width: 12px; }
-.avatar-grid::-webkit-scrollbar-track { background: #fdfdfd; border-radius: 10px; border: 2px solid #ddd; }
-.avatar-grid::-webkit-scrollbar-thumb { background: #ffb8b8; border-radius: 10px; border: 2px solid #222; }
-.avatar-grid::-webkit-scrollbar-thumb:hover { background: #FF9F43; }
-
 .avatar-item-wrapper {
   position: relative;
   display: flex;

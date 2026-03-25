@@ -2,6 +2,7 @@ import './AvatarModal.css';
 import { createPortal } from 'react-dom';
 import { useState } from 'react';
 
+
 const AvatarModal = ({ setIsAvatarModalOpen, avatarPresets, avatarImage, setAvatarImage }) => {
   const [hoveredAvatar, setHoveredAvatar] = useState(null);
 

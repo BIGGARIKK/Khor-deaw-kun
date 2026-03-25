@@ -1,29 +1,43 @@
-.right-panel { display: flex; flex-direction: column; gap: 30px; padding-top: 10px; }
+/* RightPanel.css */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px; /* <--- ลองปรับตัวเลขตรงนี้ดูนะครับ (เช่น 30px, 40px, 50px) จนกว่าจะอยู่กึ่งกลางพอดี */
+}
 
 .polaroid-wrapper {
-  position: relative; padding: 15px 15px 25px 15px; 
-  background-color: #fff; transform: rotate(3deg); 
-  display: flex; flex-direction: column; align-items: center;
+  position: relative;
+  padding: 16px 16px 20px 16px; /* ✨ 4. Padding น้อยลง */
+  background-color: #fff;
+  transform: rotate(2deg); /* บิดน้อยลง ให้ดูสุภาพขึ้นในที่แคบ */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%; /* กว้างเต็ม 25% */
+  box-sizing: border-box;
+  border-radius: 16px; /* มนขึ้นนิดนึง */
 }
 
 .tape {
-  position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-4deg);
-  width: 90px; height: 28px; background-color: rgba(255, 235, 150, 0.85); 
-  border: 2px solid rgba(0, 0, 0, 0.1); box-shadow: 1px 1px 3px rgba(0,0,0,0.1); z-index: 2;
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 90px; /* ✨ ขยายความยาวเทปกาว */
+  height: 28px; /* ✨ ขยายความกว้างเทปกาว */
+  background-color: rgba(255, 235, 150, 0.85);
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
-
-.polaroid-img { width: 100%; height: 200px; object-fit: cover; border: 3px solid #222; border-radius: 4px; }
-.polaroid-caption { margin-top: 15px; font-size: 1.2rem; font-weight: bold; color: #333; font-family: 'Mali', cursive; }
 
 .story-trigger {
   cursor: pointer;
-  border: 4px solid transparent !important;
+  border: 3px solid transparent !important;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
-    conic-gradient(
-      from var(--story-angle),
-      #ff6b81, #FF9F43, #ffe066, #84E045, #4A90E2, #ff6b81
-    ) border-box !important;
+    conic-gradient(from var(--story-angle),
+      #ff6b81, #FF9F43, #ffe066, #84E045, #4A90E2, #ff6b81) border-box !important;
   animation: spinStoryBorder 2.5s linear infinite;
 }
 
@@ -31,6 +45,32 @@
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
     linear-gradient(#84E045, #84E045) border-box !important;
-  transform: rotate(0deg) scale(1.05);
-  animation: none; 
+  transform: rotate(0deg) scale(1.02);
+  animation: none;
+}
+
+.story-cover-img {
+  width: 100%;
+  height: 85px; /* ✨ 4. รูปภาพเตี้ยลงกะทัดรัด */
+  object-fit: contain;
+  background-color: #e6e6e6;
+  border-radius: 6px;
+}
+
+.story-placeholder-gray {
+  width: 100%;
+  height: 85px; /* ✨ 4. ให้เท่ากับรูปด้านบน */
+  background-color: #e6e6e6;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.polaroid-caption {
+  margin-top: 15px; /* ✨ เพิ่มระยะห่างจากรูป */
+  font-size: 1.1rem; /* ✨ ขยายตัวอักษรให้ใหญ่ขึ้น */
+  font-weight: bold;
+  color: #333;
+  font-family: 'Mali', cursive;
 }
