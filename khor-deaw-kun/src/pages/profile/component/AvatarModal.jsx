@@ -2,6 +2,7 @@ import './AvatarModal.css';
 import { createPortal } from 'react-dom';
 import { useState } from 'react';
 
+
 const AvatarModal = ({ setIsAvatarModalOpen, avatarPresets, avatarImage, setAvatarImage }) => {
   const [hoveredAvatar, setHoveredAvatar] = useState(null);
 
@@ -56,8 +57,6 @@ const AvatarModal = ({ setIsAvatarModalOpen, avatarPresets, avatarImage, setAvat
             );
           })}
         </div>
-
-        {/* 👉 ลบโค้ดส่วน <button className="avatar-close-btn"> ... </button> ออกไปแล้วครับ */}
 
       </div>
     </div>,

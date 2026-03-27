@@ -1,180 +1,186 @@
-/* profile-main.css */
-@import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&family=Playpen+Sans+Thai:wght@100..800&display=swap');
+/* profile.css */
+@import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Itim&family=Mali:wght@400;600;700&display=swap');
 
-* { box-sizing: border-box; }
+/* ================= CSS VARIABLES (ปรับ Spacing และสีให้คุมง่าย) ================= */
+:root {
+  --border-thin: 2px solid #222222;
+  --border-radius-main: 16px;
+  --border-radius-sm: 12px;
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.12);
+  --gap-main: 28px; /* ✨ ระยะห่างระหว่างคอลัมน์ 24-32px */
+}
 
-/* ================= BASE LAYOUT ================= */
+* {
+  box-sizing: border-box;
+}
+
+/* ================= BACKGROUND ================= */
 .profile-page {
-  /* ใช้สีโทนทราย/ทะเล เป็นพื้นหลังเผื่อรูปโหลดไม่ขึ้น */
-  background-color: #F4CE9B; 
-  background-image: url('../../assets/Hub/bg.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  /* เพิ่ม Playpen เข้ามาเป็นตัวเลือกเผื่ออยากใช้ฟอนต์เดียวกับ Feed */
-  font-family: 'Playpen Sans Thai', 'Mali', cursive, sans-serif; 
+  font-family: 'Mali', cursive, sans-serif;
   min-height: 100vh;
   width: 100%;
+  padding: 50px ;
   display: flex;
   justify-content: center;
-  align-items: flex-start; 
-  padding: 20px 20px;
 }
 
+/* ================= 1. LAYOUT หลัก (3 คอลัมน์ 1fr : 2.2fr : 1fr) ================= */
 .profile-container {
   display: grid;
-  grid-template-columns: 280px 1fr 280px; 
-  gap: 40px; 
+  grid-template-columns: 1fr 2.2fr 1fr; /* ✨ สัดส่วนซ้าย-กลาง-ขวา */
+  gap: var(--gap-main);
   width: 100%;
-  max-width: 1400px; 
+  max-width: 1350px; /* ✨ กว้างคุ้มพื้นที่ 1300-1400px แต่อยู่กึ่งกลาง */
   margin: 0 auto;
+  align-items: start; /* ✨ ให้ทุกคอลัมน์เริ่มจากขอบบนสุด */
 }
 
-.center-panel { display: flex; flex-direction: column; gap: 30px; }
+.center-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-main);
+  min-width: 0; 
+}
 
-/* ================= WOODEN BOX (แทนที่ Doodle Box เดิม) ================= */
+/* ================= BORDER & SHADOW (Doodle Box) ================= */
 .doodle-box {
-  /* สีครีมกระดาษ/ไม้สว่าง */
-  background-color: #FDF5E6; 
-  /* ขอบสีน้ำตาลเข้มแบบไม้ */
-  border: 3px solid #3E2723; 
-  /* ปรับให้ขอบมนนิดๆ คล้าย PostCard */
-  border-radius: 15px; 
-  /* เงาสีน้ำตาลเข้ม */
-  box-shadow: 5px 5px 0px #3E2723;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin: 5px;
-  color: #3E2723;
+  background-color: #ffffff;
+  border: var(--border-thin);
+  border-radius: var(--border-radius-main);
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .doodle-box:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0px #3E2723;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
 }
 
-.loading-box {
-  padding: 30px;
-  font-size: 1.5rem;
-  text-align: center;
-  font-weight: bold;
-  color: #3E2723;
-}
+.loading-box { padding: 30px; font-size: 1.5rem; text-align: center; font-weight: bold; }
 
-/* ================= SHARED MODAL BACKGROUND & BOX ================= */
-.ig-story-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(62, 39, 35, 0.8); /* หรี่พื้นหลังด้วยสีน้ำตาลเข้มแทนสีดำ */
-  z-index: 9999;
-  display: flex; justify-content: center; align-items: center; 
-  backdrop-filter: blur(5px);
-  animation: fadeInOverlay 0.3s ease;
-}
+/* ================= MODALS ================= */
+.ig-story-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); animation: fadeInOverlay 0.3s ease; }
 
 .avatar-modal-box {
-  background-color: #FDF5E6;
-  /* เพิ่มลวดลายเส้นไม้จางๆ (ถ้ามี) หรือใช้สีครีมเรียบๆ ก็สวยแล้ว */
-  padding: 20px 30px 25px 30px; 
-  border-radius: 20px;
-  border: 4px solid #3E2723;
-  width: 95%;
-  max-width: 480px; 
+  background-color: #ebd6bb;
+  max-width: 500px; 
+  padding: 40px; 
+  border-radius: 24px;
+  border: var(--border-thin);
+  width: 95%; 
   position: relative;
-  box-shadow: 12px 12px 0px #3E2723;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  transform-origin: center;
+  animation: modalPop 0.3s ease forwards;
 }
 
-.avatar-title-wrapper { text-align: center; margin-bottom: 25px; }
+.avatar-title-wrapper { text-align: center; margin-bottom: 20px; }
+.avatar-modal-title { font-size: 1.5rem; margin: 10px 0; color: #222; font-weight: 800; }
+@property --story-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes spinStoryBorder { 0% { --story-angle: 0deg; } 100% { --story-angle: 360deg; } }
+@keyframes popIn { 0% { transform: scale(0.95) translateY(10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes modalPop { 0% { opacity: 0; transform: scale(0.9) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popBubble { 0% { transform: scale(0.8) translateY(10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
-.avatar-modal-title {
-  font-size: 1.8rem;
-  margin-top: 10px;      
-  margin-bottom: 10px;   
-  color: #3E2723; /* ตัวหนังสือสีน้ำตาลเข้ม */
-  font-weight: 900;
-  text-align: center;
-  /* เงาไฮไลต์สีส้ม/ไม้สว่างๆ */
-  text-shadow: 2px 2px 0px #FFD285; 
+/* ================= POST หลัก (ตรงกลาง) ================= */
+.feed-carousel-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   position: relative;
 }
 
-.avatar-modal-title::after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: -5px;
-  right: -5px;
-  height: 14px;
-}
-
-/* ================= SHARED STORY ANIMATIONS ================= */
-@property --story-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes spinStoryBorder {
-  0% { --story-angle: 0deg; }
-  100% { --story-angle: 360deg; }
-}
-
-/* ================= SCROLL TO TOP BUTTON ================= */
-.scroll-top-btn {
-  position: fixed;
-  bottom: 40px;
-  right: 40px;
-  width: 60px;
-  height: 60px;
-  /* เปลี่ยนเป็นสีส้มให้เข้ากับปุ่ม Shout! */
-  background-color: #F48C2A; 
-  color: #1A1A1A;
-  cursor: pointer;
-  z-index: 999; 
+.carousel-content {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  border: 3px solid #3E2723;
-  border-radius: 50% 40% 50% 40% / 40% 50% 40% 50%; 
-  box-shadow: 3px 3px 0px #3E2723;
-  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: all 0.2s ease;
+  animation: fadeSlide 0.3s ease;
 }
 
-.scroll-top-btn:hover {
-  background-color: #FF9F43; 
-  transform: translateY(-5px) rotate(5deg);
-  box-shadow: 5px 5px 0px #3E2723;
+.carousel-content > div {
+  width: 100%;
+  padding: 18px !important; 
+  /* ✨ เพิ่มความมนให้เท่ากับกล่อง Doodle อื่นๆ */
+  border-radius: 24px !important; 
+  border: var(--border-thin) !important;
+  box-shadow: var(--shadow-soft) !important;
+  background-color: #fff;
+  margin-bottom: 20px;
 }
 
-/* ================= GLOBAL KEYFRAMES ================= */
-@keyframes popIn {
-  0% { transform: scale(0) translateY(20px); opacity: 0; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+.carousel-content img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  height: auto; 
+  object-fit: cover; 
+  object-position: center;
+  /* ✨ ปรับความมนของรูปภาพด้านในให้โค้งล้อไปกับกรอบด้านนอก */
+  border-radius: 16px; 
+  border: 1px solid #eaeaea;
+  display: block;
 }
 
-@keyframes modalPop {
-  0% { opacity: 0; transform: scale(0.5) translateY(50px); }
-  70% { transform: scale(1.05) translateY(-5px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+.carousel-btn { 
+  position: absolute; 
+  /* ✨ ขยับลงมานิดนึงให้อยู่กึ่งกลางรูปภาพพอดี (ชดเชยพื้นที่ส่วนหัวโพสต์) */
+  top: 55%; 
+  transform: translateY(-50%); 
+  /* ✨ ปรับพื้นหลังให้ทึบ 100% เวลาทับรูปจะได้เห็นปุ่มชัดๆ */
+  background-color: #ffffff; 
+  border: var(--border-thin); 
+  border-radius: 50%; 
+  width: 44px; 
+  height: 44px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  cursor: pointer; 
+  box-shadow: 3px 3px 0px #222222; 
+  color: #222222; 
+  z-index: 20; 
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
 
-@keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.prev-btn { left: 0px; }
+.next-btn { right: 0px; }
+
+.carousel-btn:hover { 
+  background-color: #84E045; 
+  transform: translateY(-50%) scale(1.15); 
+  box-shadow: 4px 4px 0px #222222; 
 }
 
-@keyframes popBubble {
-  0% { transform: scale(0) translateY(10px) rotate(-10deg); opacity: 0; }
-  100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+@keyframes fadeSlide { from { opacity: 0.5; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ================= SIDEBAR ขวา ================= */
+.right-panel-wrapper { 
+  display: flex; 
+  flex-direction: column; 
+  min-width: 0; 
 }
 
-/* ================= RESPONSIVE ================= */
+/* ================= 10. RESPONSIVE ================= */
 @media (max-width: 1024px) {
-  .profile-container { grid-template-columns: 1fr; max-width: 600px; }
-  .profile-header-content { flex-direction: column; align-items: center; text-align: center; margin-top: -60px; }
-  .right-panel { display: none; }
+  .profile-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: start; 
+  }
+  
+  .center-panel { order: 1; }
+  .left-panel-wrapper { order: 2; } 
+  .right-panel-wrapper { order: 3; }
+  .profile-header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .left-profile-col { margin-top: -80px; }
+  .profile-text-info { padding-right: 0; margin-top: 15px; }
+  .btn-edit-profile { position: relative; bottom: auto; right: auto; margin-top: 15px; }
 }

@@ -1,6 +1,7 @@
 import './LeftPanel.css'
 import { TbArrowLeft, TbX, TbSend, TbMessageCircle, TbBrandFacebook, TbBrandInstagram } from "react-icons/tb";
 import { useState } from 'react';
+import MyVibe from './MyVibe';
 
 const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
   
@@ -61,6 +62,8 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
         </div>
       </div>
 
+      <MyVibe />
+
       <div className="contact-section">
         {/* 🌟 เปลี่ยนจาก doodle-box เป็น wooden-box */}
         <button 
@@ -77,7 +80,7 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
 
           {isEditingContact ? (
             <>
-              <div className="contact-input-box line-input">
+              <div className=" contact-input-box line-input">
                 <TbMessageCircle size={28} />
                 <input 
                   placeholder="Line ID ..." 
