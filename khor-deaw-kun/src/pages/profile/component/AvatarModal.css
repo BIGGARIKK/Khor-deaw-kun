@@ -8,11 +8,6 @@
   padding: 0; 
 }
 
-.avatar-grid::-webkit-scrollbar { width: 12px; }
-.avatar-grid::-webkit-scrollbar-track { background: #fdfdfd; border-radius: 10px; border: 2px solid #ddd; }
-.avatar-grid::-webkit-scrollbar-thumb { background: #ffb8b8; border-radius: 10px; border: 2px solid #222; }
-.avatar-grid::-webkit-scrollbar-thumb:hover { background: #FF9F43; }
-
 .avatar-item-wrapper {
   position: relative;
   display: flex;
@@ -47,10 +42,10 @@
   transform: translateX(-50%); 
   background: white;
   border: 3px solid #222;
-  padding: 5px 12px;       
+  padding: 5px 5px;       
   border-radius: 12px;
-  font-weight: 800;
-  font-size: 0.85rem;
+  font-weight: 500;
+  font-size: 0.8rem;
   white-space: nowrap; 
   box-shadow: 4px 4px 0px #222;
   z-index: 10;

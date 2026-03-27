@@ -72,7 +72,7 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
   }, []);
 
   return (
-    <div className="doodle-box profile-header-card" style={{ '--status-color': statusConfig[status].color }}>
+    <div className="wooden-box profile-header-card" style={{ '--status-color': statusConfig[status].color }}>
       <div
         className="profile-cover"
         onClick={() => setIsColorModalOpen(true)}
@@ -157,14 +157,14 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
               <div className="input-wrapper">
                 <input
                   type="text"
-                  className={`doodle-input edit-name-input ${(editName || '').length >= 20 ? 'input-full' : ''}`}
+                  className={`doodle-input edit-name-input ${(editName || '').length >= 10 ? 'input-full' : ''}`}
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   placeholder="Your Name ..."
-                  maxLength={20}
+                  maxLength={10}
                 />
-                <span className={`char-counter ${(editName || '').length >= 20 ? 'text-red' : ''}`}>
-                  {(editName || '').length}/20
+                <span className={`char-counter ${(editName || '').length >= 10 ? 'text-red' : ''}`}>
+                  {(editName || '').length}/10
                 </span>
               </div>
 
@@ -191,7 +191,13 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
             <>
               {/* ชื่อโชว์เดี่ยวๆ */}
               <h1 className="profile-name">
-                <span className="highlight-text">{userData.username}</span> 
+                <span 
+                  className="highlight-text"
+                  // ✨ เพิ่ม style ตรงนี้เพื่อดึงสีจาก bannerColor มาใช้กับตัวหนังสือ
+                  style={{ color: typeof bannerColor === 'object' ? bannerColor.color : bannerColor }}
+                >
+                  {userData.username}
+                </span> 
               </h1>
               
               <p className="profile-bio">{userData?.bio || ""}</p>
