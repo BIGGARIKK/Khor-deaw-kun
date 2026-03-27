@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../service/api';
-import { TbArrowUp, TbChevronLeft, TbChevronRight } from "react-icons/tb";
+import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import PostCard from '../Feed/component/feed/PostCard';
 import './profile.css';
 
 import LeftPanel from './component/LeftPanel';
 import ProfileHeader from './component/ProfileHeader';
 import RightPanel from './component/RightPanel';
+import MyPosts from './component/MyPosts'; 
+
 import AvatarModal from './component/AvatarModal';
 import StoryModal from './component/StoryModal';
 import BannerColorModal from './component/BannerColorModal';
@@ -24,7 +26,7 @@ import myAv9 from '../../assets/avatars/9.png';
 
 export const BANNER_PRESETS = [
   { id: 1, color: '#ffb8b8', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
-  { id: 2, color: '#ff9f43', pattern: 'radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%)', size: '20px 20px', position: '0 0, 10px 10px' },
+  { id: 2, color: '#6de6e6', pattern: 'radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%)', size: '20px 20px', position: '0 0, 10px 10px' },
   { id: 3, color: '#ffe066', pattern: 'linear-gradient(rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.5) 2px, transparent 2px)', size: '20px 20px' },
   { id: 4, color: '#84e045', pattern: 'linear-gradient(45deg, rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(-45deg, rgba(255,255,255,0.5) 2px, transparent 2px)', size: '15px 15px' },
   { id: 5, color: '#50ade2', pattern: 'repeating-linear-gradient(-45deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
@@ -65,6 +67,22 @@ const Profile = () => {
 
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
 
+  // ✨ ระบบความจำ: เก็บ ID ของโพสต์ที่โดนกดไลก์แล้วไว้ที่ส่วนกลาง
+  const [likedPosts, setLikedPosts] = useState(new Set());
+
+  // ✨ ฟังก์ชันสลับสถานะไลก์ แล้วบันทึกลงความจำ
+  const toggleLike = (postId) => {
+    setLikedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId); // ถ้ายกเลิกไลก์ ก็เอาออกจากความจำ
+      } else {
+        newSet.add(postId);    // ถ้ากดไลก์ ก็เพิ่มเข้าความจำ
+      }
+      return newSet;
+    });
+  };
+
   const userPosts = [
     { id: 1, time: "1 min ago", text: "หยุดน่ารักได้มั้ย ใจเราก็แค่นี้อะ 🥺 #รักน้องแมวมาก", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 105, comments: 20 },
     { id: 2, time: "2 hours ago", text: "วันนี้เขียนโค้ดทั้งวันเลย สมองเบลอไปหมดแล้ววว 💻😵‍💫", hasImage: false, imageUrl: "", likes: 42, comments: 5 },
@@ -89,12 +107,41 @@ const Profile = () => {
       try {
         const data = await apiRequest('/profile', 'GET');
         setUserData(data);
+
+        // ดึงรูปที่เซฟไว้ใน DB มาโชว์ (ถ้ามี)
+        if (data && data.profile_image) {
+          const match = data.profile_image.match(/\d+/);
+          if (match) {
+            const index = parseInt(match[0], 10) - 1;
+            if (index >= 0 && index < avatarPresets.length) {
+              setAvatarImage(avatarPresets[index]);
+            }
+          }
+        }
       } catch (error) {
         alert(error.message || 'Failed to fetch profile data!');
       }
     };
     loadProfile();
   }, []);
+
+  const handleUpdateAvatar = async (selectedAvatar) => {
+    setAvatarImage(selectedAvatar);
+
+    try {
+      const avatarIndex = avatarPresets.indexOf(selectedAvatar);
+      const fileName = avatarIndex !== -1 ? `${avatarIndex + 1}.png` : '1.png';
+
+      await apiRequest('/profile', 'PUT', {
+        profile_image: fileName
+      });
+      console.log("Avatar updated in Database:", fileName);
+
+    } catch (error) {
+      console.error("Failed to update avatar:", error);
+      alert("บันทึกรูปไม่สำเร็จ ลองใหม่อีกครั้งนะครับ 😅");
+    }
+  };
 
   const handlePointerDown = () => {
     setIsPaused(true);
@@ -224,7 +271,6 @@ const Profile = () => {
 
       <div className="profile-container">
         
-        {/* ✨ คอลัมน์ซ้าย (1fr) */}
         <div className="left-panel-wrapper">
           <LeftPanel
             navigate={navigate}
@@ -234,7 +280,6 @@ const Profile = () => {
           />
         </div>
 
-        {/* ✨ คอลัมน์กลาง (2.2fr ใหญ่สุด) */}
         <div className="center-panel">
           <ProfileHeader
             userData={userData}
@@ -260,6 +305,15 @@ const Profile = () => {
             <div className="carousel-content">
               {imagePosts.length > 0 ? (
                 <PostCard
+                  key={imagePosts[currentPostIndex].id} 
+                  postId={imagePosts[currentPostIndex].id} 
+                  image_author={avatarImage} 
+
+                  // ✨ 4. ส่งสถานะไกล์เข้าไป ถ้ามีชื่อใน Set แปลว่าไลก์แล้ว
+                  isLikedParent={likedPosts.has(imagePosts[currentPostIndex].id)} 
+                  // ✨ 5. ผูกปุ่มกดไลก์เข้ากับฟังก์ชันจดจำของหน้าแม่
+                  onLikeToggle={() => toggleLike(imagePosts[currentPostIndex].id)} 
+
                   author={userData.username}
                   time={imagePosts[currentPostIndex].time}
                   text={imagePosts[currentPostIndex].text}
@@ -285,7 +339,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* ✨ คอลัมน์ขวา (1fr) */}
         <div className="right-panel-wrapper">
           <RightPanel
             stories={stories}
@@ -296,26 +349,8 @@ const Profile = () => {
             }}
           />
 
-          {/* ส่วนของ My Post (ถูกดันลงมาด้วย CSS margin-top: 250px เพื่อให้ขนานกับ Carousel กลาง) */}
-          {textPosts.length > 0 && (
-            <div className="text-posts-feed">
-              <h3 className="text-feed-title">My Post 💭</h3>
-              <div className="text-posts-scrollable">
-                {textPosts.map(post => (
-                  <div className="text-post-item" key={post.id}>
-                    <PostCard
-                      author={userData.username}
-                      time={post.time}
-                      text={post.text}
-                      hasImage={false}
-                      likes={post.likes}
-                      comments={post.comments}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <MyPosts textPosts={textPosts} username={userData.username} />
+          
         </div>
 
       </div>

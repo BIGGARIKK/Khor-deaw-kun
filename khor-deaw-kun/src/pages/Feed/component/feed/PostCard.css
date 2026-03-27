@@ -1,264 +1,106 @@
-/* PostCard.css - ฉบับแก้ไข (แก้กระพริบ + ภาพชัด) */
+.post-list-container { display: flex; flex-direction: column; gap: 30px; }
+.post-card-container { transition: transform 0.2s; }
+.post-card-container:hover { transform: translateY(-3px); }
 
-.post-card-container {
-    position: relative;
-    /* (Doodle Box styles) */
-}
+.post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; position: relative; z-index: 2; }
+.user-info-group { display: flex; align-items: center; gap: 15px; }
 
-/* --- Header & Dropdown Menu --- */
-.menu-trigger {
-    cursor: pointer;
-    padding: 5px;
+.post-avatar {
+    width: 50px;
+    height: 50px;
+    background-color: transparent !important; /* ✨ ลบพื้นหลังสีขาวหรือเทาออก */
+    border: 3px solid #3E2723;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    /* 🌟 ทริค: เพิ่มพื้นที่รับเมาส์รอบปุ่มนิดหน่อย ช่วยลดการกระพริบ */
-    outline: 2px solid transparent; 
-}
-
-.menu-trigger:hover {
-    background-color: #f0f0f0;
-    transform: scale(1.1);
-}
-
-.post-dropdown-menu {
-    /* ... (คงเดิม) ... */
-    position: absolute;
-    top: 40px; 
-    right: 0; 
-    background-color: #fff;
-    border: 3px solid #111;
-    border-radius: 15px;
-    box-shadow: 4px 4px 0px #111;
-    width: 130px;
-    z-index: 100; 
     overflow: hidden; 
-    display: flex;
-    flex-direction: column;
+    box-shadow: 2px 2px 0px #3E2723;
+    padding: 0 !important; /* ✨ ลบระยะขอบทิ้ง */
+    display: block; 
 }
 
-.dropdown-item {
-    /* ... (คงเดิม) ... */
-    padding: 10px 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 1.1rem;
-    transition: background-color 0.2s;
-    border-bottom: 2px solid #111; 
+.post-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    margin: 0;
+    padding: 0;
+    
+
+    transform: scale(1.54) translateY(5px);
 }
 
+.user-meta { display: flex; flex-direction: column; }
+.post-username { font-weight: bold; font-size: 1.3rem; }
+.post-time { font-size: 0.9rem; opacity: 0.8; font-weight: bold;}
+.menu-container { position: relative; }
+.menu-trigger { cursor: pointer; padding: 5px; border-radius: 50%; transition: 0.2s; }
+.menu-trigger:hover { background: rgba(255, 255, 255, 0.5); transform: scale(1.1);}
+.post-dropdown-menu { position: absolute; top: 35px; right: 0; background-color: #fff; border: 3px solid #3E2723; border-radius: 12px; box-shadow: 4px 4px 0px #3E2723; width: 130px; z-index: 100; overflow: hidden; display: flex; flex-direction: column; }
+.dropdown-item { padding: 10px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; border-bottom: 2px solid #3E2723; }
 .dropdown-item:last-child { border-bottom: none; }
-.dropdown-item:hover { background-color: #FFD500; }
+.dropdown-item:hover { background-color: #F48C2A; }
 .dropdown-item.delete:hover { background-color: #ff4d4f; color: #fff; }
 
-/* --- 🌟🌟🌟 Image Section (ในฟีด) - ส่วนที่แก้ไขหลัก 🌟🌟🌟 --- */
+.post-content-area { position: relative; z-index: 2; margin-bottom: 20px; }
+.post-text { font-size: 1.3rem; line-height: 1.5; margin-bottom: 15px; }
+.post-image-wrapper { border-radius: 15px; border: 4px solid #3E2723; box-shadow: 4px 4px 0px #3E2723; cursor: pointer; overflow: hidden; display: flex; justify-content: center; background: #fff;}
+.post-image-content { max-height: 500px; max-width: 100%; object-fit: contain; }
 
-/* 1. กล่องหุ้ม (รับหน้าที่แสดงขอบและเงา) */
-/* ในไฟล์ PostCard.css */
-
-.post-image-wrapper {
-    width: 100%;
-    margin-bottom: 15px;
-    border-radius: 15px;
-    border: 3px solid #111;
-    box-shadow: 4px 4px 0px #111;
-    background-color: #fafafa; 
-    cursor: pointer;
-    overflow: hidden; 
-    position: relative; 
-
-    /* 🌟🌟🌟 เพิ่ม 3 บรรทัดนี้เพื่อจัดรูปให้อยู่กลางกล่อง 🌟🌟🌟 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-/* 2. ตัวรูปภาพ (เอาขอบ/เงาออก) */
-.post-image-content {
-    /* ❌ ลบบรรทัดนี้ทิ้ง: width: 100%; */
-    
-    /* ✅ เพิ่มบรรทัดนี้แทน: */
-    max-width: 100%; /* บอกว่า "ห้ามกว้างเกินกรอบ" (แต่ถ้ารูปเล็กกว่ากรอบ ก็ให้แสดงตามขนาดจริง) */
-    
-    height: auto; /* รักษาสัดส่วน */
-    max-height: 600px; /* กันเหนียวไม่ให้สูงเกินไป */
-    object-fit: contain; 
-
-    display: block;
-    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.post-footer-new { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); /* ✨ บังคับแบ่งพื้นที่เป็น 3 ส่วนเท่าๆ กันเป๊ะ 100% */
+  gap: 8px; /* ระยะห่างระหว่างปุ่ม */
+  align-items: center; 
+  padding-top: 15px; 
+  border-top: 2px dashed rgba(62, 39, 35, 0.4); 
+  width: 100%;
 }
 
-/* 3. สั่งให้รูปขยายเมื่อเอาเมาส์ชี้ที่กล่องหุ้ม */
-.post-image-wrapper:hover .post-image-content {
-    /* ขยายเล็กน้อยพอให้ดูมีมิติ */
-    transform: scale(1.03); 
+/* ✨ ทริคสำคัญ: สลายกล่องที่ครอบปุ่ม Like กับ Comment อยู่ 
+   เพื่อให้ปุ่มทั้ง 3 มาอยู่ในระดับเดียวกันและถูก Grid คุมได้ */
+.footer-left-group { 
+  display: contents; 
 }
 
-.post-image-placeholder {
-    /* ... (คงเดิม) ... */
-    width: 100%;
-    height: 250px;
-    border: 3px solid #111;
-    border-radius: 20px;
-    margin-bottom: 15px;
-    background-image: linear-gradient(to right, #ccc, #eee); 
-    box-shadow: 4px 4px 0px #111;
+.action-btn { 
+  width: 100%; 
+  height: 42px; /* ✨ บังคับความสูงให้เท่ากันทุกปุ่ม (ปรับลดเพิ่มได้ตามชอบ) */
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 6px; 
+  background: rgba(255, 255, 255, 0.5); 
+  border: 2px solid #3E2723; 
+  border-radius: 12px; 
+  cursor: pointer; 
+  font-family: 'Patrick Hand', "Playpen Sans Thai", cursive; 
+  font-size: 1.1rem; 
+  font-weight: bold; 
+  box-shadow: 0px 4px 0px #3E2723; 
+  transition: 0.1s; 
+  padding: 0; /* เคลียร์ Padding ทิ้ง ให้ Grid และ Height คุมขนาดแทน */
+  box-sizing: border-box;
+  margin: 0;
 }
 
-/* --- Footer --- */
-.footer-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    /* 🌟 ทริค: เพิ่มพื้นที่รับเมาส์รอบไอคอน */
-    padding: 4px; 
-    margin: -4px; 
-    border-radius: 4px;
+.share-btn {
+  flex: 1;
 }
 
-.footer-actions:hover {
-    transform: scale(1.1) rotate(2deg);
-    color: #FFD500;
-    background-color: rgba(255, 213, 0, 0.1); /* เพิ่มพื้นหลังจางๆ ตอน hover */
-}
+.action-btn:hover { background: rgba(255, 255, 255, 0.8); transform: translateY(-2px); box-shadow: 0px 6px 0px #3E2723; }
+.action-btn:active { transform: translateY(4px); box-shadow: 0px 0px 0px #3E2723; }
+.cheers-btn.active { background-color: #F48C2A; color: white; }
 
-/* --- 🌟🌟🌟 Image Modal Popup (ส่วน Popup ใหญ่) 🌟🌟🌟 --- */
+.comments-section-wood { background: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 15px; margin-top: 20px; border: 3px solid #3E2723; position: relative; z-index: 2; }
+.comment-bubble { background: white; padding: 12px 15px; border-radius: 12px; border: 2px solid #3E2723; margin-bottom: 10px; box-shadow: 2px 2px 0 rgba(62, 39, 35, 0.2); font-size: 1.1rem; }
+.comment-input-wrap { display: flex; gap: 10px; margin-top: 10px; }
+.comment-input { flex: 1; border: 3px solid #3E2723; border-radius: 12px; padding: 10px 15px; font-family: 'Patrick Hand', "Playpen Sans Thai" ,cursive; outline: none; font-size: 1.1rem;}
+.send-comment-btn { background: #F48C2A; border: 3px solid #3E2723; border-radius: 12px; padding: 0 15px; cursor: pointer; box-shadow: 0 4px 0 #3E2723; }
+.send-comment-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #3E2723; }
 
-.image-modal-overlay {
-    /* ... (คงเดิม) ... */
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background-color: rgba(0, 0, 0, 0.85); 
-    backdrop-filter: blur(5px); 
-    display: flex; justify-content: center; align-items: center;
-    z-index: 9999;
-    overflow: hidden;
-}
-
-.image-modal-content {
-    position: relative;
-    /* ใช้ padding สร้างพื้นที่รอบรูปสำหรับปุ่มปิด */
-    padding: 40px; 
-    display: flex; justify-content: center; align-items: center;
-    /* 🌟 ทริค: กำหนดขนาดสูงสุดของ container ไม่ให้เกินจอ */
-    max-width: 100vw;
-    max-height: 100vh;
-}
-
-.modal-image {
-    /* 🌟 บังคับขยายรูปตามความสูงหน้าจอ (80% ของจอ) */
-    height: 80vh; 
-    /* ให้ความกว้างขยายตามสัดส่วนอัตโนมัติ */
-    width: auto; 
-    /* กันเหนียว เผื่อรูปกว้างเกินไปจนล้นขอบจอ */
-    max-width: 90vw; 
-
-    
-    border: 4px solid #fff; 
-    border-radius: 15px;
-    box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-}
-
-/* ปุ่มปิด (X) */
-.modal-close-btn {
-    /* ... (คงเดิม) ... */
-    position: absolute;
-    top: 0px; right: 0px;
-    background-color: #FFD500; color: #111;
-    border: 3px solid #111; border-radius: 50%;
-    width: 45px; height: 45px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    box-shadow: 3px 3px 0px #111;
-    z-index: 10000;
-    transform: translateZ(0); 
-    transition: transform 0.2s ease;
-}
-
-.modal-close-btn:hover {
-    transform: scale(1.1) rotate(10deg) translateZ(0);
-}
-
-/* --- 🌟🌟🌟 Comments Section (ส่วนที่กางออกมา) 🌟🌟🌟 --- */
-
-.comments-section {
-    margin-top: 15px;
-    padding-top: 15px;
-    /* ใช้เส้นประหนาๆ แบ่งโซนให้ดูมีความเป็นสมุดวาดรูป */
-    border-top: 3px dashed #111; 
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    
-    /* อนิเมชันเด้งลงมาแบบสมูทๆ */
-    animation: slideDown 0.3s ease forwards;
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* กล่องข้อความคอมเมนต์แต่ละอัน */
-.comment-item {
-    font-size: 0.95rem;
-    background-color: #fff;
-    padding: 10px 15px;
-    border-radius: 15px;
-    border: 2px solid #111;
-    /* เงาเล็กๆ ให้ดูมีมิติ */
-    box-shadow: 2px 2px 0px #111; 
-    margin: 5px 5px;
-}
-
-/* โซนพิมพ์คอมเมนต์และปุ่มส่ง */
-.comment-input-area {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.comment-input {
-    flex: 1;
-    padding: 12px 15px;
-    border: 3px solid #111;
-    border-radius: 20px;
-    font-family: inherit; /* ดึงฟอนต์ Doodle ของเว็บมาใช้ */
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.comment-input:focus {
-    border-color: #FFD500;
-    box-shadow: 0 0 0 3px rgba(255, 213, 0, 0.3);
-}
-
-.comment-submit-btn {
-    background-color: #FFD500;
-    color: #111;
-    border: 3px solid #111;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 3px 3px 0px #111;
-    transition: all 0.1s ease;
-}
-
-/* 🌟 เอฟเฟกต์ตอนถูกคลิก (Active State) ให้ปุ่มยุบลงไปเหมือนกดจริงๆ */
-.comment-submit-btn:active {
-    transform: translate(3px, 3px); /* ขยับลงมาทับเงาพอดี */
-    box-shadow: 0px 0px 0px #111; /* ซ่อนเงา */
-}
+.image-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+.image-modal-content { position: relative; padding: 20px; max-width: 100vw; max-height: 100vh; }
+.modal-image { max-height: 85vh; max-width: 90vw; border: 4px solid #fff; border-radius: 15px; }
+.modal-close-btn { position: absolute; top: -10px; right: -10px; background: #F48C2A; border: 3px solid #111; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; transition: 0.2s;}
+.modal-close-btn:hover { transform: scale(1.1) rotate(10deg); }

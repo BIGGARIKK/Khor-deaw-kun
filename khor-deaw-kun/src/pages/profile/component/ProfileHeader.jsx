@@ -13,6 +13,7 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
 
   const [isHoveringAvatar, setIsHoveringAvatar] = useState(false);
   const [phraseIndices, setPhraseIndices] = useState(Array(9).fill(0));
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const allAvatarPhrases = [
     ["What's up! 😎", "Nice to meet you!", "Looking good today!"],
@@ -72,7 +73,7 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
   }, []);
 
   return (
-    <div className="doodle-box profile-header-card" style={{ '--status-color': statusConfig[status].color }}>
+    <div className="wooden-box profile-header-card" style={{ '--status-color': statusConfig[status].color }}>
       <div
         className="profile-cover"
         onClick={() => setIsColorModalOpen(true)}
@@ -102,13 +103,14 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
             }}
             onMouseLeave={() => setIsHoveringAvatar(false)}
           >
-            {/* กล่องคำพูด (แสดงเฉพาะตอนออนไลน์) */}
+
             {isHoveringAvatar && !isStatusMenuOpen && status === 'online' && (
               <div key={phraseIndices[currentAvatarIndex]} className="main-avatar-speech-bubble">
                 {allAvatarPhrases[currentAvatarIndex][phraseIndices[currentAvatarIndex]]}
               </div>
+              
             )}
-
+            
             <img 
               src={avatarImage} 
               alt="avatar" 
@@ -146,6 +148,15 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
               )}
             </div>
           </div>
+
+          {/* ✨ ✨ ✨ ปุ่ม Follow จะถูกจัดให้อยู่ใต้กรอบ Avatar ตรงนี้ครับ ✨ ✨ ✨ */}
+          <button 
+            className={`doodle-follow-btn ${isFollowing ? 'following' : ''}`}
+            onClick={() => setIsFollowing(!isFollowing)}
+          >
+            {isFollowing ? 'Following ✨' : 'Follow +'}
+          </button>
+
         </div>
         
         {/* ข้อความและช่องกรอกข้อมูลฝั่งขวา */}
@@ -205,7 +216,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
           )}
         </div>
       </div>
-
 
       {!isEditing && (
         <button className="doodle-btn btn-edit-profile" onClick={handleEditClick}>

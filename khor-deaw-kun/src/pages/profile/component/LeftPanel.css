@@ -1,43 +1,45 @@
+/* ================= LEFT PANEL (WOODEN THEME) ================= */
 .left-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px; /* ลดระยะห่างระหว่างกล่อง */
+  margin-top: 70px; /* ✨ 1. เพิ่มระยะห่างจากขอบบนจอให้ดูไม่ชิดเกินไป */
 }
 
+/* 🌟 ปุ่มย้อนกลับ (แผ่นไม้) */
 .back-btn {
   width: 100%;
-  padding: 15px;
-  font-size: 1.1rem;
+  padding: 12px; /* ✨ 2. ลดความหนาของปุ่ม */
+  font-size: 1rem; /* ✨ 2. ลดขนาดตัวอักษร */
   font-weight: 800;
-  color: #222;
-  background-color: #fff;
+  color: #3E2723;
   cursor: pointer;
-  margin-bottom: 10px;
-  border: 3px solid #222;
+  margin-bottom: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.2s ease;
 }
 
 .back-btn:hover {
-  background-color: #eb5555;
-  transform: translate(-3px, -3px);
-  box-shadow: 6px 6px 0px #222;
+  transform: translateY(-4px); /* ✨ 3. เด้งขึ้นบนตรงๆ เล็กน้อย */
+  box-shadow: 4px 4px 0px #3E2723;
 }
 
 .icon-flex {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 10px; /* ✨ ลดระยะห่างระหว่างไอคอนกับข้อความ */
   width: 100%;
 }
 
+/* 🌟 กล่องสถิติ */
 .stats-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 15px;
+  padding: 15px 10px; /* ✨ 2. ลดความอ้วนของกล่อง */
   border: 4px solid transparent !important;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
@@ -51,26 +53,26 @@
   flex-direction: column;
   align-items: center;
   flex: 1;
-  gap: 10px;
-  padding: 5px 10px;
+  gap: 5px; /* ✨ ลดระยะห่างบรรทัด */
+  padding: 5px;
 }
 
 .stat-number {
-  font-size: 1.6rem;
+  font-size: 1.3rem; /* ✨ 2. ลดขนาดตัวเลข */
   font-weight: 800;
   color: #FF9F43;
 }
 
 .stat-label {
-  font-size: 0.95rem;
+  font-size: 0.8rem; /* ✨ 2. ลดขนาดข้อความ */
   font-weight: bold;
   color: #555;
   text-transform: uppercase;
 }
 
 .stat-divider {
-  width: 5px;
-  height: 40px;
+  width: 4px; /* ทำให้เส้นบางลง */
+  height: 30px; /* ทำให้เส้นสั้นลง */
   background-color: #222;
   border-radius: 5px;
   opacity: 0.2;
@@ -79,13 +81,13 @@
 .contact-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .contact-main-btn {
   width: 100%;
-  padding: 15px;
-  font-size: 1.2rem;
+  padding: 12px; /* ✨ 2. ลดความหนาของปุ่ม */
+  font-size: 1.05rem; /* ✨ 2. ลดขนาดตัวอักษร */
   font-weight: 800;
   color: #222 !important;
   background-color: #ffffff !important;
@@ -98,21 +100,23 @@
   justify-content: center;
   align-items: center;
   margin: 0 !important;
+  transition: all 0.2s ease;
 }
 
 .contact-main-btn.active {
   background-color: #f54545 !important;
 }
 
+/* ✨ 3. แก้ไขให้ปุ่ม Contact เด้งขึ้นตรงๆ แทนการหมุนเอียง */
 .contact-main-btn:hover {
-  transform: translate(-3px, -3px) rotate(-1deg);
-  box-shadow: 6px 6px 0px #222 !important;
+  transform: translateY(-4px); 
+  box-shadow: 4px 4px 0px #222 !important;
 }
 
 .contact-links-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   max-height: 0;
   overflow: hidden;
   opacity: 0;
@@ -132,16 +136,17 @@
   padding: 8px 10px 15px 10px;
 }
 
+/* 🌟 ปุ่มลิงก์แอปต่างๆ */
 .contact-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
-  font-size: 1.15rem;
+  padding: 10px 15px; /* ✨ 2. ลดขนาดปุ่มย่อย */
+  font-size: 1rem; /* ✨ 2. ลดขนาดตัวอักษร */
   font-weight: 800;
   text-decoration: none;
   color: #222;
-  background-color: #fff;
+  background-color: #E8CFAF;
   border: 3px solid #222;
   border-radius: 50px;
   box-shadow: 4px 4px 0px #222;
@@ -154,7 +159,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -164,7 +169,7 @@
 
 .contact-link:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 6px 6px 0px #222 !important;
+  box-shadow: 4px 4px 0px #222 !important;
   border-color: #222 !important;
 }
 
@@ -172,33 +177,22 @@
   transform: scale(1.2) rotate(-10deg);
 }
 
-.line-link:hover {
-  background-color: #00B900;
-  color: #fff;
-}
+.line-link:hover { background-color: #00B900; color: #fff; }
+.fb-link:hover { background-color: #1877F2; color: #fff; }
+.ig-link:hover { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #fff; }
 
-.fb-link:hover {
-  background-color: #1877F2;
-  color: #fff;
-}
-
-.ig-link:hover {
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  color: #fff;
-}
-
+/* 🌟 ปุ่ม Edit Contact */
 .edit-contact-btn {
   background: transparent;
   border: none;
-  font-family: 'Mali', cursive;
   font-weight: 800;
-  font-size: 1.05rem;
-  color: #777;
+  font-size: 0.95rem;
+  color: #2b2a2a;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 15px;
+  margin-top: 10px;
   margin-bottom: 5px;
   width: 100%;
   transition: 0.2s;
@@ -209,13 +203,14 @@
   transform: scale(1.05);
 }
 
+/* 🌟 ช่อง Input แก้ไข Contact */
 .contact-input-box {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   width: 100%;
-  padding: 14px 20px;
-  background-color: #fff;
+  padding: 12px 15px;
+  background-color: #E8CFAF;
   border: 3px solid #222;
   border-radius: 50px;
   box-shadow: 4px 4px 0px #222;
@@ -225,7 +220,7 @@
 .contact-input-box:hover,
 .contact-input-box:focus-within {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 6px 6px 0px #222;
+  box-shadow: 4px 4px 0px #3E2723;
 }
 
 .contact-input-box svg {
@@ -237,45 +232,21 @@
   transform: scale(1.2) rotate(-10deg);
 }
 
-.line-input:hover,
-.line-input:focus-within {
-  border-color: #00B900;
-}
-
-.line-input:hover svg,
-.line-input:focus-within svg {
-  color: #00B900;
-}
-
-.fb-input:hover,
-.fb-input:focus-within {
-  border-color: #1877F2;
-}
-
-.fb-input:hover svg,
-.fb-input:focus-within svg {
-  color: #1877F2;
-}
-
-.ig-input:hover,
-.ig-input:focus-within {
-  border-color: #E1306C;
-}
-
-.ig-input:hover svg,
-.ig-input:focus-within svg {
-  color: #E1306C;
-}
+.line-input:hover, .line-input:focus-within { border-color: #00B900; }
+.line-input:hover svg, .line-input:focus-within svg { color: #00B900; }
+.fb-input:hover, .fb-input:focus-within { border-color: #1877F2; }
+.fb-input:hover svg, .fb-input:focus-within svg { color: #1877F2; }
+.ig-input:hover, .ig-input:focus-within { border-color: #E1306C; }
+.ig-input:hover svg, .ig-input:focus-within svg { color: #E1306C; }
 
 .contact-input-box input {
   border: none;
   outline: none;
   background: transparent;
-  font-family: 'Mali', cursive;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: bold;
   width: 100%;
-  color: #222;
+  color: #3E2723;
 }
 
 .contact-input-box input::placeholder {

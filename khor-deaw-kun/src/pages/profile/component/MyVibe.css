@@ -1,8 +1,14 @@
 /* ================= MyVibe.css ================= */
 .rpg-stats-container {
   padding: 15px 15px 20px 15px;
-  background-color: #fff;
+  
+
+  background-color: #FDE8C4; /* สีพื้นหลังสำรอง */
+
+  border: 2px solid #222222;
   border-radius: 20px;
+  box-shadow: 4px 4px 0px #222222;
+
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -12,37 +18,36 @@
 
 .rpg-title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem; /* ✨ 2. ลดขนาดหัวข้อ */
   font-weight: 800;
   color: #222;
   text-align: center;
-  border-bottom: 2px dashed #ccc;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   font-family: 'Mali', cursive;
 }
 
 .rpg-stat-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
+  gap: 6px; /* ✨ ลดช่องว่างระหว่างข้อความและหลอด */
+  font-size: 0.75rem; /* ✨ 2. ลดขนาดตัวอักษรของ Label */
   font-weight: 800;
   color: #333;
 }
 
 .rpg-label {
-  width: 70px; 
+  width: 65px; /* ✨ ลดความกว้างพื้นที่ข้อความ */
   white-space: nowrap;
 }
 
 .rpg-bar-bg {
   flex: 1;
-  height: 16px;
+  height: 14px; /* ✨ 2. ทำให้หลอดพลังบางลง (เดิม 16px) */
   background-color: #f0f0f0;
   border: 2px solid #222;
   border-radius: 8px;
   overflow: hidden;
-  position: relative; /* ✨ สำคัญมาก! เพื่อให้ input ลอยอยู่ด้านในกล่องนี้ได้ */
+  position: relative; 
   box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
 }
 
@@ -57,28 +62,26 @@
     transparent 5px,
     transparent 10px
   );
-  /* ✨ หัวใจความสมูท! ให้ความกว้างเปลี่ยนแบบมี Transition นุ่มๆ */
   transition: width 0.15s ease-out; 
 }
 
 .rpg-percent {
-  width: 35px;
+  width: 32px;
   text-align: right;
 }
 
-/* ================= 🎚️ ระบบ Slider (ซ่อนไว้มองไม่เห็น แต่จับการกดได้) ================= */
+/* ================= 🎚️ ระบบ Slider ================= */
 .vibe-range-slider {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0; /* ซ่อนตัว Input ให้โปร่งใส 100% */
-  cursor: grab; /* เปลี่ยนเมาส์เป็นรูปมือจับ */
+  opacity: 0; 
+  cursor: grab; 
   margin: 0;
-
 }
 
 .vibe-range-slider:active {
-  cursor: grabbing; /* ตอนลากให้เมาส์กำหมัด */
+  cursor: grabbing; 
 }

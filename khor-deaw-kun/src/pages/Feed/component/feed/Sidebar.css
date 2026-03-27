@@ -1,93 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap');
+.left-sidebar { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; height: max-content; }
+.widget-box { padding: 18px; }
+.widget-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3E2723; padding-bottom: 8px; margin-bottom: 12px; }
+.widget-header h3 { font-size: 1.2rem; color: #1A1A1A; }
+.table-id { background: #3E2723; color: #FFD285; padding: 2px 8px; border-radius: 8px; font-weight: bold; }
+.table-members { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+.member-avatar { width: 40px; height: 40px; background: white; border: 2px solid #3E2723; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 2px 2px 0 #3E2723; }
+.member-avatar.empty { background: rgba(255,255,255,0.4); border: 2px dashed #3E2723; cursor: pointer; }
+.btn-wood-small { width: 100%; background: #F48C2A; border: 2px solid #3E2723; border-radius: 10px; padding: 8px; font-family: 'Schoolbell',  'Playpen Sans Thai',cursive; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 3px 0 #3E2723; transition: 0.1s; }
+.btn-wood-small:active { transform: translateY(3px); box-shadow: 0 0 0 #3E2723; }
+.jukebox-container { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.4); padding: 10px; border-radius: 12px; border: 2px solid #3E2723; }
+.vinyl-record { width: 50px; height: 50px; background: #1A1A1A; border-radius: 50%; border: 3px solid #3E2723; display: flex; align-items: center; justify-content: center; animation: spin 4s linear infinite; }
+.vinyl-center { width: 15px; height: 15px; background: #FFD285; border-radius: 50%; border: 2px solid #1A1A1A; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.song-info { display: flex; flex-direction: column; }
+.song-title { font-size: 1rem; color: #1A1A1A; }
+.song-artist { font-size: 0.8rem; color: #5C4033; font-weight: bold; }
 
-.sidebar {
-    /* 🌟 ล็อกความกว้างให้คงที่ ไม่ให้ล้นและไม่ให้ยืดหด */
-    flex: 0 0 260px; 
-    
-    display: flex;
-    flex-direction: column;
-    padding: 25px;
-    background-color: #ffffff;
-    
-    /* 🌟 สไตล์ Doodle แบบกลมมนขั้นสุด */
-    border: 3px solid #222;
-    border-radius: 20px;
-    box-shadow: 6px 6px 0px #222;
-    
-    /* การจัดการตำแหน่ง */
-    position: sticky;
-    top: 40px;
-    height: calc(100vh - 80px);
-    
-    /* 🌟 แก้ปัญหาล้น: กำหนดให้ทุกอย่างที่เกินกรอบถูกตัดทิ้ง */
+/* 🏆 Daily Quest Progress Bar */
+.mission-text { 
+    font-size: 0.95rem; 
+    font-weight: bold; 
+    margin-bottom: 8px; 
+    color: #3E2723;
+}
+.progress-bar-bg { 
+    width: 100%; 
+    height: 18px; 
+    background: rgba(255, 255, 255, 0.5); 
+    border: 2px solid #3E2723; 
+    border-radius: 10px; 
     overflow: hidden; 
-    
-    font-family: 'Mali', cursive, sans-serif;
-}
-
-/* ส่วนบน: จัดการให้ Profile อยู่ตรงกลางและไม่ล้น */
-.sidebar-top {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    height: 100%;
-}
-
-.logo {
-    font-size: 1.8rem;
-    font-weight: 800;
-    text-align: center;
-    color: #222;
     margin-bottom: 5px;
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
+}
+.progress-bar-fill { 
+    height: 100%; 
+    background: #4CAF50; 
+    /* ใส่ลูกเล่นเป็นลายทางให้หลอดพลังดูเป็นเกมมากขึ้น */
+    background-image: linear-gradient(
+        45deg, 
+        rgba(255,255,255,0.15) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(255,255,255,0.15) 50%, 
+        rgba(255,255,255,0.15) 75%, 
+        transparent 75%, 
+        transparent
+    );
+    background-size: 1rem 1rem;
+    animation: moveStripes 2s linear infinite;
+}
+.progress-text { 
+    text-align: right; 
+    font-size: 0.85rem; 
+    font-weight: bold; 
+    color: #5C4033; 
 }
 
-/* 🌟 Container โปรไฟล์: บังคับให้ขนาดพอดีกับ Sidebar */
-.profile-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    border-bottom: 2px dashed #ccc;
-    padding-bottom: 15px;
-    /* ย่อส่วนโปรไฟล์ลงนิดนึงถ้ามันดูใหญ่ไป */
-    transform: scale(0.9);
+@keyframes moveStripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 1rem 0; }
 }
 
-/* เมนู */
-.nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.nav-item {
+/* 🌊 Beach Vibe Widget */
+.vibe-box {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding: 12px 20px;
-    font-size: 1.2rem;
+    padding: 12px 18px;
+    background: rgba(62, 39, 35, 0.1);
+}
+.vibe-icon {
+    font-size: 2rem;
+    filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.2));
+}
+.vibe-text {
+    display: flex;
+    flex-direction: column;
+}
+.vibe-text strong {
+    font-size: 1rem;
+    color: #1A1A1A;
+}
+.vibe-text span {
+    font-size: 0.85rem;
     font-weight: bold;
-    color: #333;
-    cursor: pointer;
-    
-    /* ปรับขอบให้เป็น Doodle */
-    border: 2px solid transparent;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-}
-
-.nav-item:hover {
-    background-color: #FFA237;
-    border: 2px solid #222;
-    box-shadow: 3px 3px 0px #222;
-    transform: translateX(5px);
-}
-
-.nav-item:hover svg {
-    color: #ff6b81;
-    transform: scale(1.1);
+    color: #5C4033;
 }

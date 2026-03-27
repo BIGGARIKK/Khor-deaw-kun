@@ -1,0 +1,84 @@
+/* ================= MyPosts.css ================= */
+.text-posts-feed { 
+  display: flex; 
+  flex-direction: column; 
+  margin-top: 40px;
+  
+  /* ✨ ปรับลดเลขตรงนี้ลงครับ จาก 15px เหลือ 0 หรือ 5px ก็ได้ */
+  margin-left: 0px; 
+  
+  animation: popIn 0.5s ease; 
+}
+
+.text-feed-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #222;
+  margin: 0 0 16px 0;
+  text-align: center;
+  background-color: #ffffff;
+  border: 3px solid #222222;
+  border-radius: 50px; 
+  padding: 12px 20px;
+  box-shadow: 4px 4px 0px #222222; 
+  z-index: 100;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.text-posts-scrollable {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 680px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 15px 25px 40px 18px;
+  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+.text-posts-scrollable::-webkit-scrollbar { width: 6px; }
+.text-posts-scrollable::-webkit-scrollbar-track { background: transparent; }
+.text-posts-scrollable::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+.text-posts-scrollable::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
+.text-post-item { 
+  width: 100%; 
+  position: relative; 
+  margin-top: -10px; 
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  z-index: 1; 
+}
+
+.text-post-item:first-child { 
+  margin-top: 0; 
+}
+
+.text-post-item:hover { 
+  transform: translateY(-8px) scale(1.02); 
+  z-index: 50; 
+}
+
+.text-post-item > div { 
+  padding: 15px !important; 
+  border-radius: 20px !important;         
+  border: 2px solid #222222 !important;   
+  box-shadow: 4px 4px 0px #222222 !important; 
+  background-color: #ffffff; 
+  transition: all 0.3s ease; 
+}
+
+.text-post-item:hover > div { 
+  box-shadow: 6px 6px 0px #222222 !important; 
+}
+
+.text-post-item p { 
+  font-size: 0.85rem !important; 
+  line-height: 1.5 !important; 
+  margin: 6px 0 0 0 !important; 
+}
+
+@media (max-width: 1024px) {
+  .text-posts-feed { margin-top: 20px; } 
+}

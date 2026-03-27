@@ -1,18 +1,19 @@
-/* ProfileHeader.css */
 .profile-header-card {
   width: 100%;
   display: flex;
   flex-direction: column;
   border-radius: 20px;
   position: relative;
-  overflow: hidden; /* ✨ 2. ตัดขอบโค้งของ Banner */
-  background-color: #fff;
+  overflow: hidden; 
+  /* ✨ 1. เติม padding: 0 !important; เข้าไปเพื่อบังคับลบช่องว่างรอบๆ ทิ้ง */
+  padding: 0 !important; 
 }
 
 .profile-cover {
   width: 100%;
   height: 180px; 
-  border-radius: 27px 27px 0 0;
+  /* ✨ 2. เติม margin: 0 !important; กันเหนียวไม่ให้แบนเนอร์เด้งห่างขอบ */
+  margin: 0 !important; 
   border-bottom: 3px solid #222;
   cursor: pointer;
   transition: filter 0.2s;
@@ -24,11 +25,12 @@
 
 .profile-header-content {
   display: flex;
-  padding: 0 30px 30px 30px; /* กระชับขอบล่างให้พอดี */
-  gap: 25px;
+  /* ปรับ Padding บนลงมาหน่อยเพื่อรับข้อความ */
+  padding: 20px 30px 30px 30px; 
+  gap: 30px;
   align-items: flex-start;
-  /* ✨ ดึงรูปโปรไฟล์ให้คร่อมเส้นแบนเนอร์แบบสมดุล */
-  margin-top: -55px; 
+  background: transparent;
+  /* ✨ ยกเลิกการดึง margin-top: -55px ตรงนี้ออก */
 }
 
 .avatar-wrapper {
@@ -39,6 +41,7 @@
 }
 
 .avatar {
+  /* ✨ 2. ปรับความกว้าง-สูง ให้ใหญ่ขึ้นจากเดิม (120px -> 145px) */
   width: 120px; 
   height: 120px;
   border-radius: 50%;
@@ -46,8 +49,6 @@
   box-shadow: 3px 3px 0px #222;
   background-color: #fff;
   object-fit: cover;
-  
-  /* ✨ 1. เปลี่ยน transition ให้รองรับทุกการเปลี่ยนแปลง และเพิ่ม will-change ป้องกันภาพเบลอ */
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   will-change: transform;
 }
@@ -65,31 +66,93 @@
   transform: scale(1.05) translateY(-3px);
 }
 
-.status-container { position: absolute; bottom: 8px; right: 8px; z-index: 10; width: 24px; height: 24px; }
-.online-dot { position: absolute; top: 0; left: 0; width: 24px; height: 24px; background-color: var(--status-color); border: 3px solid #222; border-radius: 50%; cursor: pointer; box-shadow: 2px 2px 0px #222; transition: all 0.2s; }
+.status-container { 
+  position: absolute; 
+  bottom: 15px; /* ขยับตำแหน่งให้เข้ากับรูปที่ใหญ่ขึ้น */
+  right: 15px;  
+  z-index: 10; 
+  /* ✨ ลดขนาดลงจาก 24px เหลือ 16px */
+  width: 16px; 
+  height: 16px; 
+}
+
+.online-dot { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  /* ✨ ลดขนาดลงให้เท่ากับกล่อง */
+  width: 16px; 
+  height: 16px; 
+  background-color: var(--status-color); 
+  /* ลดขอบจาก 3px เหลือ 2px ให้ดูไม่หนาเกินไป */
+  border: 2px solid #222; 
+  border-radius: 50%; 
+  cursor: pointer; 
+  box-shadow: 2px 2px 0px #222; 
+  transition: all 0.2s; 
+}
+
 .online-dot:hover { transform: scale(1.2); }
 .avatar-wrapper:hover .online-dot { transform: scale(1.2); transition: all 0.2s; }
 
-.status-menu { position: absolute; bottom: 35px; left: -5px; background: white; border: 3px solid #222; border-radius: 15px; padding: 10px; display: flex; flex-direction: column; gap: 5px; box-shadow: 4px 4px 0px #222; animation: popIn 0.2s ease; min-width: 120px; z-index: 11; }
-.status-option { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
-.status-option:hover { background: #f0f0f0; transform: translateX(3px); }
-.status-color-circle { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #222; }
+.status-menu { 
+  position: absolute; 
+  bottom: 35px;  /* ปรับความสูงตอนเด้งให้พอดีกับจุดที่เล็กลง */
+  left: -1px;   /* ขยับให้อยู่ตรงกลางจุดพอดี */
+  background: white; 
+  border: 2px solid #222; /* ลดความหนาเส้นขอบ */
+  border-radius: 12px;    /* ลดความมนลงนิดนึงให้สมดุล */
+  padding: 6px;           /* ลดพื้นที่ว่างรอบๆ ด้านใน */
+  display: flex; 
+  flex-direction: column; 
+  gap: 2px;               /* ลดช่องว่างระหว่างบรรทัด */
+  box-shadow: 3px 3px 0px #222; /* ลดขนาดเงาให้เล็กลง */
+  animation: popIn 0.2s ease; 
+  min-width: 95px;        /* ลดความกว้างของเมนู */
+  z-index: 11; 
+}
+
+/* ✨ 2. ตัวเลือกแต่ละบรรทัด (ลดขนาดตัวอักษร และพื้นที่กด) */
+.status-option { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px;           /* ลดระยะห่างระหว่างจุดกับตัวหนังสือ */
+  padding: 5px 8px;   /* ลดความอ้วนของบรรทัด */
+  border-radius: 8px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  font-size: 0.8rem;  /* ✨ ปรับขนาดตัวอักษรให้เล็กลง (จากเดิม 0.9rem) */
+  transition: 0.2s; 
+}
+
+.status-option:hover { 
+  background: #f0f0f0; 
+  transform: translateX(3px); 
+}
+
+/* ✨ 3. จุดสีข้างในเมนู (ลดขนาดลงให้เข้ากับฟอนต์) */
+.status-color-circle { 
+  width: 12px;  /* ลดขนาดจาก 15px เหลือ 12px */
+  height: 12px; 
+  border-radius: 50%; 
+  border: 2px solid #222; 
+}
 
 .profile-text-info {
   display: flex;
   flex-direction: column;
   gap: 10px; 
-  margin-top: 60px; 
-  
+  /* ✨ 3. ปรับให้บรรทัดตรงกับขอบรูปโปรไฟล์พอดี */
+  margin-top: -20px; 
   width: 100%;
-  padding-right: 90px; /* เว้นที่ให้ปุ่ม Edit ขวาล่าง */
+  padding-right: 90px; 
 }
 
 .profile-name { 
   margin: 0; 
   /* ✨ เปลี่ยนมาใช้ฟอนต์ Itim ให้ดูเป็นลายมือเมจิกหนาๆ */
   font-family: 'Itim', cursive; 
-  font-size: 2.5rem; 
+  font-size: 1.8rem;
   color: #222; 
   display: flex; 
   align-items: center; 
@@ -117,7 +180,7 @@
 .profile-bio { 
   margin: 0; 
   font-family: 'Mali', cursive; 
-  font-size: 1rem; 
+  font-size: 0.9rem; 
   font-weight: 700; 
   color: #555; 
   line-height: 1.6; 
@@ -128,7 +191,7 @@
   cursor: text; 
   text-overflow: ellipsis;
 
-  min-height: 78px; 
+  min-height: 60px;
 
   overflow-wrap: anywhere; 
 }
@@ -147,7 +210,7 @@
   margin-top: 5px; 
 }
 
-.doodle-input { font-family: 'Mali', cursive; font-size: 1rem; padding: 10px 15px; border: 3px solid #222; border-radius: 15px; outline: none; background: #fff; transition: 0.2s; box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1); }
+.doodle-input { font-family: 'Mali', cursive; font-size: 1rem; padding: 10px 15px; border: 3px solid #222; border-radius: 15px; outline: none; background: #E8CFAF; transition: 0.2s; box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1); }
 .doodle-input:focus { border-color: #84E045; box-shadow: 3px 3px 0px #222; transform: translateY(-2px); }
 .edit-name-input { font-size: 1.2rem; font-weight: 800; color: #222; padding-right: 65px; width: 100%; }
 .edit-bio-input { resize: none; min-height: 80px; overflow: hidden; padding-right: 15px; padding-bottom: 45px; width: 100%; }
@@ -165,8 +228,20 @@
 .doodle-input.input-full:focus { border-color: #ff4d4d !important; box-shadow: 3px 3px 0px rgba(255, 77, 77, 0.2) !important; }
 .char-counter.text-red { color: #ff4d4d; }
 
-.left-profile-col { display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: 2; }
-.btn-edit-profile { position: absolute; bottom: 20px; right: 24px; background-color: #ffffff; font-size: 0.9rem; padding: 6px 12px; color: #222; z-index: 10; }
+.left-profile-col { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 15px; 
+  z-index: 2; 
+  
+  /* ✨ 2. ขยับกรอบรูปไปทางขวา */
+  margin-left: 20px; 
+  /* ✨ ดึงเฉพาะรูปโปรไฟล์ขึ้นไปทับแบนเนอร์แทน */
+  margin-top: -85px; 
+}
+
+.btn-edit-profile { position: absolute; bottom: 20px; right: 24px; background-color: #E8CFAF; font-size: 0.9rem; padding: 6px 12px; color: #222; z-index: 10; }
 .btn-edit-profile:hover { background-color: #ffe066; transform: translate(-2px, -2px); box-shadow: 3px 3px 0px #222; }
 
 .highlight-text { 
@@ -192,3 +267,97 @@
 }
 
 .highlight-text:hover { transform: translateY(-5px); }
+
+.doodle-follow-btn {
+  font-family: 'Mali', cursive;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #222;
+  background-color: #fff;
+  border: 3px solid #222;
+  border-radius: 12px;
+  padding: 6px 18px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #222;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10;
+  
+  /* ดึงปุ่มให้ชิดรูปขึ้นอีกนิด เผื่อระยะห่าง gap มันเยอะไป */
+  margin-top: -5px; 
+}
+
+/* เอฟเฟกต์ตอนเอาเมาส์ชี้ */
+.doodle-follow-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px #222;
+  background-color: #ffe066; /* สีเหลืองพาสเทล */
+}
+
+/* เอฟเฟกต์ตอนกดแล้ว (เปลี่ยนเป็นสีเขียว) */
+.doodle-follow-btn.following {
+  background-color: #84E045;
+  color: #222;
+}
+
+.doodle-follow-btn.following:hover {
+  background-color: #76c93d;
+}
+
+/* ProfileHeader.css ต่อท้ายคลาส .header-user-infoเดิม */
+
+/* ✨ ✨ ✨ เพิ่มคลาสสำหรับจัดปุ่มไว้ใต้รูป ✨ ✨ ✨ */
+.avatar-follow-group {
+  display: flex;
+  flex-direction: column; /* ✨ จัดแบบแนวตั้ง ✨ */
+  align-items: center; /* ✨ ให้อยู่กึ่งกลางเป๊ะๆ ✨ */
+  gap: 8px; /* ✨ ระยะห่างระหว่างรูปกับปุ่ม ✨ */
+}
+
+.header-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #3E2723;
+  box-shadow: 0 4px 0 #3E2723; 
+/* margin-top: -30px; ลบออกเพื่อให้กลุ่มขยับขึ้นแทน */
+  object-fit: cover; 
+}
+
+/* ✨ ✨ ✨ สไตล์สำหรับปุ่ม Follow (ธีม Doodle/Wooden) ✨ ✨ ✨ */
+.follow-btn {
+  background-color: #fff;
+  color: #3E2723;
+  border: 3px solid #3E2723;
+  border-radius: 12px;
+  padding: 6px 16px;
+  font-family: 'Patrick Hand', "Playpen Sans Thai" ,cursive;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #3E2723; /* ✨ เงาแบบนูน (Block Shadow) ✨ */
+  transition: all 0.1s ease; /* ✨ เปลี่ยนแปลงเร็วๆ เพื่อให้ดูเด้ง ✨ */
+}
+
+/* เอฟเฟกต์ตอนเอาเมาส์ชี้ */
+.follow-btn:hover {
+  background-color: #F8B400; /* ✨ สีเหลืองทองตอนโฮเวอร์ ✨ */
+  transform: translateY(-2px); /* ✨ ยกลอยขึ้นนิดนึง ✨ */
+  box-shadow: 0 6px 0 #3E2723; /* ✨ เงาหนาขึ้น ✨ */
+}
+
+/* ✨ ✨ ✨ เอฟเฟกต์ฟิสิกส์ตอนกดปุ่ม ( ยุบตัวลง ) ✨ ✨ ✨ */
+.follow-btn:active {
+  transform: translateY(4px); /* ✨ ขยับลงมาเท่ากับระยะเงา ✨ */
+  box-shadow: 0 0 0 #3E2723; /* ✨ ลบเงาออกเหมือนปุ่มไปปิดทับเงาพอดี ✨ */
+}
+
+/* ✨ ✨ ✨ สไตล์สำหรับสถานะ "Following" (ติดตามแล้ว) ✨ ✨ ✨ */
+.follow-btn.following {
+  background-color: #84E045; /* ✨ สีเขียวมะนาว ✨ */
+  color: white; /* ✨ ข้อความสีขาว ✨ */
+}
+
+/* เอฟเฟกต์ตอนโฮเวอร์ในสถานะ Following */
+.follow-btn.following:hover {
+  background-color: #76c93d; /* ✨ เขียวเข้มขึ้นนิดนึง ✨ */
+}

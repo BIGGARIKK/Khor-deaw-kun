@@ -7,6 +7,7 @@ import SignIn from './pages/AuthenPage/SignIn/SignIn'
 import SignUp from './pages/AuthenPage/SignUp/SignUp'
 import Profile from './pages/profile/profile'
 import Feed from './pages/Feed/Feed'
+import Hub from './pages/Hub/Hub'
 
 function App() {
   return (
@@ -23,7 +24,9 @@ function App() {
         
         {/* 3. หน้า Sign Up */}
         <Route path="/Signup" element={<SignUp />} />
-        <Route path="/Feed" element={<Feed />} />
+        <Route path="/Beach" element={<Feed />} />
+
+        <Route path="/Hub" element={<Hub />} />
       </Routes>
     </BrowserRouter>
   )

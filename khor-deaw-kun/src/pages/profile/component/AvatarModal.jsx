@@ -58,8 +58,6 @@ const AvatarModal = ({ setIsAvatarModalOpen, avatarPresets, avatarImage, setAvat
           })}
         </div>
 
-        {/* 👉 ลบโค้ดส่วน <button className="avatar-close-btn"> ... </button> ออกไปแล้วครับ */}
-
       </div>
     </div>,
     document.body

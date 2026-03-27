@@ -18,11 +18,10 @@
 
 /* ================= BACKGROUND ================= */
 .profile-page {
-  background:url('../../assets/bg.png') center/cover fixed;
   font-family: 'Mali', cursive, sans-serif;
   min-height: 100vh;
   width: 100%;
-  padding: 10px 24px;
+  padding: 50px ;
   display: flex;
   justify-content: center;
 }
@@ -61,14 +60,12 @@
 
 .loading-box { padding: 30px; font-size: 1.5rem; text-align: center; font-weight: bold; }
 
-/* ================= MODALS (ย่อไว้) ================= */
+/* ================= MODALS ================= */
 .ig-story-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); animation: fadeInOverlay 0.3s ease; }
 
 .avatar-modal-box {
   background-color: #ebd6bb;
   max-width: 500px; 
-  
-  
   padding: 40px; 
   border-radius: 24px;
   border: var(--border-thin);
@@ -108,7 +105,6 @@
 .carousel-content > div {
   width: 100%;
   padding: 18px !important; 
-  /* ✨ เพิ่มความมนให้เท่ากับกล่อง Doodle อื่นๆ */
   border-radius: 24px !important; 
   border: var(--border-thin) !important;
   box-shadow: var(--shadow-soft) !important;
@@ -122,7 +118,6 @@
   height: auto; 
   object-fit: cover; 
   object-position: center;
-  /* ✨ ปรับความมนของรูปภาพด้านในให้โค้งล้อไปกับกรอบด้านนอก */
   border-radius: 16px; 
   border: 1px solid #eaeaea;
   display: block;
@@ -130,11 +125,10 @@
 
 .carousel-btn { 
   position: absolute; 
-  /* ✨ ขยับลงมานิดนึงให้อยู่กึ่งกลางรูปภาพพอดี (ชดเชยพื้นที่ส่วนหัวโพสต์) */
-  top: 55%; 
-  transform: translateY(-50%); 
+
+  top: 400px; 
   
-  /* ✨ ปรับพื้นหลังให้ทึบ 100% เวลาทับรูปจะได้เห็นปุ่มชัดๆ */
+  transform: translateY(-50%); 
   background-color: #ffffff; 
   border: var(--border-thin); 
   border-radius: 50%; 
@@ -146,7 +140,7 @@
   cursor: pointer; 
   box-shadow: 3px 3px 0px #222222; 
   color: #222222; 
-  z-index: 20; /* ดันให้อยู่บนสุด ไม่โดนรูปทับ */
+  z-index: 20; 
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
 
@@ -154,112 +148,18 @@
 .next-btn { right: 0px; }
 
 .carousel-btn:hover { 
-  background-color: #84E045; /* สีเขียวเวลานำเมาส์ไปชี้ */
+  background-color: #84E045; 
   transform: translateY(-50%) scale(1.15); 
   box-shadow: 4px 4px 0px #222222; 
 }
 
 @keyframes fadeSlide { from { opacity: 0.5; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ================= SIDEBAR ขวา (Post ย่อย & Stacked Cards) ================= */
+/* ================= SIDEBAR ขวา ================= */
 .right-panel-wrapper { 
   display: flex; 
   flex-direction: column; 
   min-width: 0; 
-}
-
-.text-posts-feed { 
-  display: flex; 
-  flex-direction: column; 
-  margin-top: 50px;
-  animation: popIn 0.5s ease; 
-}
-
-.text-feed-title {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #222;
-  margin: 0 0 16px 0;
-  text-align: center;
-  background-color: #ffffff;
-  
-  border: 3px solid #222222;
-  border-radius: 50px; 
-  padding: 12px 20px;
-
-  box-shadow: 4px 4px 0px #222222; 
-  
-  z-index: 100;
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  cursor: pointer;
-}
-
-/* ✨ เอฟเฟกต์ตอนเอาเมาส์ชี้: เด้งขึ้นและขยายเงานิดหน่อย */
-.text-feed-title:hover {
-  background-color: #ffe066; /* สีเหลืองเวลานำเมาส์ไปชี้ */
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 6px 6px 0px #222222; 
-}
-
-.text-posts-scrollable {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  max-height: 680px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 15px 25px 40px 10px;
-
-  /* ✨ เพิ่ม 2 บรรทัดนี้เข้าไปเพื่อให้ขอบล่างค่อยๆ จางเนียนๆ */
-  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-}
-
-.text-posts-scrollable::-webkit-scrollbar { width: 6px; }
-.text-posts-scrollable::-webkit-scrollbar-track { background: transparent; }
-.text-posts-scrollable::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-.text-posts-scrollable::-webkit-scrollbar-thumb:hover { background: #aaa; }
-
-/* ================= เอฟเฟกต์ซ้อนไพ่ฝั่งขวา (My Post) ================= */
-.text-post-item { 
-  width: 100%; 
-  position: relative; 
-  /* ✨ ลดระยะที่ซ้อนทับกันลง เพื่อให้เห็นความโค้งมนของขอบกล่องแต่ละใบชัดเจนขึ้น */
-  margin-top: -15px; 
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-  z-index: 1; 
-}
-
-.text-post-item:first-child { 
-  margin-top: 0; 
-}
-
-.text-post-item:hover { 
-  transform: translateY(-8px) scale(1.02); 
-  z-index: 50; 
-}
-
-/* ✨ หัวใจหลัก: ปรับเป็นสี่เหลี่ยมมน ขอบดำ และมีมิติทรง 3D */
-.text-post-item > div { 
-  padding: 15px !important; 
-  border-radius: 20px !important;         /* ✨ ทำให้ขอบมนขึ้นแบบแคปซูล/กล่องการ์ตูน */
-  border: 2px solid #222222 !important;   /* ✨ ขอบสีดำหนาชัดเจน */
-  box-shadow: 4px 4px 0px #222222 !important; /* ✨ เพิ่มเงาดำทึบ ให้กล่องดูลอยมีมิติ */
-  background-color: #ffffff; 
-  transition: all 0.3s ease; 
-}
-
-/* เอฟเฟกต์ตอนนำเมาส์ไปชี้ */
-.text-post-item:hover > div { 
-  box-shadow: 6px 6px 0px #222222 !important; /* เงาใหญ่ขึ้นตอนกล่องเด้ง */
-}
-
-/* ปรับระยะห่างของตัวอักษรด้านในนิดหน่อยให้อ่านง่าย */
-.text-post-item p { 
-  font-size: 0.85rem !important; 
-  line-height: 1.5 !important; 
-  margin: 6px 0 0 0 !important; 
 }
 
 /* ================= 10. RESPONSIVE ================= */
@@ -273,8 +173,6 @@
   .center-panel { order: 1; }
   .left-panel-wrapper { order: 2; } 
   .right-panel-wrapper { order: 3; }
-
-  .text-posts-feed { margin-top: 20px; } /* ล้าง margin-top ออกบนมือถือ */
 
   .profile-header-content {
     flex-direction: column;

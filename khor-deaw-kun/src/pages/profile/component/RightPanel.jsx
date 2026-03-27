@@ -7,8 +7,7 @@ const RightPanel = ({ setIsStoryOpen, stories = [] }) => {
       <div className="right-panel">
          
          {/* ================= กล่อง Story (My Story) ================= */}
-         <div className="doodle-box polaroid-wrapper story-trigger" onClick={() => setIsStoryOpen(true)}>
-            <div className="tape"></div>
+         <div className="wooden-box polaroid-wrapper story-trigger" onClick={() => setIsStoryOpen(true)}>
 
             {firstStoryImage ? (
                <div style={{ position: 'relative', width: '100%', height: '180px' }}>

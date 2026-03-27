@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './MyVibe.css';
+import woodPattern from '../../../assets/Hub/cartoon-wood-pattern1.jpg';
 
 const MyVibe = () => {
   // 1. สร้าง State เก็บค่าพลัง (เริ่มที่ 0 เพื่อให้หลอดวิ่งขึ้นตอนเปิดหน้าเว็บ)
@@ -18,15 +19,24 @@ const MyVibe = () => {
   }, []);
 
   return (
-    <div className="doodle-box rpg-stats-container">
-      <h3 className="rpg-title">My Vibe 📖</h3>
+    <div 
+  className="rpg-stats-container"
+  /* ✅ ใส่เป็น prop style ตรงนี้เลยครับ */
+  style={{
+    backgroundImage: `url(${woodPattern})`, 
+    backgroundSize: 'cover', 
+    backgroundPosition: 'center',
+    backgroundColor: '#FDE8C4'
+  }}
+>
+  <h3 className="rpg-title">My Vibe 📖</h3>
       
       {/* หลอดที่ 1: Coffee */}
       <div className="rpg-stat-row">
-         <span className="rpg-label">👄 No bae!</span>
+         <span className="rpg-label">🌑 Sleepy</span>
          <div className="rpg-bar-bg">
             {/* แถบสีที่จะยืดหดตาม state */}
-            <div className="rpg-bar-fill" style={{ width: `${coffee}%`, backgroundColor: '#2ECC71' }}></div>
+            <div className="rpg-bar-fill" style={{ width: `${coffee}%`, backgroundColor: '#363837' }}></div>
             {/* Range Input ซ่อนไว้ด้านบนเพื่อรับการกด/ลาก */}
             <input 
               type="range" min="0" max="100" 
@@ -41,9 +51,9 @@ const MyVibe = () => {
 
       {/* หลอดที่ 2: Coding */}
       <div className="rpg-stat-row">
-         <span className="rpg-label">💔 Empty </span>
+         <span className="rpg-label">🍜 Hungry </span>
          <div className="rpg-bar-bg">
-            <div className="rpg-bar-fill" style={{ width: `${coding}%`, backgroundColor: '#C0392B' }}></div>
+            <div className="rpg-bar-fill" style={{ width: `${coding}%`, backgroundColor: '#c9584b' }}></div>
             <input 
               type="range" min="0" max="100" 
               value={coding} 
@@ -56,9 +66,9 @@ const MyVibe = () => {
 
       {/* หลอดที่ 3: Sleepy */}
       <div className="rpg-stat-row">
-         <span className="rpg-label">💖 Only you </span> 
+         <span className="rpg-label">😤 Energy </span> 
          <div className="rpg-bar-bg">
-            <div className="rpg-bar-fill" style={{ width: `${sleepy}%`, backgroundColor: '#FF69B4' }}></div>
+            <div className="rpg-bar-fill" style={{ width: `${sleepy}%`, backgroundColor: '#5db962' }}></div>
             <input 
               type="range" min="0" max="100" 
               value={sleepy} 

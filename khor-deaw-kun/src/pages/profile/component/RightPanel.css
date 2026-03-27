@@ -18,19 +18,6 @@
   border-radius: 16px; /* มนขึ้นนิดนึง */
 }
 
-.tape {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-3deg);
-  width: 90px; /* ✨ ขยายความยาวเทปกาว */
-  height: 28px; /* ✨ ขยายความกว้างเทปกาว */
-  background-color: rgba(255, 235, 150, 0.85);
-  border: 2px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-  z-index: 2;
-}
-
 .story-trigger {
   cursor: pointer;
   border: 3px solid transparent !important;
