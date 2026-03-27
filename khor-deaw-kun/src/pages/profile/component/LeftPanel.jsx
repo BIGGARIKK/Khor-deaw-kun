@@ -124,8 +124,12 @@ const LeftPanel = ({ navigate, userData, isContactOpen, setIsContactOpen }) => {
             </>
           )}
 
-          <button className="edit-contact-btn" onClick={() => setIsEditingContact(!isEditingContact)}>
-            {isEditingContact ? '💾 Save' : '✏️ Edit the contact '}
+          {/* 🌟 เพิ่มคลาส saving-mode เข้าไปตอนที่กำลัง Edit อยู่ */}
+          <button 
+            className={`edit-contact-btn ${isEditingContact ? 'saving-mode' : ''}`} 
+            onClick={() => setIsEditingContact(!isEditingContact)}
+          >
+            {isEditingContact ? '💾 Save Contact' : '✏️ Edit Contact'}
           </button>
 
         </div>

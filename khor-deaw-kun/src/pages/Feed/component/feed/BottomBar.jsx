@@ -9,8 +9,30 @@ import './BottomBar.css';
 function BottomBar() {
     const navigate = useNavigate();
     const [showProfileSheet, setShowProfileSheet] = useState(false);
-    const [currentVibe, setCurrentVibe] = useState('chill');
     const [userData, setUserData] = useState(null);
+    const [currentVibe, setCurrentVibe] = useState(userData?.vibe || 'chill');
+
+    useEffect(() => {
+        if (userData?.vibe) {
+            setCurrentVibe(userData.vibe);
+        }
+    }, [userData]);
+
+    const handleVibeChange = async (newVibe) => {
+        // เปลี่ยนสีปุ่มที่หน้าเว็บทันทีให้ดูสมูท
+        setCurrentVibe(newVibe);
+
+        try {
+            // ยิง API ไปอัปเดตที่ Flask (ใช้ Route เดิมที่เราเขียนไว้ได้เลย)
+            await apiRequest('/profile', 'PUT', { vibe: newVibe });
+
+            // อัปเดตข้อมูล userData หลักใน React ด้วย
+            setUserData(prev => ({ ...prev, vibe: newVibe }));
+        } catch (error) {
+            console.error("Save vibe failed:", error);
+            alert("เปลี่ยนสถานะไม่สำเร็จ ลองใหม่อีกครั้งนะ 😅");
+        }
+    };
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -52,7 +74,7 @@ function BottomBar() {
                         />
                     </div>
                 </div>
-                
+
                 <div className="nav-item">
                     <TbBell size={28} />
                     <span className="nav-label">Shouts</span>
@@ -98,19 +120,19 @@ function BottomBar() {
                             <div className="vibe-options">
                                 <button
                                     className={`vibe-btn ${currentVibe === 'chill' ? 'active-chill' : ''}`}
-                                    onClick={() => setCurrentVibe('chill')}
+                                    onClick={() => handleVibeChange('chill')}
                                 >
                                     🟢 ชิลล์ๆ
                                 </button>
                                 <button
                                     className={`vibe-btn ${currentVibe === 'tipsy' ? 'active-tipsy' : ''}`}
-                                    onClick={() => setCurrentVibe('tipsy')}
+                                    onClick={() => handleVibeChange('tipsy')}
                                 >
                                     🟡 กรึ่มๆ
                                 </button>
                                 <button
                                     className={`vibe-btn ${currentVibe === 'wasted' ? 'active-wasted' : ''}`}
-                                    onClick={() => setCurrentVibe('wasted')}
+                                    onClick={() => handleVibeChange('wasted')}
                                 >
                                     🔴 ภาพตัด
                                 </button>
