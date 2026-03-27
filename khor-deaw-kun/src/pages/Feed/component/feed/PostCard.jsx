@@ -110,17 +110,18 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
 
             <div className="post-footer-new">
                 <div className="footer-left-group">
+                    {/*
                     <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleLike}>
                         <span className="icon-wrap">{isLiked ? '🍻' : <TbBeer size={22} />}</span>
                         <span className="count">{likesCount}</span>
                     {/* ✨ เปลี่ยน onClick มาใช้ handleLikeClick ที่เราสร้างใหม่ */}
-                    /*
-                    <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleLikeClick}>
+                    
+                    <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleLike}>
                         <span className="icon-wrap">
                            {isLiked ? <IoBeer size={22} color="#F48C2A" /> : <IoBeerOutline size={22} />}
                         </span>
-                        <span className="count">{isLiked ? likes + 1 : likes}</span>
-                    </button>*/
+                        <span className="count">{likesCount}</span>
+                    </button>
                     <button className={`action-btn comment-btn ${showComments ? 'active' : ''}`} onClick={() => setShowComments(!showComments)}>
                         <span className="icon-wrap"><TbMessageCircle size={22} /></span>
                         <span className="count">{commentLists.length}</span>
