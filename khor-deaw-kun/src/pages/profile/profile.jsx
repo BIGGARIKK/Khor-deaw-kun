@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../service/api';
 import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
+import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import PostCard from '../Feed/component/feed/PostCard';
 import './profile.css';
 
@@ -27,6 +28,7 @@ import myAv9 from '../../assets/avatars/9.png';
 export const BANNER_PRESETS = [
   { id: 1, color: '#ffb8b8', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
   { id: 2, color: '#6de6e6', pattern: 'radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%)', size: '20px 20px', position: '0 0, 10px 10px' },
+  { id: 2, color: '#6de6e6', pattern: 'radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%)', size: '20px 20px', position: '0 0, 10px 10px' },
   { id: 3, color: '#ffe066', pattern: 'linear-gradient(rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.5) 2px, transparent 2px)', size: '20px 20px' },
   { id: 4, color: '#84e045', pattern: 'linear-gradient(45deg, rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(-45deg, rgba(255,255,255,0.5) 2px, transparent 2px)', size: '15px 15px' },
   { id: 5, color: '#50ade2', pattern: 'repeating-linear-gradient(-45deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
@@ -36,6 +38,7 @@ export const BANNER_PRESETS = [
   { id: 9, color: '#fdffb6', pattern: 'repeating-linear-gradient(transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px), repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px)', size: '100% 100%' },
   { id: 10, color: '#caffbf', pattern: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0, rgba(255,255,255,0.5) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
   { id: 11, color: '#ffd6a5', pattern: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0, rgba(255,255,255,0.4) 10px, transparent 10px, transparent 20px)', size: '100% 100%' },
+  { id: 12, color: '#30795d', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)', size: '100% 100%' }
   { id: 12, color: '#30795d', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)', size: '100% 100%' }
 ];
 
@@ -55,6 +58,10 @@ const Profile = () => {
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
 
   const avatarPresets = [myAv1, myAv2, myAv3, myAv4, myAv5, myAv6, myAv7, myAv8, myAv9];
+  const [avatarImage, setAvatarImage] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * avatarPresets.length);
+    return avatarPresets[randomIndex];
+  });
   const [avatarImage, setAvatarImage] = useState(() => {
     const randomIndex = Math.floor(Math.random() * avatarPresets.length);
     return avatarPresets[randomIndex];
@@ -111,7 +118,9 @@ const Profile = () => {
         // ดึงรูปที่เซฟไว้ใน DB มาโชว์ (ถ้ามี)
         if (data && data.profile_image) {
           const match = data.profile_image.match(/\d+/);
+          const match = data.profile_image.match(/\d+/);
           if (match) {
+            const index = parseInt(match[0], 10) - 1;
             const index = parseInt(match[0], 10) - 1;
             if (index >= 0 && index < avatarPresets.length) {
               setAvatarImage(avatarPresets[index]);
@@ -126,6 +135,7 @@ const Profile = () => {
   }, []);
 
   const handleUpdateAvatar = async (selectedAvatar) => {
+    setAvatarImage(selectedAvatar);
     setAvatarImage(selectedAvatar);
 
     try {
@@ -150,6 +160,7 @@ const Profile = () => {
 
   const handlePointerUp = (e) => {
     setIsPaused(false);
+    setIsPaused(false);
     const holdDuration = Date.now() - pressTimer.current;
     if (holdDuration < 200) {
       handleStoryNavigation(e);
@@ -159,11 +170,15 @@ const Profile = () => {
   const handleAddStoryClick = () => {
     setIsPaused(true);
     fileInputRef.current.click();
+    setIsPaused(true);
+    fileInputRef.current.click();
 
     window.addEventListener('focus', () => {
       setTimeout(() => {
         setIsPaused(false);
+        setIsPaused(false);
       }, 500);
+    }, { once: true });
     }, { once: true });
   };
 
@@ -177,6 +192,7 @@ const Profile = () => {
           return nextProgress;
         });
       }, 100);
+      }, 100);
     }
     return () => clearInterval(timer);
   }, [isStoryOpen, isPaused, currentStoryIndex, stories.length]);
@@ -186,7 +202,12 @@ const Profile = () => {
       if (currentStoryIndex < stories.length - 1) {
         setCurrentStoryIndex((prev) => prev + 1);
         setStoryProgress(0);
+        setCurrentStoryIndex((prev) => prev + 1);
+        setStoryProgress(0);
       } else {
+        setIsStoryOpen(false);
+        setCurrentStoryIndex(0);
+        setStoryProgress(0);
         setIsStoryOpen(false);
         setCurrentStoryIndex(0);
         setStoryProgress(0);
@@ -197,9 +218,12 @@ const Profile = () => {
   useEffect(() => {
     if (isColorModalOpen || isAvatarModalOpen || isStoryOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
+      document.body.style.overflow = '';
     }
+    return () => document.body.style.overflow = '';
     return () => document.body.style.overflow = '';
   }, [isColorModalOpen, isAvatarModalOpen, isStoryOpen]);
 
@@ -217,14 +241,21 @@ const Profile = () => {
       return;
     }
 
+    if (stories.length >= 10) {
+      alert("You can upload up to 10 stories only! 📸");
+      return;
+    }
+
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setStories((prev) => {
         const newStories = [...prev, imageUrl];
         setCurrentStoryIndex(newStories.length - 1);
+        setCurrentStoryIndex(newStories.length - 1);
         return newStories;
       });
+      setStoryProgress(0);
       setStoryProgress(0);
       setIsStoryOpen(true);
     }
@@ -269,6 +300,7 @@ const Profile = () => {
         onChange={(e) => setBannerColor(e.target.value)}
       />
 
+
       <div className="profile-container">
         
         <div className="left-panel-wrapper">
@@ -280,9 +312,11 @@ const Profile = () => {
           />
         </div>
 
+        {/* ✨ คอลัมน์กลาง (2.2fr ใหญ่สุด) */}
         <div className="center-panel">
           <ProfileHeader
             userData={userData}
+            setUserData={setUserData}
             setUserData={setUserData}
             bannerColor={bannerColor}
             setIsColorModalOpen={setIsColorModalOpen}
@@ -355,6 +389,9 @@ const Profile = () => {
 
       </div>
 
+      {isColorModalOpen && <BannerColorModal setIsColorModalOpen={setIsColorModalOpen} bannerColor={bannerColor} setBannerColor={setBannerColor} bannerPresets={BANNER_PRESETS} />}
+      {isAvatarModalOpen && <AvatarModal setIsAvatarModalOpen={setIsAvatarModalOpen} avatarPresets={avatarPresets} avatarImage={avatarImage} setAvatarImage={setAvatarImage} />}
+      {isStoryOpen && <StoryModal setIsStoryOpen={setIsStoryOpen} stories={stories} currentStoryIndex={currentStoryIndex} fileInputRef={fileInputRef} handleDeleteStory={handleDeleteStory} handleStoryNavigation={handleStoryNavigation} handleFileChange={handleFileChange} storyProgress={storyProgress} handlePointerDown={handlePointerDown} handlePointerUp={handlePointerUp} setIsPaused={setIsPaused} handleAddStoryClick={handleAddStoryClick} />}
       {isColorModalOpen && <BannerColorModal setIsColorModalOpen={setIsColorModalOpen} bannerColor={bannerColor} setBannerColor={setBannerColor} bannerPresets={BANNER_PRESETS} />}
       {isAvatarModalOpen && <AvatarModal setIsAvatarModalOpen={setIsAvatarModalOpen} avatarPresets={avatarPresets} avatarImage={avatarImage} setAvatarImage={setAvatarImage} />}
       {isStoryOpen && <StoryModal setIsStoryOpen={setIsStoryOpen} stories={stories} currentStoryIndex={currentStoryIndex} fileInputRef={fileInputRef} handleDeleteStory={handleDeleteStory} handleStoryNavigation={handleStoryNavigation} handleFileChange={handleFileChange} storyProgress={storyProgress} handlePointerDown={handlePointerDown} handlePointerUp={handlePointerUp} setIsPaused={setIsPaused} handleAddStoryClick={handleAddStoryClick} />}

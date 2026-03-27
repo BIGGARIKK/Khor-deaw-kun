@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { createPortal } from 'react-dom';
 import { TbDots, TbEdit, TbTrash, TbMessageCircle, TbSend, TbX } from "react-icons/tb";
 import { apiRequest } from '../../../../service/api'; 
@@ -31,8 +31,8 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         ? image_author 
         : `/src/assets/avatars/${image_author || '1.png'}`;
 
-    const postImageUrl = imageUrl?.startsWith("http") || imageUrl?.startsWith("data:") 
-        ? imageUrl 
+    const postImageUrl = imageUrl?.startsWith("http") || imageUrl?.startsWith("data:")
+        ? imageUrl
         : `/src/assets/avatars/${imageUrl}`;
 
     const handleAddComment = async () => {
@@ -42,10 +42,26 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
             if (response.comment) {
                 setCommentList([...commentLists, response.comment]);
                 setInputText("");
+                setInputText("");
             }
         } catch (error) {
             console.error("Comment failed:", error);
             alert("คอมเมนต์ไม่ไป ลองใหม่อีกครั้งนะ 😅");
+        }
+    };
+
+    // 🌟 ฟังก์ชันชนแก้ว (กดไลก์)
+    const handleLike = async () => {
+        // สลับสีและบวก/ลบเลขทันที ให้ผู้ใช้รู้สึกว่าแตะปุ๊บติดปั๊บ
+        setIsLiked(!isLiked);
+        setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+        
+        try {
+            await apiRequest(`/posts/${postId}/like`, 'POST');
+        } catch (error) {
+            // ถ้า Database มีปัญหา ค่อยเด้งกลับมาค่าเดิม
+            setIsLiked(!isLiked);
+            setLikesCount(isLiked ? likesCount + 1 : likesCount - 1);
         }
     };
 
@@ -88,7 +104,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                         </span>
                         <span className="count">{isLiked ? likes + 1 : likes}</span>
                     </button>
-                    <button className="action-btn comment-btn" onClick={() => setShowComments(!showComments)}>
+                    <button className={`action-btn comment-btn ${showComments ? 'active' : ''}`} onClick={() => setShowComments(!showComments)}>
                         <span className="icon-wrap"><TbMessageCircle size={22} /></span>
                         <span className="count">{commentLists.length}</span>
                     </button>
@@ -100,10 +116,10 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                 <div className="comments-section-wood">
                     <div className="comments-list">
                         {commentLists.length === 0 ? (
-                            <div style={{textAlign: 'center', opacity: 0.6, fontSize: '0.9rem', padding: '10px 0'}}>ยังไม่มีคอมเมนต์ เปิดตี้เลย! 🍻</div>
+                            <div style={{ textAlign: 'center', opacity: 0.6, fontSize: '0.9rem', padding: '10px 0' }}>ยังไม่มีคอมเมนต์ เปิดตี้เลย! 🍻</div>
                         ) : (
-                            commentLists.map((c) => (
-                                <div key={c.comment_id || Math.random()} className="comment-bubble">
+                            commentLists.map((c, index) => (
+                                <div key={c.comment_id || index} className="comment-bubble">
                                     <strong>{c.author}:</strong> {c.text}
                                 </div>
                             ))
