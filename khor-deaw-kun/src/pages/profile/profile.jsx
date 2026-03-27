@@ -2,13 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../service/api';
 import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
-import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import PostCard from '../Feed/component/feed/PostCard';
 import './profile.css';
 
 import LeftPanel from './component/LeftPanel';
 import ProfileHeader from './component/ProfileHeader';
 import RightPanel from './component/RightPanel';
+// ✨ เพิ่มการ Import MyPosts ที่นี่
 import MyPosts from './component/MyPosts'; 
 
 import AvatarModal from './component/AvatarModal';
@@ -28,7 +28,6 @@ import myAv9 from '../../assets/avatars/9.png';
 export const BANNER_PRESETS = [
   { id: 1, color: '#ffb8b8', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
   { id: 2, color: '#6de6e6', pattern: 'radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%)', size: '20px 20px', position: '0 0, 10px 10px' },
-  { id: 2, color: '#6de6e6', pattern: 'radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%)', size: '20px 20px', position: '0 0, 10px 10px' },
   { id: 3, color: '#ffe066', pattern: 'linear-gradient(rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.5) 2px, transparent 2px)', size: '20px 20px' },
   { id: 4, color: '#84e045', pattern: 'linear-gradient(45deg, rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(-45deg, rgba(255,255,255,0.5) 2px, transparent 2px)', size: '15px 15px' },
   { id: 5, color: '#50ade2', pattern: 'repeating-linear-gradient(-45deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
@@ -38,7 +37,6 @@ export const BANNER_PRESETS = [
   { id: 9, color: '#fdffb6', pattern: 'repeating-linear-gradient(transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px), repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px)', size: '100% 100%' },
   { id: 10, color: '#caffbf', pattern: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0, rgba(255,255,255,0.5) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
   { id: 11, color: '#ffd6a5', pattern: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0, rgba(255,255,255,0.4) 10px, transparent 10px, transparent 20px)', size: '100% 100%' },
-  { id: 12, color: '#30795d', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)', size: '100% 100%' }
   { id: 12, color: '#30795d', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)', size: '100% 100%' }
 ];
 
@@ -62,10 +60,6 @@ const Profile = () => {
     const randomIndex = Math.floor(Math.random() * avatarPresets.length);
     return avatarPresets[randomIndex];
   });
-  const [avatarImage, setAvatarImage] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * avatarPresets.length);
-    return avatarPresets[randomIndex];
-  });
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const pressTimer = useRef(0);
 
@@ -73,22 +67,6 @@ const Profile = () => {
   const [storyProgress, setStoryProgress] = useState(0);
 
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
-
-  // ✨ ระบบความจำ: เก็บ ID ของโพสต์ที่โดนกดไลก์แล้วไว้ที่ส่วนกลาง
-  const [likedPosts, setLikedPosts] = useState(new Set());
-
-  // ✨ ฟังก์ชันสลับสถานะไลก์ แล้วบันทึกลงความจำ
-  const toggleLike = (postId) => {
-    setLikedPosts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId); // ถ้ายกเลิกไลก์ ก็เอาออกจากความจำ
-      } else {
-        newSet.add(postId);    // ถ้ากดไลก์ ก็เพิ่มเข้าความจำ
-      }
-      return newSet;
-    });
-  };
 
   const userPosts = [
     { id: 1, time: "1 min ago", text: "หยุดน่ารักได้มั้ย ใจเราก็แค่นี้อะ 🥺 #รักน้องแมวมาก", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 105, comments: 20 },
@@ -118,9 +96,7 @@ const Profile = () => {
         // ดึงรูปที่เซฟไว้ใน DB มาโชว์ (ถ้ามี)
         if (data && data.profile_image) {
           const match = data.profile_image.match(/\d+/);
-          const match = data.profile_image.match(/\d+/);
           if (match) {
-            const index = parseInt(match[0], 10) - 1;
             const index = parseInt(match[0], 10) - 1;
             if (index >= 0 && index < avatarPresets.length) {
               setAvatarImage(avatarPresets[index]);
@@ -135,7 +111,6 @@ const Profile = () => {
   }, []);
 
   const handleUpdateAvatar = async (selectedAvatar) => {
-    setAvatarImage(selectedAvatar);
     setAvatarImage(selectedAvatar);
 
     try {
@@ -160,7 +135,6 @@ const Profile = () => {
 
   const handlePointerUp = (e) => {
     setIsPaused(false);
-    setIsPaused(false);
     const holdDuration = Date.now() - pressTimer.current;
     if (holdDuration < 200) {
       handleStoryNavigation(e);
@@ -170,15 +144,11 @@ const Profile = () => {
   const handleAddStoryClick = () => {
     setIsPaused(true);
     fileInputRef.current.click();
-    setIsPaused(true);
-    fileInputRef.current.click();
 
     window.addEventListener('focus', () => {
       setTimeout(() => {
         setIsPaused(false);
-        setIsPaused(false);
       }, 500);
-    }, { once: true });
     }, { once: true });
   };
 
@@ -192,7 +162,6 @@ const Profile = () => {
           return nextProgress;
         });
       }, 100);
-      }, 100);
     }
     return () => clearInterval(timer);
   }, [isStoryOpen, isPaused, currentStoryIndex, stories.length]);
@@ -202,12 +171,7 @@ const Profile = () => {
       if (currentStoryIndex < stories.length - 1) {
         setCurrentStoryIndex((prev) => prev + 1);
         setStoryProgress(0);
-        setCurrentStoryIndex((prev) => prev + 1);
-        setStoryProgress(0);
       } else {
-        setIsStoryOpen(false);
-        setCurrentStoryIndex(0);
-        setStoryProgress(0);
         setIsStoryOpen(false);
         setCurrentStoryIndex(0);
         setStoryProgress(0);
@@ -218,12 +182,9 @@ const Profile = () => {
   useEffect(() => {
     if (isColorModalOpen || isAvatarModalOpen || isStoryOpen) {
       document.body.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
-      document.body.style.overflow = '';
     }
-    return () => document.body.style.overflow = '';
     return () => document.body.style.overflow = '';
   }, [isColorModalOpen, isAvatarModalOpen, isStoryOpen]);
 
@@ -241,21 +202,14 @@ const Profile = () => {
       return;
     }
 
-    if (stories.length >= 10) {
-      alert("You can upload up to 10 stories only! 📸");
-      return;
-    }
-
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setStories((prev) => {
         const newStories = [...prev, imageUrl];
         setCurrentStoryIndex(newStories.length - 1);
-        setCurrentStoryIndex(newStories.length - 1);
         return newStories;
       });
-      setStoryProgress(0);
       setStoryProgress(0);
       setIsStoryOpen(true);
     }
@@ -300,9 +254,9 @@ const Profile = () => {
         onChange={(e) => setBannerColor(e.target.value)}
       />
 
-
       <div className="profile-container">
         
+        {/* ✨ คอลัมน์ซ้าย (1fr) */}
         <div className="left-panel-wrapper">
           <LeftPanel
             navigate={navigate}
@@ -316,7 +270,6 @@ const Profile = () => {
         <div className="center-panel">
           <ProfileHeader
             userData={userData}
-            setUserData={setUserData}
             setUserData={setUserData}
             bannerColor={bannerColor}
             setIsColorModalOpen={setIsColorModalOpen}
@@ -339,15 +292,6 @@ const Profile = () => {
             <div className="carousel-content">
               {imagePosts.length > 0 ? (
                 <PostCard
-                  key={imagePosts[currentPostIndex].id} 
-                  postId={imagePosts[currentPostIndex].id} 
-                  image_author={avatarImage} 
-
-                  // ✨ 4. ส่งสถานะไกล์เข้าไป ถ้ามีชื่อใน Set แปลว่าไลก์แล้ว
-                  isLikedParent={likedPosts.has(imagePosts[currentPostIndex].id)} 
-                  // ✨ 5. ผูกปุ่มกดไลก์เข้ากับฟังก์ชันจดจำของหน้าแม่
-                  onLikeToggle={() => toggleLike(imagePosts[currentPostIndex].id)} 
-
                   author={userData.username}
                   time={imagePosts[currentPostIndex].time}
                   text={imagePosts[currentPostIndex].text}
@@ -373,6 +317,7 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* ✨ คอลัมน์ขวา (1fr) */}
         <div className="right-panel-wrapper">
           <RightPanel
             stories={stories}
@@ -383,15 +328,13 @@ const Profile = () => {
             }}
           />
 
+          {/* ✨ เรียกใช้ Component MyPosts ที่เราแยกมาแล้วส่ง Props ให้มัน */}
           <MyPosts textPosts={textPosts} username={userData.username} />
           
         </div>
 
       </div>
 
-      {isColorModalOpen && <BannerColorModal setIsColorModalOpen={setIsColorModalOpen} bannerColor={bannerColor} setBannerColor={setBannerColor} bannerPresets={BANNER_PRESETS} />}
-      {isAvatarModalOpen && <AvatarModal setIsAvatarModalOpen={setIsAvatarModalOpen} avatarPresets={avatarPresets} avatarImage={avatarImage} setAvatarImage={setAvatarImage} />}
-      {isStoryOpen && <StoryModal setIsStoryOpen={setIsStoryOpen} stories={stories} currentStoryIndex={currentStoryIndex} fileInputRef={fileInputRef} handleDeleteStory={handleDeleteStory} handleStoryNavigation={handleStoryNavigation} handleFileChange={handleFileChange} storyProgress={storyProgress} handlePointerDown={handlePointerDown} handlePointerUp={handlePointerUp} setIsPaused={setIsPaused} handleAddStoryClick={handleAddStoryClick} />}
       {isColorModalOpen && <BannerColorModal setIsColorModalOpen={setIsColorModalOpen} bannerColor={bannerColor} setBannerColor={setBannerColor} bannerPresets={BANNER_PRESETS} />}
       {isAvatarModalOpen && <AvatarModal setIsAvatarModalOpen={setIsAvatarModalOpen} avatarPresets={avatarPresets} avatarImage={avatarImage} setAvatarImage={setAvatarImage} />}
       {isStoryOpen && <StoryModal setIsStoryOpen={setIsStoryOpen} stories={stories} currentStoryIndex={currentStoryIndex} fileInputRef={fileInputRef} handleDeleteStory={handleDeleteStory} handleStoryNavigation={handleStoryNavigation} handleFileChange={handleFileChange} storyProgress={storyProgress} handlePointerDown={handlePointerDown} handlePointerUp={handlePointerUp} setIsPaused={setIsPaused} handleAddStoryClick={handleAddStoryClick} />}
