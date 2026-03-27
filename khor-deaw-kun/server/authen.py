@@ -186,7 +186,7 @@ def create_post():
 @jwt_required()
 def get_posts():
     
-    posts_cursor = mongo.db.posts.find().sort("create at" ,-1)
+    posts_cursor = mongo.db.posts.find().sort("create_at" ,-1)
 
     posts_list = []
     for post in posts_cursor:
@@ -226,29 +226,77 @@ def add_comment(post_id):
     return jsonify({'message': 'Comment added successfully!', 'comment': new_comment}), 201
 
 # ==========================================
-# 🛠️ UPDATE PROFILE (อัปเดตข้อมูลโปรไฟล์)
+# 🛠️ UPDATE PROFILE (อัปเดตข้อมูลโปรไฟล์ & Vibe)
 # ==========================================
 @app.route('/profile', methods=['PUT'])
 @jwt_required()
 def update_profile():
     current_user = get_jwt_identity()
     data = request.get_json()
-    new_image = data.get('profile_image')
     
-    if new_image:
-        # 1. เปลี่ยนรูปในโปรไฟล์หลัก (Collection: users)
-        mongo.db.users.update_one(
-            {'username': current_user},
-            {'$set': {'profile_image': new_image}}
-        )
+    # สร้างกล่องเปล่าไว้เก็บว่าผู้ใช้ส่งอะไรมาอัปเดตบ้าง
+    update_fields = {}
+    
+    # 1. ถ้าส่งรูปมา ก็เก็บลงกล่อง
+    if 'profile_image' in data:
+        update_fields['profile_image'] = data['profile_image']
         
-        # ✨ 2. ความลับอยู่ตรงนี้! สั่งให้อัปเดต "ทุกโพสต์" ที่คนนี้เคยเขียนไว้ด้วยรูปใหม่ทันที!
+        # (อย่าลืมคำสั่ง update_many เพื่อเปลี่ยนรูปในโพสต์เก่าด้วย ถ้ามี)
         mongo.db.posts.update_many(
             {'author_username': current_user},
-            {'$set': {'author_image': new_image}}
+            {'$set': {'author_image': data['profile_image']}}
         )
         
-        return jsonify({'message': 'Profile updated everywhere!'}), 200
+    # 🌟 2. ถ้าส่ง vibe มา ก็เก็บลงกล่องด้วย!
+    if 'vibe' in data:
+        update_fields['vibe'] = data['vibe'].strip()
+        
+    # 3. สั่งเซฟลง Database ทีเดียวเลย (ถ้ามีอะไรให้เซฟ)
+    if update_fields:
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$set': update_fields}
+        )
+        return jsonify({'message': 'Profile updated successfully!'}), 200
+        
+    return jsonify({'message': 'No data provided to update'}), 400
+
+
+from bson.objectid import ObjectId
+
+# ==========================================
+# 🍻 TOGGLE LIKE (กดชนแก้ว / ยกเลิกชนแก้ว)
+# ==========================================
+@app.route('/posts/<post_id>/like', methods=['POST'])
+@jwt_required()
+def toggle_like(post_id):
+    current_user = get_jwt_identity() # คนที่กดไลก์คือใคร?
+    
+    # 1. ไปหาโพสต์นี้มาก่อน
+    post = mongo.db.posts.find_one({'_id': ObjectId(post_id)})
+    if not post:
+        return jsonify({'message': 'Post not found'}), 404
+        
+    # 2. เช็คว่าในโพสต์นี้ มีชื่อเราอยู่ในช่อง likes แล้วหรือยัง?
+    current_likes = post.get('likes', [])
+    
+    if current_user in current_likes:
+        # 🔴 ถ้ามีชื่อเราอยู่แล้ว แปลว่าเขาจะ "ยกเลิกไลก์ (Unlike)"
+        # ใช้คำสั่ง $pull เพื่อดึงชื่อเราออกจาก Array
+        mongo.db.posts.update_one(
+            {'_id': ObjectId(post_id)},
+            {'$pull': {'likes': current_user}}
+        )
+        return jsonify({'message': 'Unliked', 'liked': False}), 200
+        
+    else:
+        # 🟢 ถ้ายังไม่มีชื่อเรา แปลว่าเขา "กดไลก์ (Like)"
+        # ใช้คำสั่ง $push เพื่อยัดชื่อเราเข้า Array
+        mongo.db.posts.update_one(
+            {'_id': ObjectId(post_id)},
+            {'$push': {'likes': current_user}}
+        )
+        return jsonify({'message': 'Liked', 'liked': True}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

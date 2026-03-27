@@ -8,6 +8,7 @@ import SignUp from './pages/AuthenPage/SignUp/SignUp'
 import Profile from './pages/profile/profile'
 import Feed from './pages/Feed/Feed'
 import Hub from './pages/Hub/Hub'
+import GrillRoom from './pages/Mookata/GrillRoom'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/Beach" element={<Feed />} />
 
         <Route path="/Hub" element={<Hub />} />
+        <Route path="/Mookata" element={<GrillRoom />} />
       </Routes>
     </BrowserRouter>
   )

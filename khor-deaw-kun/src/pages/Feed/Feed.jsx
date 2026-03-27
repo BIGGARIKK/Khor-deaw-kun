@@ -8,39 +8,58 @@ import PostCard from './component/feed/PostCard';
 
 // 🌟 อย่าลืม import apiRequest
 import { apiRequest } from '../../service/api'; 
-
-// 🌟 ย้ายฟังก์ชันมาไว้ข้างนอก จะได้ไม่ถูกสร้างใหม่ทุกครั้งที่โหลดหน้าเว็บ
-const getTimeAgo = (dateString) => {
-    if (!dateString) return "JUST NOW";
-
-    let date = new Date(dateString);
-    if (isNaN(date.getTime()) && typeof dateString === 'string') {
-        date = new Date(dateString.replace(' ', 'T') + 'Z'); 
-    }
-
-    if (isNaN(date.getTime())) return "UNKNOWN TIME";
-
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-
-    if (seconds < 60) return "JUST NOW"; 
     
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} MINS AGO`; 
-    
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} HOURS AGO`; 
-    
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days} DAYS AGO`; 
+    const getTimeAgo = (dateString) => {
+        // 1. ถ้าไม่มีค่าส่งมา ให้ขึ้นคำว่า UNKNOWN แทน จะได้รู้ว่าบั๊กที่ Database ไม่ส่งมา
+        if (!dateString) return "UNKNOWN TIME";
 
-    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-};
+        // ลองแอบปริ้นท์ค่าดูใน Console (F12) ว่า Flask ส่งอะไรมากันแน่
+        // console.log("เวลาจาก DB:", dateString); 
+
+        let date;
+        // 2. เช็คว่า Database ส่งมาเป็น Object {$date: ...} แบบ MongoDB หรือเปล่า
+        if (typeof dateString === 'object' && dateString.$date) {
+            date = new Date(dateString.$date);
+        } else {
+            date = new Date(dateString);
+            // ดักเผื่อ Flask ส่งมาเป็น Text ทื่อๆ แบบไม่มี Timezone
+            if (isNaN(date.getTime()) && typeof dateString === 'string') {
+                // เปลี่ยนเว้นวรรคเป็น T แต่รอบนี้ "ไม่เติม Z" เพื่อให้มันยึดตามเวลา Local ของเครื่อง
+                date = new Date(dateString.replace(' ', 'T')); 
+            }
+        }
+
+        if (isNaN(date.getTime())) return "INVALID TIME";
+
+        const now = new Date();
+        // 3. คำนวณความต่าง (Math.abs ช่วยกันเหนียวเผื่อเวลาติดลบจาก Timezone)
+        let seconds = Math.floor((now - date) / 1000);
+
+        // ถ้าเวลาเป็นอนาคต (ติดลบ) เกิน 1 นาที แปลว่า Timezone ตีกันแน่ๆ ให้บังคับแก้ชั่วคราว
+        if (seconds < -60) {
+            seconds = Math.abs(seconds); 
+        }
+
+        if (seconds < 60) return "JUST NOW"; 
+        
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes} MINS AGO`; 
+        
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} HOURS AGO`; 
+        
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days} DAYS AGO`; 
+
+        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    };
 
 function Feed() {
+
+
     const [posts, setPosts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
+    const myUsername = localStorage.getItem('username');
     const fetchPosts = async () => {
         try {
             setIsLoading(true);
@@ -84,22 +103,24 @@ function Feed() {
                             </div>
                         ) : (
                             posts.map((post) => {
-                                // 🌟 จุดที่แก้ไข: เพิ่ม postId และเปลี่ยน comments ให้เป็น Array
+                                // 🌟 จุดที่แก้ไข: ปรับการส่ง likes และเพิ่ม currentUser
                                 const formattedPost = {
                                     id: post._id,
-                                    postId: post._id, // ✨ ต้องมีตัวนี้ส่งไปให้ PostCard ใช้ยิง API คอมเมนต์
+                                    postId: post._id, 
                                     author: post.author_username,
                                     image_author: post.author_image,
-                                    time: getTimeAgo(post.created_at),
+                                    time: getTimeAgo(post.create_at),
                                     text: post.text,
                                     hasImage: !!post.image_url,
                                     imageUrl: post.image_url,
-                                    likes: post.likes ? post.likes.length : 0,
-                                    comments: post.comments || [] // ✨ ส่งไปทั้ง Array เลย ถ้าไม่มีให้เป็น Array ว่าง []
+                                    likes: post.likes || [], 
+                                    comments: post.comment || [], 
+                                    currentUser: myUsername 
                                 };
 
                                 return <PostCard key={formattedPost.id} {...formattedPost} />;
                             })
+
                         )}
                     </div>
 

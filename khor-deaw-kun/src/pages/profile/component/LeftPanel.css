@@ -166,24 +166,57 @@
 .fb-link:hover { background-color: #1877F2; color: #fff; border-color: #1877F2 !important; } 
 .ig-link:hover { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #fff; border-color: #E1306C !important; }
 
-/* 🌟 ปุ่ม Edit Contact */
+/* 🌟 ปุ่ม Edit Contact (โฉมใหม่แบบป้ายไม้) */
 .edit-contact-btn {
-  background: transparent;
-  border: none;
+  background-color: #FDF5E6; /* สีครีมไม้ */
+  border: 2px dashed #A1887F; /* ขอบปะสีน้ำตาลอ่อน ให้ดูเหมือนรอยเย็บหรือป้ายเล็กๆ */
+  border-radius: 20px; /* ทรงแคปซูล */
+  font-family: inherit;
   font-weight: 800;
   font-size: 1.05rem; 
-  color: #8D6E63; /* สีไม้ซีดๆ */
+  color: #6D4C41; /* สีน้ำตาลกลาง */
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center; 
-  margin-top: 15px; 
+  justify-content: center;
+  gap: 8px; /* ระยะห่างระหว่างไอคอนกับตัวหนังสือ */
+  padding: 12px 20px;
+  margin-top: 20px; 
   margin-bottom: 5px;
   width: 100%;
-  transition: 0.2s;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.edit-contact-btn:hover { color: #F48C2A; transform: scale(1.05); }
 
+/* ตอนเอาเมาส์ไปชี้โหมดปกติ */
+.edit-contact-btn:hover { 
+  background-color: #FFD285; /* สีส้มไม้อ่อน */
+  border: 2px solid #F48C2A; /* เปลี่ยนจากเส้นปะเป็นเส้นทึบสีส้ม */
+  color: #3E2723; /* ตัวหนังสือเข้มขึ้น */
+  transform: translateY(-3px) scale(1.02); 
+  box-shadow: 4px 4px 0px #3E2723; /* เด้งขึ้นมาพร้อมเงา */
+}
+
+/* 🌟 โหมดกำลังแก้ไข (เปลี่ยนเป็นปุ่มสีเขียวเซฟ) */
+.edit-contact-btn.saving-mode {
+  background-color: #84E045; /* สีเขียวเด่นๆ */
+  border: 2px solid #3E2723; /* ขอบทึบสีน้ำตาลเข้ม */
+  color: #1A1A1A; /* ตัวหนังสือสีดำ */
+  box-shadow: 4px 4px 0px #3E2723; /* มีเงาให้ดูเป็นปุ่มสำคัญ */
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ตอนเอาเมาส์ไปชี้โหมดเซฟ */
+.edit-contact-btn.saving-mode:hover {
+  background-color: #A3E635; /* สีเขียวสว่างขึ้นนิดนึง */
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 6px 6px 0px #3E2723;
+}
+
+/* จังหวะตอนกดคลิกให้ปุ่มยุบลงไป */
+.edit-contact-btn:active {
+  transform: translateY(0) scale(0.98) !important;
+  box-shadow: 2px 2px 0px #3E2723 !important;
+}
 /* 🌟 ช่อง Input แก้ไข Contact */
 .contact-input-box {
   display: flex;
