@@ -1,0 +1,696 @@
+/* =========================================
+   🏖️ MAIN LAYOUT (ห้องย่างหมูกระทะ)
+   ========================================= */
+.grill-room-container {
+    width: 100vw;
+    height: 100vh;
+    /* 🌟 ใส่รูปพื้นหลังทะเลของคุณตรงนี้ ถ้ายังไม่มีมันจะเป็นสีฟ้าชิลล์ๆ แทน */
+    background: url('../../assets/Mookata/bg moota.jpg');
+    background-size: cover;
+    background-position: center;
+    font-family: 'Patrick Hand', 'Playpen Sans Thai', cursive;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ส่วนหัว Header (ปุ่ม Back และ ชื่อห้อง) */
+.room-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    z-index: 10;
+}
+
+.room-header h2 {
+    font-size: 2.5rem;
+    color: #3E2723;
+    text-shadow: 2px 2px 0px #FFF; /* ขอบขาวให้ข้อความเด้งขึ้นมา */
+    margin: 0;
+}
+
+.leave-room-btn {
+    background-color: #fff;
+    border: 3px solid #3E2723;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #3E2723;
+    transition: 0.2s;
+}
+
+.leave-room-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 6px 6px 0px #3E2723;
+    background-color: #FFD285;
+}
+
+.room-content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* ให้อยู่กึ่งกลางแนวตั้ง */
+    flex: 1;
+    padding: 0 40px 40px 40px;
+}
+
+/* =========================================
+   🥩 LEFT MENU & PREVIEW (แก้รูปทะลุจอ)
+   ========================================= */
+.ingredient-menu-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 75vh;
+    flex-shrink: 0; 
+    width: 120px; /* 🌟 ล็อกความกว้างกล่องใหญ่ไว้ */
+}
+
+.ingredient-menu {
+    width: 100%; 
+    flex: 1; 
+    background-color: #fff;
+    border: 4px solid #3E2723;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px;
+    box-shadow: 6px 6px 0px rgba(62, 39, 35, 0.4);
+    overflow-y: auto; 
+    overflow-x: hidden; /* 🌟 กันรูปแนวนอนทะลุ */
+}
+
+.ingredient-menu h3 { display: none; }
+.ingredient-name { display: none; }
+
+.ingredient-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    align-items: center;
+}
+
+/* 🌟 ปุ่มเลือกของสด (ล็อกขนาดและห้ามล้น) */
+.ingredient-btn {
+    background: #fff;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    width: 70px;   /* 🌟 บังคับกว้าง */
+    height: 70px;  /* 🌟 บังคับสูง */
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px; /* ให้มีระยะขอบนิดนึง */
+    overflow: hidden; /* 🌟 สำคัญ! ห้ามรูปทะลุปุ่มเด็ดขาด */
+}
+
+.ingredient-btn:hover {
+    transform: scale(1.1) rotate(5deg);
+    background-color: #FDF5E6;
+}
+
+.ingredient-btn.active {
+    border: 4px solid #84E045; 
+    background-color: #E8F8DE;
+    box-shadow: 0 0 10px rgba(132, 224, 69, 0.5);
+    transform: scale(1.1);
+}
+
+/* 🌟 รูปในเมนูฝั่งซ้าย (ให้ขนาดพอดีกับปุ่ม) */
+.ingredient-icon-img {
+    width: 100%; /* 🌟 กว้าง 100% ของปุ่ม (คือ 70px) */
+    height: 100%; /* 🌟 สูง 100% ของปุ่ม */
+    object-fit: contain; 
+    pointer-events: none; 
+}
+
+/* กล่องควบคุมการหมุน */
+.rotate-controls {
+    width: 100%;
+    background-color: #FDF5E6;
+    border: 4px solid #3E2723;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 5px;
+    box-shadow: 6px 6px 0px rgba(62, 39, 35, 0.4);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.preview-text {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #3E2723;
+    margin: 0 0 10px 0;
+    text-align: center;
+}
+
+/* 🌟 รูปภาพพรีวิวที่ใช้จับลาก (ล็อกขนาด) */
+.preview-img {
+    width: 80px; /* 🌟 บังคับความกว้างสูงสุดแค่ 80px */
+    height: 80px; 
+    max-width: 100%; /* 🌟 กันเหนียว ไม่ให้ทะลุ 100% ของกล่องควบคุม */
+    object-fit: contain;
+    margin-bottom: 15px;
+    transition: transform 0.2s; 
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
+}
+
+.draggable-item { cursor: grab; }
+.draggable-item:active { cursor: grabbing; }
+
+.control-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    padding: 0 5px;
+}
+
+.tool-btn {
+    background-color: #F48C2A;
+    border: 3px solid #3E2723;
+    border-radius: 10px;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #1A1A1A;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px #3E2723;
+    width: 100%;
+}
+
+.tool-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0px 0px 0px #3E2723;
+}
+/* =========================================
+   🥘 CENTER PAN (โซนเตาย่างขยายใหญ่)
+   ========================================= */
+.pan-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* พื้นที่ล่องหนสำหรับรับคลิก (ครอบกระทะไว้) ขยายใหญ่ขึ้น */
+.mookata-pan-area {
+    width: 700px; /* 🌟 ขยายเตาให้ใหญ่สะใจ! */
+    height: 700px;
+    position: relative;
+    cursor: crosshair; /* เป้าเล็งเตรียมย่าง */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    user-select: none; 
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* รูปกระทะของจริง */
+.pan-actual-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* กันรูปกระทะเบี้ยว */
+    pointer-events: none; /* 🌟 สำคัญมาก! เพื่อให้คลิกทะลุได้ */
+    filter: drop-shadow(0px 20px 15px rgba(0,0,0,0.3));
+}
+
+/* ของที่ตกลงไปบนเตา */
+.item-on-pan {
+    position: absolute; 
+    transform: translate(-50%, -50%); 
+    
+    /* 🌟 เปลี่ยนจาก none เป็น auto เพื่อให้มันรับคำสั่งคลิกได้! */
+    pointer-events: auto; 
+    
+    z-index: 10; /* ให้หมูลอยอยู่เหนือกระทะแน่ๆ */
+    animation: dropIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.mookata-pan-area
+/* รูปเมื่อวางลงบนเตาหมูกระทะ */
+.item-pan-img {
+    width: 70px; 
+    height: 70px;
+    object-fit: contain;
+    
+    /* 🌟 บังคับให้รูปกดได้ และเปลี่ยนเมาส์เป็นรูปนิ้วชี้ */
+    pointer-events: auto; 
+    cursor: pointer; 
+    
+    transition: filter 0.5s ease;
+}
+/* 🎬 อนิเมชั่นตอนวางของลงกระทะ (เด้งดึ๋ง) */
+@keyframes dropIn {
+    0% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+
+/* =========================================
+   💬 RIGHT CHAT (แชทบีชฝั่งขวา)
+   ========================================= */
+/* =========================================
+   💬 RIGHT CHAT (แชทบีชฝั่งขวา - ตีมการ์ตูนน่ารัก)
+   ========================================= */
+.room-chat-container {
+    width: 380px;
+    height: 75vh;
+    box-sizing: border-box;
+    /* 🌟 ใช้สีพื้นหลังโทนครีมอ่อนๆ เข้ากับสีไม้ */
+    background-color: #FDF5E6; 
+    border: 4px solid #3E2723;
+    border-radius: 20px;
+    
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    
+    /* เงาหนาๆ สไตล์ป๊อปอัปเกม */
+    box-shadow: 8px 8px 0px #3E2723;
+}
+
+/* 🌟 เอา Header กลับมา แล้วแต่งให้เป็นแถบสีส้มด้านบน */
+.chat-header {
+    background-color: #FFD285;
+    padding: 15px;
+    border-bottom: 4px solid #3E2723;
+    text-align: center;
+}
+
+.chat-header h3 {
+    margin: 0;
+    color: #3E2723;
+    font-size: 1.5rem;
+    text-shadow: 1px 1px 0px #fff; /* ขอบตัวหนังสือสีขาวให้เด้งๆ */
+}
+
+/* พื้นที่แสดงข้อความ */
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    background-color: #FFF9F0; /* สีพื้นหลังแชทสว่างขึ้นนิดนึงให้อ่านง่าย */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 🌟 แต่ง Scrollbar แชทให้เข้าตีม (ถ้าเบราว์เซอร์รองรับ) */
+.chat-messages::-webkit-scrollbar {
+    width: 10px;
+}
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #F48C2A;
+    border-radius: 10px;
+    border: 2px solid #3E2723;
+}
+
+/* =========================================
+   🎈 CHAT BUBBLES (ลูกโป่งข้อความ)
+   ========================================= */
+
+/* 🌟 ลูกโป่งข้อความของผู้เล่น */
+.chat-bubble.user {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    background-color: #fff;
+    padding: 12px 18px;
+    
+    /* 🌟 ทำให้มุมซ้ายล่างเหลี่ยมๆ เหมือนเป็นหางลูกโป่งคำพูด */
+    border-radius: 20px 20px 20px 4px; 
+    border: 3px solid #3E2723;
+    
+    width: fit-content;
+    max-width: 85%;
+    color: #3E2723;
+    box-shadow: 3px 3px 0px rgba(62, 39, 35, 0.15);
+}
+
+.chat-bubble.user strong {
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 4px;
+    color: #F48C2A; /* ชื่อคนพิมพ์สีส้มเด่นๆ */
+    border-bottom: 2px dashed #E0D4C3; /* เส้นปะคั่นชื่อกับข้อความ */
+    padding-bottom: 4px;
+}
+
+/* 🌟 ข้อความแจ้งเตือน (เข้าร่วมห้อง) ทำเป็นป้ายประกาศ */
+.chat-bubble.system {
+    color: #D8435A;
+    font-weight: bold;
+    font-size: 0.95rem;
+    text-align: center;
+    background-color: #FFDEE4;
+    border: 2px dashed #D8435A; /* กรอบเส้นปะสีชมพู */
+    border-radius: 20px;
+    margin: 5px auto;
+    padding: 6px 15px;
+    width: fit-content;
+}
+
+/* =========================================
+   ⌨️ CHAT INPUT (กล่องพิมพ์แชทด้านล่าง)
+   ========================================= */
+/* =========================================
+   ⌨️ CHAT INPUT (แก้ปัญหาล้นขอบ / จัดระเบียบใหม่)
+   ========================================= */
+.chat-input-area {
+    display: flex;
+    padding: 15px;
+    gap: 10px;
+    background-color: transparent; /* ให้พื้นหลังกลืนไปกับลายไม้ */
+    border-top: 4px solid #3E2723;
+    width: 100%;
+    box-sizing: border-box; /* 🌟 สำคัญมาก: ป้องกันไม่ให้ Padding ดันกล่องจนทะลุ */
+}
+
+.chat-input-area input {
+    flex: 1; /* ให้ยืดเต็มพื้นที่ที่เหลือ */
+    min-width: 0; /* 🌟 ตัวทีเด็ด!: ป้องกันไม่ให้ Input ดันกรอบจนปุ่ม Send ตกขอบ */
+    padding: 12px 15px;
+    border: 3px solid #3E2723;
+    border-radius: 15px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    outline: none;
+    box-sizing: border-box;
+    box-shadow: inset 2px 2px 0px rgba(0,0,0,0.05); /* เงาจมด้านในนิดๆ */
+}
+
+.chat-input-area input:focus {
+    border-color: #F48C2A;
+    background-color: #FFFAEC;
+}
+
+.chat-input-area button {
+    flex-shrink: 0; /* 🌟 ห้ามปุ่มหดตัว หรือเบี้ยวเด็ดขาด */
+    background-color: #F48C2A; /* ปุ่มสีส้มเข้ม */
+    color: #1A1A1A;
+    border: 3px solid #3E2723;
+    border-radius: 15px;
+    padding: 0 18px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #3E2723;
+    transition: 0.1s;
+    box-sizing: border-box;
+}
+
+.chat-input-area button:active {
+    transform: translateY(3px);
+    box-shadow: 0px 0px 0px #3E2723;
+}
+/* =========================================
+   🛑 ซ่อน Scrollbar ของเมนู (แต่ยังเลื่อนได้ปกติ)
+   ========================================= */
+.ingredient-menu {
+    -ms-overflow-style: none;  /* สำหรับ IE และ Edge */
+    scrollbar-width: none;  /* สำหรับ Firefox */
+}
+.ingredient-menu::-webkit-scrollbar {
+    display: none; /* สำหรับ Chrome, Safari และ Opera */
+}
+
+
+/* =========================================
+   🔥 สถานะของวัตถุดิบบนเตา (ดิบ -> สุก -> ไหม้)
+   ========================================= */
+.item-pan-img {
+    transition: filter 0.5s ease; /* ค่อยๆ เปลี่ยนสีเนื้ออย่างสมูท */
+    cursor: pointer; /* เมาส์เป็นรูปมือเวลาชี้เนื้อบนเตา (ให้รู้ว่ากดพลิกได้) */
+}
+
+/* 1. กำลังย่าง (สีจะเข้มขึ้นนิดนึง) */
+.item-pan-img.cooking {
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5)) brightness(0.9) saturate(1.2);
+}
+
+/* 2. สุกแล้ว น่ากินสุดๆ! (สีอมน้ำตาลทอง) */
+.item-pan-img.cooked {
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5)) sepia(0.6) brightness(0.7) contrast(1.2) saturate(1.5);
+}
+
+/* 3. ไหม้เกรียม ดำปี๋! (ย่างทิ้งไว้นานไป) */
+.item-pan-img.burnt {
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5)) brightness(0.2) contrast(1.5) grayscale(0.8);
+}
+
+/* =========================================
+   🎯 SCORE BOARD (กระดานคะแนนความอร่อย)
+   ========================================= */
+.score-board {
+    background-color: #FFF9F0;
+    border: 4px solid #3E2723;
+    border-radius: 15px;
+    padding: 8px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 4px 4px 0px #3E2723;
+}
+
+.score-label {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #3E2723;
+}
+
+.score-number {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #84E045; /* สีเขียวตอนคะแนนบวก */
+    background-color: #3E2723;
+    padding: 2px 15px;
+    border-radius: 10px;
+    min-width: 60px;
+    text-align: center;
+}
+
+/* ถ้าคะแนนติดลบ ให้ตัวเลขเป็นสีแดง */
+.score-number.negative {
+    color: #FF6B81; 
+}
+
+/* =========================================
+   🍽️ & 🗑️ ACTION ZONES (จาน และ ถังขยะ)
+   ========================================= */
+.action-zones-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.drop-zone {
+    width: 140px;
+    height: 140px;
+    border: 4px dashed #3E2723;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    transition: 0.2s;
+}
+
+/* ตอนลากของมาจ่อ ให้กล่องมันขยาย+เปลี่ยนสี */
+.drop-zone:hover {
+    transform: scale(1.1);
+}
+
+.plate-zone {
+    background-color: #E8F8DE; /* สีเขียวอ่อน น่ากิน */
+    border-color: #84E045;
+}
+.plate-zone:hover { box-shadow: 0 0 15px rgba(132, 224, 69, 0.6); }
+
+.trash-zone {
+    background-color: #FFDEE4; /* สีแดงอ่อน อันตราย */
+    border-color: #FF6B81;
+}
+.trash-zone:hover { box-shadow: 0 0 15px rgba(255, 107, 129, 0.6); }
+
+.zone-icon {
+    font-size: 3rem;
+    margin-bottom: 5px;
+    pointer-events: none; /* ห้ามเมาส์โดนไอคอนตอน Drop */
+}
+
+.zone-text {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #3E2723;
+    pointer-events: none;
+}
+
+/* =========================================
+   📊 MEAT STATUS BADGE (ป้าย % สุก และ เตือนไหม้)
+   ========================================= */
+.meat-status-badge {
+    position: absolute;
+    bottom: 80%; /* ให้ลอยอยู่เหนือชิ้นเนื้อ */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid #3E2723;
+    border-radius: 8px;
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    
+    /* 🌟 สำคัญมาก: ห้ามป้ายนี้ขวางการคลิกหมูเด็ดขาด! */
+    pointer-events: none; 
+    
+    white-space: nowrap;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    z-index: 20;
+    margin-bottom: 5px;
+}
+
+.status-text {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #3E2723;
+}
+
+.status-text.burnt { 
+    color: #FF6B81; 
+}
+
+/* 🌟 ลูกเล่นตัวหนังสือเตือนไฟกะพริบ! */
+.status-text.warning {
+    color: #FF4757;
+    animation: blinkWarning 0.5s infinite alternate;
+}
+
+@keyframes blinkWarning {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.1); opacity: 0.8; color: #FF0000; text-shadow: 0 0 5px red;}
+}
+
+/* 🌟 หลอดเปอร์เซ็นต์มินิ */
+.progress-mini {
+    width: 100%;
+    height: 6px;
+    background-color: #E0D4C3;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #3E2723;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+/* =========================================
+   👥 PLAYERS AVATAR ZONE (โซนป้อนเพื่อน)
+   ========================================= */
+.players-action-board {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.player-drop-zone {
+    width: 90px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 3px dashed #3E2723;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 5px;
+    transition: 0.2s;
+    box-shadow: 4px 4px 0px rgba(62, 39, 35, 0.3);
+}
+
+/* 🌟 ไฮไลท์กรอบสีเขียวให้รู้ว่านี่คือกล่องตัวเอง */
+.player-drop-zone.is-me {
+    border: 3px solid #84E045;
+    background-color: #E8F8DE;
+}
+
+/* ตอนลากหมูมาจ่อที่หน้าเพื่อน กล่องจะเด้งขยายรับ */
+.player-drop-zone:hover {
+    transform: scale(1.15) translateY(-5px);
+    box-shadow: 0px 10px 15px rgba(0,0,0,0.2);
+    border-style: solid; /* เปลี่ยนเป็นกรอบทึบให้เห็นชัดๆ */
+    border-color: #F48C2A; 
+}
+
+.player-avatar {
+    font-size: 2.5rem;
+    pointer-events: none; /* ห้ามเมาส์ไปติดไอคอนตอนดรอป */
+}
+
+.player-name {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #3E2723;
+    text-align: center;
+    margin: 5px 0;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.player-score {
+    font-weight: 900;
+    color: #84E045;
+    background-color: #3E2723;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.player-score.negative {
+    color: #FF6B81; /* คะแนนติดลบสีแดง */
+}
+
+.pan-controls-mini {
+    margin-top: 15px;
+}
+
+.pan-controls-mini button {
+    background-color: #FDF5E6;
+    border: 3px solid #3E2723;
+    border-radius: 15px;
+    padding: 5px 15px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #3E2723;
+    transition: 0.1s;
+}
+
+.pan-controls-mini button:active {
+    transform: translateY(3px);
+    box-shadow: 0px 0px 0px #3E2723;
+}

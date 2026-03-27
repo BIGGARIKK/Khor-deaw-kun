@@ -1,34 +1,47 @@
 import React, { useState, useEffect } from 'react'; 
 import { createPortal } from 'react-dom';
-import { TbDots, TbEdit, TbTrash, TbMessageCircle, TbSend, TbX } from "react-icons/tb";
-import { apiRequest } from '../../../../service/api'; 
+import { TbDots, TbEdit, TbTrash, TbMessageCircle, TbSend, TbX, TbBeer } from "react-icons/tb";
+import { apiRequest } from '../../../../service/api';
 import './PostCard.css';
 import { IoBeerOutline, IoBeer } from "react-icons/io5";
 
-// ✨ 1. เพิ่ม isLikedParent และ onLikeToggle มารับค่าความจำจากหน้าหลัก
-function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl, likes, comments, isLikedParent, onLikeToggle }) {
+function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl, likes, comments, currentUser }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showComments, setShowComments] = useState(false);
     const [inputText, setInputText] = useState("");
-    
-    // ✨ 2. ระบบจัดการ Like: ถ้าหน้าแม่ส่งค่ามาให้ใช้ของแม่ (จะจำค่าได้) ถ้าไม่มีก็ใช้ของตัวเอง
-    const [localIsLiked, setLocalIsLiked] = useState(false);
-    const isLiked = isLikedParent !== undefined ? isLikedParent : localIsLiked;
 
-    const handleLikeClick = () => {
-        if (onLikeToggle) {
-            onLikeToggle(); // ถ้าหน้าแม่จัดการ ให้เรียกใช้ฟังก์ชันของแม่
-        } else {
-            setLocalIsLiked(!localIsLiked); // ถ้าไม่มีหน้าแม่ (เช่นใน MyPosts) ให้จัดการตัวเอง
-        }
-    };
+    // 🌟 1. ตั้ง State พื้นฐานไว้ก่อน
+    const [isLiked, setIsLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(0);
+    const [commentLists, setCommentList] = useState([]);
 
-    const [commentLists, setCommentList] = useState(Array.isArray(comments) ? comments : []);
+    // 🌟 2. อัปเดต Comments เมื่อ Database ส่งมา
+    useEffect(() => {
+        setCommentList(Array.isArray(comments) ? comments : []);
+    }, [comments]);
 
-    // ✨ 3. แก้บั๊กรูประบบโปรไฟล์พัง (รองรับไฟล์ import, base64, url และไฟล์ local)
-    const avatarUrl = image_author?.includes("/") || image_author?.startsWith("data:") || image_author?.startsWith("http")
-        ? image_author 
+    // 🌟 3. อัปเดต Likes เมื่อ Database ส่งมา (นี่คือพระเอกที่หายไป!)
+    // 🌟 3. อัปเดต Likes เมื่อ Database ส่งมา
+    useEffect(() => {
+        const likesArray = Array.isArray(likes) ? likes : [];
+        setLikesCount(likesArray.length);
+
+        // 🌟 แก้ไข: จัดการชื่อให้เป็นตัวพิมพ์เล็กเหมือนกันให้หมด เผื่อตอนพิมพ์ Log in กับตอนเซฟลง DB มันเป็นคนละแบบ
+        const isUserLiked = likesArray.some(
+            (likeName) => likeName.trim().toLowerCase() === currentUser?.trim().toLowerCase()
+        );
+        
+        setIsLiked(isUserLiked); 
+        
+        // แอบเช็คดูใน Console (F12) ว่ามันเปรียบเทียบเจอไหม
+        console.log("รายชื่อคนกดไลก์:", likesArray, "ชื่อเรา:", currentUser, "กดไปหรือยัง?", isUserLiked);
+
+    }, [likes, currentUser]);
+
+
+    const avatarUrl = image_author?.startsWith("http")
+        ? image_author
         : `/src/assets/avatars/${image_author || '1.png'}`;
 
     const postImageUrl = imageUrl?.startsWith("http") || imageUrl?.startsWith("data:")
@@ -39,9 +52,9 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         if (inputText.trim() === "") return;
         try {
             const response = await apiRequest(`/posts/${postId}/comment`, 'POST', { text: inputText });
+
             if (response.comment) {
                 setCommentList([...commentLists, response.comment]);
-                setInputText("");
                 setInputText("");
             }
         } catch (error) {
@@ -97,13 +110,17 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
 
             <div className="post-footer-new">
                 <div className="footer-left-group">
+                    <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleLike}>
+                        <span className="icon-wrap">{isLiked ? '🍻' : <TbBeer size={22} />}</span>
+                        <span className="count">{likesCount}</span>
                     {/* ✨ เปลี่ยน onClick มาใช้ handleLikeClick ที่เราสร้างใหม่ */}
+                    /*
                     <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleLikeClick}>
                         <span className="icon-wrap">
                            {isLiked ? <IoBeer size={22} color="#F48C2A" /> : <IoBeerOutline size={22} />}
                         </span>
                         <span className="count">{isLiked ? likes + 1 : likes}</span>
-                    </button>
+                    </button>*/
                     <button className={`action-btn comment-btn ${showComments ? 'active' : ''}`} onClick={() => setShowComments(!showComments)}>
                         <span className="icon-wrap"><TbMessageCircle size={22} /></span>
                         <span className="count">{commentLists.length}</span>

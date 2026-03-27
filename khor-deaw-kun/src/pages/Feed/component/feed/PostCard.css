@@ -49,10 +49,105 @@
 
 .post-footer-new { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 2px dashed rgba(62, 39, 35, 0.4); position: relative; z-index: 2; }
 .footer-left-group { display: flex; gap: 15px; }
-.action-btn { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.5); border: 2px solid #3E2723; padding: 8px 18px; border-radius: 15px; cursor: pointer; font-family: 'Patrick Hand', "Playpen Sans Thai" ,cursive; font-size: 1.1rem; font-weight: bold; box-shadow: 0px 4px 0px #3E2723; transition: 0.1s; }
-.action-btn:hover { background: rgba(255, 255, 255, 0.8); transform: translateY(-2px); box-shadow: 0px 6px 0px #3E2723; }
-.action-btn:active { transform: translateY(4px); box-shadow: 0px 0px 0px #3E2723; }
-.cheers-btn.active { background-color: #F48C2A; color: white; }
+/* =========================================
+   🍻 ACTION BUTTONS (Like, Comment, Share) 
+   ========================================= */
+
+/* 🌟 สไตล์พื้นฐานของทั้ง 3 ปุ่ม (หน้าตาเป็นแผ่นไม้เหมือนกันหมด) */
+.action-btn {
+  background-color: #FDF5E6; /* สีพื้นไม้สว่าง */
+  border: 2px solid #3E2723; /* ขอบน้ำตาลเข้ม */
+  color: #6D4C41; /* ตัวเลขสีน้ำตาลกลาง */
+  border-radius: 12px; /* ทรงแผ่นไม้โค้งมน */
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* ระยะห่างระหว่างไอคอนกับตัวอักษร/ตัวเลข */
+  font-weight: 800;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #3E2723; /* เงาไม้ */
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ตอนเอาเมาส์ชี้ (Hover) - ทั้ง 3 ปุ่มจะเด้งขึ้นและเปลี่ยนเป็นสีไม้อ่อน */
+.action-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 4px 4px 0px #3E2723;
+  background-color: #FFD285;
+  color: #3E2723;
+}
+
+/* ตอนกำลังกดคลิก (Active คลิกค้าง) */
+.action-btn:active {
+  transform: translateY(0) scale(0.95);
+  box-shadow: 1px 1px 0px #3E2723;
+}
+
+/* ไอคอนภายในปุ่ม */
+.icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+
+/* =========================================
+   🌟 ลูกเล่นตอนปุ่มอยู่ในสถานะต่างๆ (Active) 
+   ========================================= */
+
+/* 🍻 1. ปุ่ม LIKE (เมื่อกดไลก์แล้ว) */
+.action-btn.cheers-btn.active {
+  background-color: #F48C2A; /* สีส้มทอง (ไฟร้าน/น้ำเบียร์) */
+  color: #1A1A1A; /* ตัวเลขสีดำเข้ม */
+  border-color: #3E2723;
+  box-shadow: 4px 4px 0px #3E2723;
+  
+  /* เรียกใช้อนิเมชันเด้งชนแก้วตอนกดปุ๊บ */
+  animation: cheersPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ตอนชี้ปุ่มที่กดไลก์ไปแล้ว */
+.action-btn.cheers-btn.active:hover {
+  background-color: #FF9F43; /* สว่างขึ้นอีกนิด */
+  transform: translateY(-3px) scale(1.05); /* เด้งและขยาย */
+}
+
+/* 🎬 แอนิเมชัน "ชนแก้ว" */
+@keyframes cheersPop {
+  0% { transform: scale(1) rotate(0deg); }
+  30% { transform: scale(1.15) rotate(-10deg); } /* เอียงซ้ายเตรียมชน */
+  60% { transform: scale(1.15) rotate(10deg); }  /* เอียงขวาชนแก้ว! */
+  100% { transform: scale(1) rotate(0deg); }     /* กลับท่าเดิม */
+}
+
+
+/* 💬 2. ปุ่ม COMMENT (เมื่อเปิดช่องคอมเมนต์ค้างไว้) */
+.action-btn.comment-btn.active {
+  background-color: #F48C2A; /* ค้างสีไม้อ่อนไว้ ให้รู้ว่าเปิดอยู่ */
+  color: #3E2723;
+  /* ทำให้ดูเหมือนปุ่มถูกกดจมลงไปนิดนึง (บุ๋มลงไปในไม้) */
+  box-shadow: 4px 4px 0px #3E2723;
+  transform: translateY(1px); 
+}
+
+.action-btn.comment-btn.active:hover {
+  transform: translateY(-2px); /* เวลาชี้ให้เด้งขึ้นมานิดเดียวพอ */
+  box-shadow: 3px 3px 0px #3E2723;
+}
+
+
+/* 🚀 3. ปุ่ม SHARE (เวลากดชี้เตรียมแชร์) */
+/* ปุ่มแชร์ไม่มีสถานะ Active ค้างไว้ เลยใส่ลูกเล่นตอน Hover แทน */
+.action-btn.share-btn:hover {
+  background-color: #84E045; /* เปลี่ยนเป็นสีเขียวเด่นๆ พร้อมส่ง */
+  color: #1A1A1A;
+  transform: translateY(-3px) rotate(3deg); /* เอียงเหมือนจรวดกำลังจะบิน */
+  box-shadow: 4px 4px 0px #3E2723;
+}
+
 
 .comments-section-wood { background: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 15px; margin-top: 20px; border: 3px solid #3E2723; position: relative; z-index: 2; }
 .comment-bubble { background: white; padding: 12px 15px; border-radius: 12px; border: 2px solid #3E2723; margin-bottom: 10px; box-shadow: 2px 2px 0 rgba(62, 39, 35, 0.2); font-size: 1.1rem; }
