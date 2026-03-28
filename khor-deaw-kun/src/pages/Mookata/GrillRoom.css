@@ -19,7 +19,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 40px;
+    padding: 10px 40px;
     z-index: 10;
 }
 
@@ -51,9 +51,59 @@
 .room-content-wrapper {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* ให้อยู่กึ่งกลางแนวตั้ง */
+    align-items: stretch; /* 🌟 บังคับให้เมนูกับแชทสูงเท่ากันและพอดีกรอบ */
     flex: 1;
-    padding: 0 40px 40px 40px;
+    padding: 0 40px 15px 40px; /* ลด Padding ด้านล่าง */
+    overflow: hidden; /* 🌟 ป้องกันไม่ให้ทะลุจอ */
+}
+/* =========================================
+   🔘 โซนปุ่มออกจากห้อง / พับจอ (Header Actions)
+   ========================================= */
+.header-actions {
+    display: flex;
+    gap: 15px; /* ระยะห่างระหว่าง 2 ปุ่ม */
+}
+
+/* 🌟 ปุ่ม 1: แวะไปหน้า Feed (พับจอ) - สีซอฟต์ๆ */
+.minimize-room-btn {
+    background-color: #FFF9F0;
+    border: 3px solid #3E2723;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #3E2723;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #3E2723;
+    transition: 0.2s;
+}
+
+.minimize-room-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 6px 6px 0px #3E2723;
+    background-color: #E8F8DE; /* โฮเวอร์เป็นสีเขียวอ่อน */
+    border-color: #84E045;
+}
+
+/* 🛑 ปุ่ม 2: ลุกจากโต๊ะ (ออกถาวร) - สีแดงเตือนภัย */
+.leave-room-btn {
+    background-color: #FFDEE4;
+    border: 3px solid #D8435A;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #D8435A;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #D8435A;
+    transition: 0.2s;
+}
+
+.leave-room-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 6px 6px 0px #D8435A;
+    background-color: #FF6B81;
+    color: white;
 }
 
 /* =========================================
@@ -66,6 +116,11 @@
     height: 75vh;
     flex-shrink: 0; 
     width: 120px; /* 🌟 ล็อกความกว้างกล่องใหญ่ไว้ */
+}
+
+.ingredient-menu-wrapper,
+.room-chat-container {
+    height: 100%; /* 🌟 เปลี่ยนจาก 75vh เป็น 100% */
 }
 
 .ingredient-menu {
@@ -588,107 +643,7 @@
     color: #FF6B81; 
 }
 
-/* =========================================
-   🍽️ โซนจานข้าวเพื่อน (ลากหมูมาป้อน)
-   ========================================= */
-.players-action-board {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap; /* เผื่อคนเยอะจะได้ปัดลงบรรทัดใหม่ */
-    gap: 20px;
-    margin-top: 30px;
-    width: 100%;
-}
 
-.player-plate-zone {
-    width: 110px;
-    height: 110px;
-    background-color: #FAFAFA;
-    border: 4px solid #E0D4C3;
-    border-radius: 50%; /* ทำให้กลมเหมือนจาน */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 
-        inset 0 -10px 15px rgba(0,0,0,0.05), /* เงาด้านในให้ดูเป็นหลุมจาน */
-        4px 4px 0px rgba(62, 39, 35, 0.2); /* เงาด้านนอกสไตล์การ์ตูน */
-}
-
-/* 🌟 จานของเราเอง (ไฮไลท์สีเด่นๆ) */
-.player-plate-zone.is-me {
-    background-color: #FFF0CC;
-    border-color: #F48C2A;
-}
-
-/* อนิเมชั่นตอนลากเนื้อหมูมาจ่อที่จาน (เหมือนจานอ้าปากรับ) */
-.player-plate-zone:hover {
-    transform: scale(1.15) translateY(-10px);
-    border-color: #84E045;
-    background-color: #E8F8DE;
-    box-shadow: 
-        inset 0 -10px 15px rgba(0,0,0,0.05),
-        0px 15px 0px rgba(132, 224, 69, 0.3);
-}
-
-.plate-icon {
-    font-size: 2.5rem;
-    pointer-events: none;
-    margin-bottom: -5px;
-    filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.2));
-}
-
-.plate-owner-name {
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: #3E2723;
-    text-align: center;
-    pointer-events: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 90px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-top: 5px;
-}
-
-.plate-tag {
-    position: absolute;
-    bottom: -15px;
-    background-color: #F48C2A;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: bold;
-    padding: 2px 10px;
-    border-radius: 10px;
-    border: 2px solid #3E2723;
-    box-shadow: 2px 2px 0px #3E2723;
-}
-
-/* =========================================
-   🖼️ รูปโปรไฟล์ในจานหมูกระทะ
-   ========================================= */
-.plate-profile-img {
-    width: 65px;
-    height: 65px;
-    border-radius: 50%; /* ทำให้รูปกลมดิก */
-    object-fit: cover; /* จัดทรงรูปไม่ให้เบี้ยว */
-    border: 3px solid #3E2723;
-    pointer-events: none; /* ห้ามเมาส์ไปติดรูปตอนลากหมูใส่จาน */
-    box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
-    margin-bottom: 2px;
-}
-
-/* ทำให้ตอนโฮเวอร์ จานและรูปเด้งขึ้นมาพร้อมกัน */
-.player-plate-zone:hover .plate-profile-img {
-    transform: scale(1.1);
-    transition: 0.2s;
-    border-color: #F48C2A;
-}
 /* =========================================
    📊 MEAT STATUS BADGE (ป้าย % สุก และ เตือนไหม้)
    ========================================= */
@@ -751,93 +706,142 @@
     transition: width 0.3s ease, background-color 0.3s ease;
 }
 
+
+/* =========================================
+   🧽 ปุ่มควบคุมเตา (Controls Mini)
+   ========================================= */
+.pan-controls-mini {
+    margin-top: 25px;
+}
+
+.pan-controls-mini button {
+    background-color: #FFF9F0;
+    border: 3px solid #3E2723;
+    border-radius: 15px;
+    padding: 6px 20px;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #3E2723;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #3E2723;
+    transition: 0.1s;
+}
+
+.pan-controls-mini button:active {
+    transform: translateY(4px);
+    box-shadow: 0px 0px 0px #3E2723;
+}
+
 /* =========================================
    👥 PLAYERS AVATAR ZONE (โซนป้อนเพื่อน)
    ========================================= */
 .players-action-board {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
+    gap: 30px; /* ขยายระยะห่างจานแต่ละใบให้กว้างขึ้น */
+    margin-top: 30px;
     width: 100%;
+    flex-wrap: wrap; 
 }
 
-.player-drop-zone {
-    width: 90px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 3px dashed #3E2723;
-    border-radius: 20px;
+/* 📦 ห่อหุ้ม 1 คน (รูป + ป้าย + กล่องคะแนน) */
+.player-plate-unit {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px 5px;
-    transition: 0.2s;
-    box-shadow: 4px 4px 0px rgba(62, 39, 35, 0.3);
+    position: relative; 
+    width: 120px; /* บังคับความกว้างกล่องหลัก */
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 🌟 ไฮไลท์กรอบสีเขียวให้รู้ว่านี่คือกล่องตัวเอง */
-.player-drop-zone.is-me {
-    border: 3px solid #84E045;
-    background-color: #E8F8DE;
+.player-plate-unit:hover {
+    transform: scale(1.1);
 }
 
-/* ตอนลากหมูมาจ่อที่หน้าเพื่อน กล่องจะเด้งขยายรับ */
-.player-drop-zone:hover {
-    transform: scale(1.15) translateY(-5px);
-    box-shadow: 0px 10px 15px rgba(0,0,0,0.2);
-    border-style: solid; /* เปลี่ยนเป็นกรอบทึบให้เห็นชัดๆ */
-    border-color: #F48C2A; 
+/* 🌟 กล่องวงกลมใส่รูป */
+.player-plate-zone {
+    width: 100px;
+    height: 100px;
+    border: 5px solid #3E2723;
+    border-radius: 50%;
+    overflow: hidden; 
+    position: relative;
+    background-color: #FFF; 
+    z-index: 3; /* ให้รูปอยู่ชั้นบนสุด */
+    box-shadow: 4px 4px 0px rgba(62, 39, 35, 0.2); 
+    transition: all 0.2s;
 }
 
-.player-avatar {
-    font-size: 2.5rem;
-    pointer-events: none; /* ห้ามเมาส์ไปติดไอคอนตอนดรอป */
+.player-plate-unit.is-me .player-plate-zone {
+    border-color: #F48C2A;
 }
 
-.player-name {
-    font-size: 0.85rem;
+.plate-profile-img {
+    width: 100%; 
+    height: 100%;
+    object-fit: cover; 
+    border-radius: 50%;
+    pointer-events: none; 
+}
+
+/* 🏷️ ป้ายจานของคุณ (ลอยทับขอบจาน) */
+.plate-tag {
+    position: absolute;
+    top: 85px; /* ดันลงมาให้อยู่ตรงขอบล่างของรูปโปรไฟล์พอดี */
+    background-color: #F48C2A; 
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 2px 12px;
+    border-radius: 12px;
+    border: 2px solid #3E2723;
+    z-index: 4; /* ลอยอยู่หน้าสุด */
+}
+
+/* 📝 กล่องชื่อและคะแนน */
+.plate-labels-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    border: 3px solid #3E2723;
+    border-radius: 15px;
+    width: 100%;
+    
+    margin-top: -30px; /* ดึงกล่องให้มุดเข้าไปใต้รูปโปรไฟล์ */
+    /* 🌟 ตัวแก้บั๊ก: เพิ่ม Padding Top เยอะๆ เพื่อดันตัวหนังสือให้พ้นขอบรูป */
+    padding: 40px 10px 10px 10px; 
+    
+    z-index: 1; /* ให้อยู่ชั้นล่างสุด (หลังรูป) */
+    box-shadow: 4px 4px 0px rgba(62, 39, 35, 0.15);
+}
+
+.player-plate-unit.is-me .plate-labels-wrapper {
+    background-color: #FFF0CC;
+    border-color: #F48C2A;
+}
+
+.plate-owner-name {
+    font-size: 0.95rem;
     font-weight: bold;
     color: #3E2723;
     text-align: center;
-    margin: 5px 0;
-    pointer-events: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%;
+    max-width: 100%;
+    margin-bottom: 5px;
 }
 
+/* 🌟 คะแนนดาว */
 .player-score {
-    font-weight: 900;
-    color: #84E045;
-    background-color: #3E2723;
-    padding: 2px 10px;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    pointer-events: none;
-}
-
-.player-score.negative {
-    color: #FF6B81; /* คะแนนติดลบสีแดง */
-}
-
-.pan-controls-mini {
-    margin-top: 15px;
-}
-
-.pan-controls-mini button {
-    background-color: #FDF5E6;
-    border: 3px solid #3E2723;
-    border-radius: 15px;
-    padding: 5px 15px;
     font-weight: bold;
-    cursor: pointer;
-    box-shadow: 3px 3px 0px #3E2723;
-    transition: 0.1s;
+    color: #84E045; 
+    background-color: #3E2723;
+    padding: 3px 12px;
+    border-radius: 10px;
+    font-size: 0.85rem;
 }
-
-.pan-controls-mini button:active {
-    transform: translateY(3px);
-    box-shadow: 0px 0px 0px #3E2723;
+.player-score.negative {
+    color: #FF6B81; 
 }
-

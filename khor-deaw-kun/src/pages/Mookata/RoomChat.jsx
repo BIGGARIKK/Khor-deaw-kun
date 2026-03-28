@@ -1,25 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './GrillRoom.css'; // เผื่อคุณเก็บ CSS ไว้รวมกัน
+import './GrillRoom.css'; 
 
-// 🌟 รับ players เพิ่มเข้ามาจาก Props
-function RoomChat({ socket, roomId, players }) { 
+function RoomChat({ socket, roomId, players }) {
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
-    
-    // 🌟 State สำหรับคุมแท็บ (ค่าเริ่มต้นเป็น 'chat')
-    const [activeTab, setActiveTab] = useState('chat'); // 'chat' หรือ 'members'
-    
+
+    const [activeTab, setActiveTab] = useState('chat'); 
+
     const chatEndRef = useRef(null);
     const myName = localStorage.getItem('username') || 'Guest';
 
+    // ==========================================
+    // 👂 ดักฟังข้อความใหม่ และ โหลดประวัติเก่า จาก Server
+    // ==========================================
     useEffect(() => {
         if (!socket) return;
-        socket.on('chat_message', (data) => {
-            setMessages((prev) => [...prev, data]);
+
+        // 🌟 1. รับประวัติแชททั้งหมดตอนเพิ่งเข้ามา
+        socket.on('load_chat_history', (historyMessages) => {
+            setMessages(historyMessages); 
         });
-        return () => socket.off('chat_message');
+
+        // 🌟 2. ดักฟังข้อความใหม่ๆ ที่เด้งเข้ามา (เหลืออันนี้ไว้แค่อันเดียวพอ!)
+        socket.on('chat_message', (data) => {
+            setMessages((prevMessages) => [...prevMessages, data]);
+        });
+
+        return () => {
+            socket.off('load_chat_history');
+            socket.off('chat_message');
+        };
     }, [socket]);
 
+    // 🌟 เลื่อนจอลงล่างสุดอัตโนมัติเวลาแชทอัปเดต
     useEffect(() => {
         if (activeTab === 'chat') {
             chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -27,11 +40,11 @@ function RoomChat({ socket, roomId, players }) {
     }, [messages, activeTab]);
 
     const handleSendMessage = (e) => {
-        e.preventDefault(); 
-        if (!inputText.trim() || !socket || !roomId) return; 
+        e.preventDefault();
+        if (!inputText.trim() || !socket || !roomId) return;
 
         const newMsg = {
-            id: `msg-${Date.now()}-${Math.random().toString(36).substr(2,9)}`, 
+            id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             type: 'user',
             sender: myName,
             text: inputText.trim(),
@@ -39,20 +52,20 @@ function RoomChat({ socket, roomId, players }) {
         };
 
         socket.emit('send_message', newMsg);
-        setInputText(''); 
+        setInputText('');
     };
 
     return (
         <div className="room-chat-container">
             {/* 🌟 ส่วนสลับแท็บ (Tab Navigation) */}
             <div className="chat-tabs">
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
                     onClick={() => setActiveTab('chat')}
                 >
                     💬 แชทบีช
                 </button>
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`}
                     onClick={() => setActiveTab('members')}
                 >
@@ -61,60 +74,53 @@ function RoomChat({ socket, roomId, players }) {
             </div>
 
             {/* 🌟 1. เนื้อหาของแท็บแชท */}
-            {/* 🌟 1. เนื้อหาของแท็บแชท */}
-{activeTab === 'chat' && (
-    <>
-        <div className="chat-messages">
-            {messages.map((msg) => {
-                // 1. ถ้าเป็นข้อความระบบ (เช่น คนเข้าห้อง) ให้อยู่ตรงกลาง
-                if (msg.type === 'system') {
-                    return <div key={msg.id} className="chat-bubble system">{msg.text}</div>;
-                }
+            {activeTab === 'chat' && (
+                <>
+                    <div className="chat-messages">
+                        {messages.map((msg) => {
+                            if (msg.type === 'system') {
+                                return <div key={msg.id} className="chat-bubble system">{msg.text}</div>;
+                            }
 
-                // 2. เช็คว่าข้อความนี้ "เรา" เป็นคนส่งใช่ไหม?
-                const isMe = msg.sender === myName;
+                            const isMe = msg.sender === myName;
 
-                return (
-                    <div key={msg.id} className={`chat-wrapper ${isMe ? 'is-me' : 'is-other'}`}>
-                        {/* โชว์ชื่อคนส่ง (ถ้าเป็นเราให้เขียนว่า 'คุณ') */}
-                        <div className="chat-sender">{isMe ? 'คุณ' : msg.sender}</div>
-                        
-                        {/* ตัวกล่องข้อความ */}
-                        <div className="chat-bubble user">
-                            {msg.text}
-                        </div>
+                            return (
+                                <div key={msg.id} className={`chat-wrapper ${isMe ? 'is-me' : 'is-other'}`}>
+                                    <div className="chat-sender">{isMe ? 'คุณ' : msg.sender}</div>
+                                    <div className="chat-bubble user">
+                                        {msg.text}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        <div ref={chatEndRef} />
                     </div>
-                );
-            })}
-            <div ref={chatEndRef} />
-        </div>
 
-                <form className="chat-input-area" onSubmit={handleSendMessage}>
-                    <input 
-                        type="text" 
-                        placeholder="แซวเพื่อนหน่อย..." 
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                    />
-                    <button type="submit">Send</button>
-                </form>
-            </>
-        )}
+                    <form className="chat-input-area" onSubmit={handleSendMessage}>
+                        <input
+                            type="text"
+                            placeholder="แซวเพื่อนหน่อย..."
+                            value={inputText}
+                            onChange={(e) => setInputText(e.target.value)}
+                        />
+                        <button type="submit">Send</button>
+                    </form>
+                </>
+            )}
 
             {/* 🌟 2. เนื้อหาของแท็บรายชื่อคน */}
-           {/* 🌟 2. เนื้อหาของแท็บรายชื่อคน */}
             {activeTab === 'members' && (
                 <div className="members-list-area">
                     <div className="members-instruction">รายชื่อผู้ถือตะเกียบร่วมโต๊ะ</div>
                     <div className="player-badges-list">
                         {players.map((p, index) => {
-                            const pName = p.username; // ดึงชื่อออกมา
-                            const pImg = p.profile_image; // ดึงรูปออกมา
-                            
+                            const pName = p.username; 
+                            const pImg = p.profile_image; 
+
                             return (
                                 <div key={index} className={`member-card ${pName === myName ? 'is-me' : ''}`}>
                                     {pImg ? (
-                                        <img src={pImg} className="member-avatar" style={{objectFit: 'cover'}} alt="avatar" />
+                                        <img src={`/avatars/${pImg}`} className="member-avatar" style={{ objectFit: 'cover' }} alt="avatar" />
                                     ) : (
                                         <div className="member-avatar">{pName.charAt(0).toUpperCase()}</div>
                                     )}
