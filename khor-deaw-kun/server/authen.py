@@ -176,53 +176,7 @@ def update_profile():
         
     return jsonify({'message': 'No data provided to update'}), 400
 
-@app.route('/profile/<username>', methods=['GET'])
-def get_other_profile(username):
-    user = mongo.db.users.find_one({'username': username}, {'_id': 0, 'password': 0})
-    if user:
-        return jsonify(user), 200
-    return jsonify({'message': 'User not found'}), 404
 
-# ==========================================
-# 🤝 FOLLOW SYSTEM
-# ==========================================
-@app.route('/users/<username>/follow', methods=['POST'])
-@jwt_required()
-def toggle_follow(username):
-    current_user = get_jwt_identity() 
-    
-    if current_user == username:
-        return jsonify({'message': 'You cannot follow yourself!'}), 400
-        
-    target_user = mongo.db.users.find_one({'username': username})
-    
-    if not target_user:
-        return jsonify({'message': 'User not found'}), 404
-        
-    if current_user in target_user.get('followers', []):
-        mongo.db.users.update_one(
-            {'username': username},
-            {'$pull': {'followers': current_user}}
-        )
-        mongo.db.users.update_one(
-            {'username': current_user},
-            {'$pull': {'following': username}}
-        )
-        return jsonify({'message': 'Unfollowed', 'is_following': False}), 200
-    else:
-        mongo.db.users.update_one(
-            {'username': username},
-            {'$push': {'followers': current_user}}
-        )
-        mongo.db.users.update_one(
-            {'username': current_user},
-            {'$push': {'following': username}}
-        )
-        
-        # 🌟 แจ้งเตือนเมื่อกดติดตาม
-        create_notification(username, current_user, 'follow', 'เริ่มติดตามคุณแล้ว')
-        
-        return jsonify({'message': 'Followed', 'is_following': True}), 200
 
 # ==========================================
 # 📢 POST SYSTEM (CREATE / GET / EDIT / DELETE)
@@ -384,62 +338,38 @@ def add_comment(post_id):
 # ==========================================
 # 🔔 GET NOTIFICATIONS
 # ==========================================
+# ==========================================
+# 🔔 GET NOTIFICATIONS (แก้ไขให้ดึงจาก User ตรงๆ)
+# ==========================================
 @app.route('/notifications', methods=['GET'])
 @jwt_required()
 def get_notifications():
     current_user = get_jwt_identity()
+    user = mongo.db.users.find_one({'username': current_user})
     
-    # จำกัดรายการให้ดึงมาแค่ 30 รายการล่าสุด ป้องกันโหลดข้อมูลเยอะเกิน
-    notifs_cursor = mongo.db.notifications.find({'recipient_username': current_user}).sort('created_at', -1).limit(30)
-    
-    notifs_list = []
-    unread_count = 0
-    
-    for n in notifs_cursor:
-        n['_id'] = str(n['_id'])
-        if not n.get('is_read', False):
-            unread_count += 1
-        notifs_list.append(n)
+    if not user:
+        return jsonify([]), 200 # ถ้าไม่เจอ user ส่ง array ว่างไป React จะได้ไม่พัง
         
-    return jsonify({
-        'notifications': notifs_list,
-        'unread_count': unread_count
-    }), 200
+    # ดึง list การแจ้งเตือนออกมา (ถ้าไม่มีให้เป็น list ว่าง)
+    notifications = user.get('notifications', [])
+    
+    # พลิกเอาแจ้งเตือนใหม่ล่าสุดขึ้นก่อน
+    notifications.reverse()
+    
+    # ส่งไปแค่ 30 รายการล่าสุด
+    return jsonify(notifications[:30]), 200
 
 @app.route('/notifications/read', methods=['PUT'])
 @jwt_required()
 def mark_notifications_read():
     current_user = get_jwt_identity()
     
-    # อัปเดตรายการที่ยังไม่ได้อ่านให้เปลี่ยนเป็นอ่านแล้วทั้งหมด
-    mongo.db.notifications.update_many(
-        {'recipient_username': current_user, 'is_read': False},
-        {'$set': {'is_read': True}}
+    # อัปเดต isRead ใน Array notifications ของ User คนนั้นๆ ให้เป็น True ทั้งหมด
+    mongo.db.users.update_one(
+        {'username': current_user},
+        {'$set': {'notifications.$[].isRead': True}}
     )
-    return jsonify({'message': 'ทำเครื่องหมายว่าอ่านแล้วทั้งหมด'}), 200
-
-# ==========================================
-# 🔥 TRENDING HASHTAGS
-# ==========================================
-@app.route('/trending', methods=['GET'])
-def get_trending():
-    try:
-        posts = mongo.db.posts.find({}, {"text": 1}).sort("create_at", -1).limit(100)
-        all_tags = []
-        for post in posts:
-            text = post.get('text', '')
-            tags = re.findall(r'#[^\s#]+', text)
-            all_tags.extend(tags)
-            
-        top_tags = Counter(all_tags).most_common(5)
-        trending_data = [{"tag": tag, "count": count} for tag, count in top_tags]
-        
-        return jsonify(trending_data), 200
-    except Exception as e:
-        print(f"Error fetching trending tags: {e}")
-        return jsonify({"error": "Failed to fetch trending"}), 500
-
-# ==========================================
+    return jsonify({'message': 'Marked as read'}), 200
 # 🏠 ROOMS SYSTEM
 # ==========================================
 def generate_room_id():
@@ -583,31 +513,6 @@ def get_trending():
     except Exception as e:
         print(f"Error fetching trending tags: {e}")
         return jsonify({"error": "Failed to fetch trending"}), 500
-
-@app.route('/notifications', methods=['GET'])
-@jwt_required()
-def get_notifications():
-    current_user = get_jwt_identity()
-    user = mongo.db.users.find_one({'username': current_user})
-    
-    if not user:
-        return jsonify({'message': 'User not found'}), 404
-        
-    notifications = user.get('notifications', [])
-    # พลิกเอาแจ้งเตือนใหม่ล่าสุดขึ้นก่อน
-    notifications.reverse()
-    
-    return jsonify(notifications[:30]), 200 
-
-@app.route('/notifications/read', methods=['PUT'])
-@jwt_required()
-def mark_notifications_read():
-    current_user = get_jwt_identity()
-    mongo.db.users.update_one(
-        {'username': current_user},
-        {'$set': {'notifications.$[].isRead': True}}
-    )
-    return jsonify({'message': 'Marked as read'}), 200
 
 
 if __name__ == '__main__':
