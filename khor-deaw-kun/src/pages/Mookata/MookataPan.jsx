@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
-import panImage from '../../assets/Mookata/pan.png'; 
+import panImage from '../../assets/Mookata/pan.png'; // 🌟 เช็ค Path รูปกระทะให้ตรงกับของคุณนะ
 
 function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRotation, currentFlip, players, setPlayers }) {
     
-    // (ระบบจับเวลาสุก/ไหม้ เหมือนเดิม)
+    // ==========================================
+    // ⏲️ ระบบจับเวลาสุก/ไหม้ (ทำงานทุก 1 วิ)
+    // ==========================================
     useEffect(() => {
         const cookTimer = setInterval(() => {
             setItemsOnPan(prevItems => {
@@ -27,8 +29,11 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         return () => clearInterval(cookTimer);
     }, [setItemsOnPan]);
 
+    // ==========================================
+    // 🔄 กดคลิกที่หมูเพื่อพลิกด้าน
+    // ==========================================
     const handleFlipItemOnPan = (e, item) => {
-        e.stopPropagation(); 
+        e.stopPropagation(); // กันทะลุไปโดนกระทะ
         setItemsOnPan(prevItems => prevItems.map(i => {
             if (i.uniqueId === item.uniqueId) {
                 return { ...i, activeSide: i.activeSide === 'A' ? 'B' : 'A', flip: (i.flip || 1) * -1 };
@@ -37,9 +42,12 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         }));
     };
 
+    // ==========================================
+    // 🤏 ตอนเริ่มจับลากหมูที่อยู่บนเตา
+    // ==========================================
     const handleDragStartPanItem = (e, item) => {
         e.dataTransfer.setData('application/json', JSON.stringify({
-            source: 'pan',
+            source: 'pan', // บอกว่าลากมาจากบนเตา
             uniqueId: item.uniqueId,
             status: item.status
         }));
@@ -47,6 +55,7 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
 
     const handleDragOver = (e) => e.preventDefault(); 
 
+    // คำนวณรัศมีกระทะ ป้องกันหมูลอยนอกเตา
     const isInsidePanArea = (x, y, containerWidth, containerHeight) => {
         const centerX = containerWidth / 2;
         const centerY = containerHeight / 2;
@@ -55,6 +64,9 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         return distance <= radius; 
     };
 
+    // ==========================================
+    // 🥘 วางหมูลงบนเตา (จากเมนู หรือ ย้ายที่บนเตา)
+    // ==========================================
     const handleDropOnPan = (e) => {
         e.preventDefault();
         const dataString = e.dataTransfer.getData('application/json');
@@ -68,10 +80,12 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         if (!isInsidePanArea(x, y, rect.width, rect.height)) return;
 
         if (droppedData.source === 'pan') {
+            // ย้ายที่หมูชิ้นเดิม
             setItemsOnPan(prev => prev.map(item => 
                 item.uniqueId === droppedData.uniqueId ? { ...item, x, y } : item
             ));
         } else {
+            // วางหมูชิ้นใหม่
             const newItem = {
                 ...droppedData,
                 uniqueId: Date.now(),
@@ -82,6 +96,7 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         }
     };
 
+    // คลิกวางหมูจากเมนู
     const handleDropIngredientClick = (e) => {
         if (!selectedIngredient) return;
         const rect = e.currentTarget.getBoundingClientRect();
@@ -106,11 +121,14 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
     // ==========================================
     const handleDropToPlayer = (e, targetPlayerId) => {
         e.preventDefault();
+        
+        // รับข้อมูลที่ส่งมาจากการลาก
         const dataString = e.dataTransfer.getData('application/json');
         if (!dataString) return;
 
         const data = JSON.parse(dataString);
 
+        // เช็คว่าลากมาจากบนเตาจริงๆ
         if (data.source === 'pan') {
             const isCooked = data.status === 'cooked';
 
@@ -131,6 +149,7 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
 
     return (
         <div className="pan-container">
+            {/* โซนเตาหมูกระทะ */}
             <div 
                 className="mookata-pan-area" 
                 onClick={handleDropIngredientClick}
@@ -151,6 +170,7 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                             style={{ position: 'absolute', left: `${item.x}px`, top: `${item.y}px` }}
                             onClick={(e) => handleFlipItemOnPan(e, item)} 
                         >
+                            {/* ป้าย UI บอก % สุก */}
                             <div className="meat-status-badge">
                                 {item.status === 'burnt' ? (
                                     <div className="status-text burnt">💀 ไหม้เกรียม!</div>
@@ -175,32 +195,6 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                                 className={`item-pan-img ${item.status}`} 
                                 draggable="true" 
                                 onDragStart={(e) => handleDragStartPanItem(e, item)} 
-
-                                /* ==========================================
-                                   🌟 ของใหม่: ส่งพิกัดรัวๆ ตลอดเวลาที่ลาก! 
-                                   ========================================== */
-                                onDrag={(e) => {
-                                    // HTML5 Drag จะส่งค่า X,Y เป็น 0 ตอนเราปล่อยเมาส์ ต้องดักไว้ไม่ให้หมูเด้งไปมุมจอ
-                                    if (e.clientX === 0 && e.clientY === 0) return;
-
-                                    // คำนวณหาจุด X,Y ที่เมาส์ลากไปถึง
-                                    const panRect = e.currentTarget.closest('.mookata-pan-area').getBoundingClientRect();
-                                    const x = e.clientX - panRect.left;
-                                    const y = e.clientY - panRect.top;
-
-                                    /* 🔥 1. ท่อนนี้สำหรับส่งให้เพื่อน (ผ่าน Socket.io)
-                                    คุณต้องเขียนโค้ดส่งข้อมูลประมานนี้ครับ:
-                                    socket.emit('dragMeat', { uniqueId: item.uniqueId, x: x, y: y });
-                                    */
-
-                                    // 🔥 2. ท่อนนี้ทำให้จอคุณเห็นหมูลากตามเมาส์จริงๆ แบบเรียลไทม์!
-                                    // (เอาไปแทนภาพวิญญาณลางๆ ของเบราว์เซอร์)
-                                    setItemsOnPan(prev => prev.map(i => 
-                                        i.uniqueId === item.uniqueId ? { ...i, x: x, y: y } : i
-                                    ));
-                                }}
-                                /* ========================================== */
-
                                 style={{ transform: `rotate(${item.rotation || 0}deg) scaleX(${item.flip || 1})` }} 
                             />
                         </div>
