@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { TbEdit, TbCheck, TbX, TbTrash } from "react-icons/tb";
-import { apiRequest } from "../../../service/api"; // 🌟 อย่าลืม import API Request
+import { TbEdit, TbCheck, TbX } from "react-icons/tb";
+import { apiRequest } from "../../../service/api";
 import './ProfileHeader.css';
 
 const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen, avatarImage, setIsAvatarModalOpen, avatarPresets, isOwnProfile = true }) => {
@@ -8,22 +8,29 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
 
-  const [status, setStatus] = useState('online');
+  // 🌟 State สำหรับระบบ Online Status
+  const [status, setStatus] = useState(userData?.online_status || 'online');
+  const statusRef = useRef(status); 
+  
+  // 🌟 จำค่าที่ผู้ใช้กดล็อคด้วยตัวเอง (เก็บลง localStorage เพื่อให้จำข้ามการรีเฟรชได้)
+  const manualStatusRef = useRef(localStorage.getItem('manual_status') || null); 
+
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   const [isHoveringAvatar, setIsHoveringAvatar] = useState(false);
   const [phraseIndices, setPhraseIndices] = useState(Array(9).fill(0));
-  
   const [isFollowing, setIsFollowing] = useState(false);
   
-  // 🌟 ดึงชื่อของเราที่ล็อกอินอยู่
   const myLoggedInUsername = localStorage.getItem('username'); 
 
-  // 🌟 เช็คสถานะเริ่มต้นว่าเรา Follow เขาอยู่หรือเปล่า
   useEffect(() => {
     if (userData?.followers && myLoggedInUsername) {
       setIsFollowing(userData.followers.includes(myLoggedInUsername));
+    }
+    if (userData && userData.online_status) {
+      setStatus(userData.online_status);
+      statusRef.current = userData.online_status;
     }
   }, [userData, myLoggedInUsername]);
 
@@ -50,8 +57,118 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     offline: { color: '#aaaaaa', label: 'Offline' }   
   };
 
+  // 🌟 ฟังก์ชันเปลี่ยนสถานะแบบแยกระบบ Auto / Manual
+  const handleStatusChange = async (newStatus, isManual = false) => {
+    if (statusRef.current === newStatus && !isManual) return; 
+
+    setStatus(newStatus);
+    statusRef.current = newStatus;
+
+    if (isManual) {
+      if (newStatus === 'online') {
+        // ถ้ากดเลือก Online ให้ยกเลิกการล็อค แล้วกลับไปใช้ระบบตรวจจับออโต้
+        manualStatusRef.current = null;
+        localStorage.removeItem('manual_status');
+      } else {
+        // ถ้าเลือกสีอื่น (เหลือง, แดง, เทา) ให้ "ล็อค" สีนั้นไว้ตลอดกาล
+        manualStatusRef.current = newStatus;
+        localStorage.setItem('manual_status', newStatus);
+      }
+      setIsStatusMenuOpen(false);
+    }
+
+    if (isOwnProfile) {
+      try {
+        await apiRequest('/profile', 'PUT', { online_status: newStatus });
+        if (setUserData) setUserData(prev => ({ ...prev, online_status: newStatus }));
+      } catch (error) {
+        console.error("Failed to update status", error);
+      }
+    }
+  };
+
+  // 🌟 ระบบตรวจจับ (จะทำงานก็ต่อเมื่อไม่ได้ "ล็อค" สถานะไว้)
+  useEffect(() => {
+    if (!isOwnProfile) return;
+
+    let awayTimer;
+    let busyTimer;
+
+    const resetActivityTimers = () => {
+      // 🛑 ถ้ามีการล็อคค่าเอาไว้ (manualStatusRef มีค่า) ให้หยุดการทำงานตรงนี้ไปเลย
+      if (manualStatusRef.current) return;
+
+      clearTimeout(awayTimer);
+      clearTimeout(busyTimer);
+
+      if (statusRef.current !== 'online') {
+         handleStatusChange('online', false);
+      }
+
+      awayTimer = setTimeout(() => {
+        if (!manualStatusRef.current && statusRef.current === 'online') {
+          handleStatusChange('away', false);
+        }
+      }, 30 * 1000);
+
+      busyTimer = setTimeout(() => {
+        if (!manualStatusRef.current && (statusRef.current === 'online' || statusRef.current === 'away')) {
+          handleStatusChange('busy', false);
+        }
+      }, 60 * 1000);
+    };
+
+    const handleVisibilityChange = () => {
+      if (manualStatusRef.current) return; // ถ้าล็อคไว้ ไม่ต้องสนใจว่าสลับแท็บหรือไม่
+      if (document.hidden) {
+        handleStatusChange('offline', false);
+      } else {
+        resetActivityTimers();
+      }
+    };
+
+    const handleWindowBlur = () => {
+      if (manualStatusRef.current) return; 
+      handleStatusChange('offline', false);
+    };
+
+    const handleWindowFocus = () => {
+      if (manualStatusRef.current) return;
+      if (!document.hidden) {
+        resetActivityTimers();
+      }
+    };
+
+    // ตอนเปิดเว็บมาครั้งแรก ให้เช็คว่าเคยล็อคค่าไว้ไหม ถ้าล็อคก็ให้ยิง API แจ้งหลังบ้านเลย
+    if (manualStatusRef.current) {
+       handleStatusChange(manualStatusRef.current, false);
+    } else {
+       resetActivityTimers();
+    }
+
+    window.addEventListener('mousemove', resetActivityTimers);
+    window.addEventListener('keydown', resetActivityTimers);
+    window.addEventListener('click', resetActivityTimers);
+    window.addEventListener('scroll', resetActivityTimers);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      clearTimeout(awayTimer);
+      clearTimeout(busyTimer);
+      window.removeEventListener('mousemove', resetActivityTimers);
+      window.removeEventListener('keydown', resetActivityTimers);
+      window.removeEventListener('click', resetActivityTimers);
+      window.removeEventListener('scroll', resetActivityTimers);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [isOwnProfile]);
+
   const handleEditClick = () => {
-    setEditName(userData.username);
+    setEditName(userData.display_name || userData.username);
     setEditBio(userData.bio || "");
     setIsEditing(true);
   };
@@ -64,34 +181,45 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+
     if (!editName || editName.trim() === '') {
-      alert("Please enter your name!");
-      return;
+      alert("Please enter your name! 📝");
+      return; // สั่งหยุดทำงาน ไม่ให้ไปต่อ
     }
-    setUserData(prev => ({ ...prev, username: editName.trim(), bio: editBio }));
-    setIsEditing(false);
+
+    if (setUserData) {
+      try {
+        // 🌟 ส่ง display_name ไปที่ Backend
+        await apiRequest('/profile', 'PUT', { bio: editBio, display_name: editName });
+        
+        // 🌟 อัปเดต State ให้หน้าจอเปลี่ยนตามทันที
+        setUserData(prev => ({ ...prev, bio: editBio, display_name: editName }));
+        
+        // 🌟 เก็บลง LocalStorage เพื่อให้หน้าอื่นดึงไปใช้ง่ายๆ
+        localStorage.setItem('display_name', editName);
+        
+        setIsEditing(false);
+      } catch (error) {
+        console.error("Failed to save bio or name:", error);
+        alert("บันทึกข้อมูลไม่สำเร็จ!");
+      }
+    }
   };
 
-  // 🌟 ฟังก์ชันจัดการปุ่ม Follow โดยยิง API และอัปเดตตัวเลข
   const handleToggleFollow = async () => {
     try {
       const response = await apiRequest(`/users/${userData.username}/follow`, 'POST');
-      
-      // เปลี่ยนสีและข้อความปุ่ม
       setIsFollowing(response.is_following);
-
-      // 🌟 อัปเดตตัวเลข Follower เข้าไปใน userData (ทำให้แถบซ้ายตัวเลขเด้งขึ้นทันที)
       setUserData(prev => {
         let updatedFollowers = [...(prev.followers || [])];
         if (response.is_following) {
-          updatedFollowers.push(myLoggedInUsername); // ถ้าฟอล ให้เพิ่มชื่อเรา
+          updatedFollowers.push(myLoggedInUsername); 
         } else {
-          updatedFollowers = updatedFollowers.filter(name => name !== myLoggedInUsername); // ถ้าอันฟอล ให้ลบชื่อเราออก
+          updatedFollowers = updatedFollowers.filter(name => name !== myLoggedInUsername); 
         }
         return { ...prev, followers: updatedFollowers };
       });
-
     } catch (error) {
       console.error("Failed to follow/unfollow:", error);
       alert("มีข้อผิดพลาด ไม่สามารถติดตามได้");
@@ -171,10 +299,7 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
                     <div 
                       key={key} 
                       className="status-option"
-                      onClick={() => {
-                        setStatus(key); 
-                        setIsStatusMenuOpen(false); 
-                      }}
+                      onClick={() => handleStatusChange(key, true)} // 🌟 ส่ง true เพื่อบอกว่าคนกดเปลี่ยนเอง
                     >
                       <div className="status-color-circle" style={{ backgroundColor: value.color }}></div>
                       {value.label}
@@ -185,7 +310,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
             </div>
           </div>
 
-          {/* 🌟 ปรับให้เรียกใช้ฟังก์ชันใหม่ (ยิง API แทนการสลับ State ธรรมดา) */}
           {!isOwnProfile && (
             <button 
               className={`doodle-follow-btn ${isFollowing ? 'following' : ''}`}
@@ -235,13 +359,13 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
           ) : (
             <>
               <h1 className="profile-name">
-                <span 
-                  className="highlight-text"
-                  style={{ color: typeof bannerColor === 'object' ? bannerColor.color : bannerColor }}
-                >
-                  {userData.username}
-                </span> 
-              </h1>
+            <span 
+            className="highlight-text"
+        style={{ color: typeof bannerColor === 'object' ? bannerColor.color : bannerColor }}
+        >
+           {userData.display_name || userData.username}
+    </span> 
+  </h1>
               <p className="profile-bio">{userData?.bio || ""}</p>
             </>
           )}

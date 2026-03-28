@@ -15,11 +15,17 @@
   font-weight: 800;
   color: #222;
   margin: 0 0 16px 0;
-  text-align: center;
+  
+  /* ✨ ส่วนที่แก้ไขเพื่อให้ข้อความอยู่กึ่งกลางเป๊ะๆ */
+  display: flex;
+  align-items: center;     /* กึ่งกลางแนวตั้ง */
+  justify-content: center;  /* กึ่งกลางแนวนอน */
+  min-height: 50px;        /* กำหนดความสูงขั้นต่ำเพื่อให้เห็นความกึ่งกลางชัดเจน */
+  padding: 0 20px;         /* เอา padding บน-ล่างออก แล้วใช้ min-height คุมแทน */
+  
   background-color: #ffffff;
   border: 3px solid #222222;
   border-radius: 50px; 
-  padding: 12px 20px;
   box-shadow: 4px 4px 0px #222222; 
   z-index: 100;
   position: relative;
@@ -33,7 +39,7 @@
   max-height: 680px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 15px 25px 40px 18px;
+  padding: 0px 25px 40px 18px;
   -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
 }

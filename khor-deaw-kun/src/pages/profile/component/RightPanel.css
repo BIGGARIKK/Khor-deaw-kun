@@ -2,20 +2,35 @@
 .right-panel {
   display: flex;
   flex-direction: column;
+  overflow: visible !important;
   margin-top: 40px; /* <--- ลองปรับตัวเลขตรงนี้ดูนะครับ (เช่น 30px, 40px, 50px) จนกว่าจะอยู่กึ่งกลางพอดี */
+  width: 95%;
 }
 
 .polaroid-wrapper {
   position: relative;
-  padding: 16px 16px 20px 16px; /* ✨ 4. Padding น้อยลง */
+  padding: 16px 16px 25px 16px; 
   background-color: #fff;
-  transform: rotate(2deg); /* บิดน้อยลง ให้ดูสุภาพขึ้นในที่แคบ */
+  transform: rotate(2deg);
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%; /* กว้างเต็ม 25% */
+  width: 100%;
   box-sizing: border-box;
-  border-radius: 16px; /* มนขึ้นนิดนึง */
+  border-radius: 16px; 
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+  transition: all 0.3s ease;
+  overflow-y: hidden; 
+  overflow-x: visible;
+   
+}
+
+.story-wooden-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* ✨ บังคับให้ขอบของรูปไม้เป็นมุมโค้งตามกรอบขาว ✨ */
+  border-radius: 16px; 
 }
 
 .story-trigger {
@@ -55,7 +70,7 @@
 }
 
 .polaroid-caption {
-  margin-top: 15px; /* ✨ เพิ่มระยะห่างจากรูป */
+  margin-top: 20px; /* ✨ เพิ่มระยะห่างจากรูป */
   font-size: 1.1rem; /* ✨ ขยายตัวอักษรให้ใหญ่ขึ้น */
   font-weight: bold;
   color: #333;
