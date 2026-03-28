@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './GrillRoom.css'; 
 
+// 🌟 1. ดึงรูปภาพทั้งหมดจากโฟลเดอร์ avatars (ตรวจสอบ Path ให้ตรงกับโปรเจกต์คุณ)
+// สมมติว่าเก็บไว้ที่ src/assets/avatars/
+const avatarImages = import.meta.glob('/src/assets/avatars/*.{png,jpg,jpeg,gif}', { eager: true, as: 'url' });
+
 function RoomChat({ socket, roomId, players }) {
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
     const [activeTab, setActiveTab] = useState('chat'); 
     
-    // 🌟 State สำหรับเก็บข้อมูลตอนมีคนกดชนแก้ว
+    // State สำหรับเก็บข้อมูลตอนมีคนกดชนแก้ว
     const [cheersEvent, setCheersEvent] = useState(null);
 
     const chatEndRef = useRef(null);
@@ -34,7 +38,7 @@ function RoomChat({ socket, roomId, players }) {
             }
         };
 
-        // 🌟 ฟังก์ชันดักฟังแอนิเมชันชนแก้ว
+        // ฟังก์ชันดักฟังแอนิเมชันชนแก้ว
         const handleReceiveCheers = (data) => {
             setCheersEvent(data); // เอาข้อความขึ้นโชว์กลางจอ
             // ตั้งเวลาให้แอนิเมชันหายไปเองใน 2.5 วินาที
@@ -56,7 +60,7 @@ function RoomChat({ socket, roomId, players }) {
         };
     }, [socket, roomId]);
 
-    // 🌟 เลื่อนจอลงล่างสุดอัตโนมัติเวลาแชทอัปเดต
+    // เลื่อนจอลงล่างสุดอัตโนมัติเวลาแชทอัปเดต
     useEffect(() => {
         if (activeTab === 'chat') {
             chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -80,7 +84,7 @@ function RoomChat({ socket, roomId, players }) {
         setInputText('');
     };
 
-    // 🌟 ฟังก์ชันส่งคำขอชนแก้ว
+    // ฟังก์ชันส่งคำขอชนแก้ว
     const handleSendCheers = (targetName) => {
     if (!socket || !roomId) return;
     
@@ -91,18 +95,19 @@ function RoomChat({ socket, roomId, players }) {
         target: targetName
     });
 
-    // 🌟 2. อัปเดตตัวเลขเควสต์ในเครื่องเราเอง (Sidebar จะได้อัปเดต)
+    // 2. อัปเดตตัวเลขเควสต์ในเครื่องเราเอง (Sidebar จะได้อัปเดต)
     const currentCount = parseInt(localStorage.getItem('quest_cheers_count') || '0');
     const newCount = currentCount + 1;
     localStorage.setItem('quest_cheers_count', newCount.toString());
 
-    // 🌟 3. ตะโกนบอก Sidebar ให้โหลดข้อมูลใหม่ (ยิง Event "quest_updated")
+    // 3. ตะโกนบอก Sidebar ให้โหลดข้อมูลใหม่ (ยิง Event "quest_updated")
     window.dispatchEvent(new Event('quest_updated'));
 };
+
     return (
         <div className="room-chat-container">
             
-            {/* 🌟 ป๊อปอัปแอนิเมชันชนแก้ว (จะโผล่มาทับกลางจอเมื่อมีคนกด) */}
+            {/* ป๊อปอัปแอนิเมชันชนแก้ว (จะโผล่มาทับกลางจอเมื่อมีคนกด) */}
             {cheersEvent && (
                 <div className="cheers-overlay">
                     <div className="cheers-emojis">🍻</div>
@@ -110,7 +115,7 @@ function RoomChat({ socket, roomId, players }) {
                 </div>
             )}
 
-            {/* 🌟 ส่วนสลับแท็บ (Tab Navigation) */}
+            {/* ส่วนสลับแท็บ (Tab Navigation) */}
             <div className="chat-tabs">
                 <button
                     className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
@@ -126,7 +131,7 @@ function RoomChat({ socket, roomId, players }) {
                 </button>
             </div>
 
-            {/* 🌟 1. เนื้อหาของแท็บแชท */}
+            {/* 1. เนื้อหาของแท็บแชท */}
             {activeTab === 'chat' && (
                 <>
                     <div className="chat-messages">
@@ -161,36 +166,47 @@ function RoomChat({ socket, roomId, players }) {
                 </>
             )}
 
-            {/* 🌟 2. เนื้อหาของแท็บรายชื่อคน */}
+            {/* 2. เนื้อหาของแท็บรายชื่อคน */}
             {activeTab === 'members' && (
                 <div className="members-list-area">
                     <div className="members-instruction">รายชื่อผู้ถือตะเกียบร่วมโต๊ะ</div>
                     <div className="player-badges-list">
                         {players.map((p, index) => {
                             const pName = p.username; 
-                            const pImg = p.profile_image; 
+                            const pImg = p.profile_image; // เช่น "3.png"
+
+                            // 🌟 2. ค้นหา Path รูปจริงที่ Vite รู้จัก
+                            const fullImagePath = `/src/assets/avatars/${pImg}`;
+                            const finalImageUrl = avatarImages[fullImagePath];
 
                             return (
                                 <div key={index} className={`member-card ${pName === myName ? 'is-me' : ''}`}>
                                     
-                                    <div className="noti-avatar-container" style={{ flexShrink: 0, marginRight: '12px' }}>
-                                        {pImg ? (
-                                            <img src={`/assets/avatars/${pImg}`} className="member-avatar" style={{ objectFit: 'cover' }} alt="avatar" 
+                                    <div className="noti-avatar-container" style={{ flexShrink: 0, marginRight: '12px', width: '42px', height: '42px' }}>
+                                        {pImg && finalImageUrl ? (
+                                            // 🌟 3. ใช้ finalImageUrl ที่ได้จาก Vite
+                                            <img src={finalImageUrl} className="member-avatar" style={{ objectFit: 'cover', width: '100%', height: '100%', borderRadius: '50%' }} alt="avatar" 
                                                 onError={(e) => {
+                                                    // Fallback ถ้าโหลดรูปไม่สำเร็จ
                                                     e.target.onerror = null; 
                                                     e.target.src = `https://ui-avatars.com/api/?name=${pName}&background=random`;
                                                 }}
                                             />
                                         ) : (
-                                            <div className="member-avatar">{pName.charAt(0).toUpperCase()}</div>
+                                            // Fallback กรณีไม่มีรูปใน DB หรือหาไฟล์ไม่เจอ
+                                            <div className="member-avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold', color: '#fff' }}>
+                                                {pName.charAt(0).toUpperCase()}
+                                            </div>
                                         )}
                                     </div>
 
-                                    {/* 🌟 ปรับตรงนี้เพื่อใส่ปุ่มชนแก้วทางขวามือ */}
+                                    {/* ส่วนใส่ปุ่มชนแก้วทางขวามือ */}
                                     <div className="member-info" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <span className="member-name">{pName} {pName === myName && '(คุณ)'}</span>
-                                            <span className="member-status">🟢 กำลังปิ้ง</span>
+                                            <span className="member-name" style={{ fontWeight: pName === myName ? 'bold' : 'normal' }}>
+                                                {pName} {pName === myName && '(คุณ)'}
+                                            </span>
+                                            <span className="member-status" style={{ fontSize: '0.8rem', color: 'green' }}>🟢 กำลังปิ้ง</span>
                                         </div>
                                         
                                         {/* โชว์ปุ่มชนแก้วเฉพาะที่ไม่ใช่ตัวเอง */}
@@ -198,6 +214,7 @@ function RoomChat({ socket, roomId, players }) {
                                             <button 
                                                 className="cheers-btn"
                                                 onClick={() => handleSendCheers(pName)}
+                                                style={{ padding: '4px 8px', fontSize: '0.8rem', cursor: 'pointer' }}
                                             >
                                                 🍻 ชนแก้ว!
                                             </button>

@@ -74,6 +74,22 @@ function YouTubeJukebox({ socket, roomId, myName }) {
         };
     }, [socket]);
 
+        useEffect(() => {
+        if (!socket) return;
+
+        const handleSongStart = (data) => {
+            console.log("🎬 รับข้อมูลเพลงใหม่:", data);
+            // อัปเดตสถานะเพลงในเครื่องเราตามที่ Server ส่งมา
+            setCurrentSong(data); 
+        };
+
+        socket.on('youtube_started', handleSongStart);
+
+        return () => {
+            socket.off('youtube_started', handleSongStart);
+        };
+    }, [socket]);
+
     // --- เพิ่มเพลง ---
     const handleAddMusic = async (e) => {
         e.preventDefault();

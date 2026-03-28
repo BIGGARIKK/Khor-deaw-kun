@@ -81,12 +81,12 @@ function BottomBar() {
                 {/* 🌟 ปุ่ม Shouts สลับเปิด/ปิดกล่องแจ้งเตือน */}
                 <div className={`nav-item ${showNotifications ? 'active' : ''}`} onClick={() => setShowNotifications(!showNotifications)}>
                     <TbBell size={28} />
-                    <span className="nav-label">Shouts</span>
+                    <span className="nav-label">Notifications</span>
                 </div>
 
                 <div className="nav-item" onClick={() => setShowSettingsModal(true)}>
                     <TbSettings size={28} />
-                    <span className="nav-label">Gear</span>
+                    <span className="nav-label">Setting</span>
                 </div>
             </div>
 

@@ -96,7 +96,6 @@ def signup():
     password = data.get('password')
     email = data.get('email')
 
-    # 🌟 ดักจับข้อมูลว่าง (ป้องกัน Error 500 ตอนสร้าง Hash)
     if not username or not password or not email:
         return jsonify({'message': 'กรุณากรอกข้อมูลให้ครบถ้วน!'}), 400
 
@@ -127,7 +126,6 @@ def signup():
         'socials': {'line': '', 'facebook': '', 'instagram': ''},
         'vibe_sliders': {'sleepy': 0, 'hungry': 0, 'energy': 0},
         'online_status': 'online'
-        # ไม่ต้องมี array notifications ในนี้แล้ว เพราะเราแยกไป Collection ใหม่แล้ว
     }
     
     mongo.db.users.insert_one(new_user)
@@ -180,6 +178,21 @@ def update_profile():
     data = request.get_json()
     update_fields = {}
 
+    # 🌟 1. ระบบอัปเดตอีเมล (เช็คว่าเอาเมลคนอื่นมาใช้ซ้ำไหม)
+    if 'email' in data:
+        existing_email = mongo.db.users.find_one({'email': data['email'].strip()})
+        if existing_email and existing_email['username'] != current_user:
+            return jsonify({'message': 'อีเมลนี้ถูกใช้งานโดยนักดื่มท่านอื่นแล้ว!'}), 400
+        update_fields['email'] = data['email'].strip()
+
+    # 🌟 2. ระบบเปลี่ยนรหัสผ่าน (ตรวจรหัสผ่านเก่าก่อน)
+    if 'old_password' in data and 'new_password' in data:
+        user = mongo.db.users.find_one({'username': current_user})
+        if not check_password_hash(user['password'], data['old_password']):
+            return jsonify({'message': 'รหัสผ่านเดิมไม่ถูกต้อง!'}), 400
+        update_fields['password'] = generate_password_hash(data['new_password'])
+
+    # --- ส่วนอัปเดตข้อมูลอื่นๆ (มีอยู่แล้ว) ---
     if 'display_name' in data:
         update_fields['display_name'] = data['display_name'].strip()
         mongo.db.posts.update_many(

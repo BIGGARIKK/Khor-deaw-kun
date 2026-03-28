@@ -50,7 +50,8 @@ def background_timer():
 room_members = {}  
 room_scores = {}   
 room_chats = {}
-room_meats = {} # 🌟 สมุดจดสำหรับ "ของบนเตา"
+room_meats = {} 
+room_music = {} # 🌟 เพิ่มสมุดจดสำหรับ "ตู้เพลง"
 
 # ==========================================
 # 🚪 ระบบจัดการการเชื่อมต่อ
@@ -78,6 +79,7 @@ def handle_join_game_room(data):
     if room_id not in room_scores: room_scores[room_id] = {}
     if room_id not in room_chats: room_chats[room_id] = []
     if room_id not in room_meats: room_meats[room_id] = {}
+    if room_id not in room_music: room_music[room_id] = None # 🌟 เตรียมโต๊ะวางเครื่องเล่นเพลง
         
     # ลบร่างเก่าถ้ารีเฟรช
     keys_to_delete = [k for k, v in room_members[room_id].items() if v.get('username') == username]
@@ -91,7 +93,6 @@ def handle_join_game_room(data):
         'score': current_score
     }
     
-    # แจ้งเตือนลงแชทถ้าเป็นคนเข้าใหม่จริงๆ
     if len(keys_to_delete) == 0: 
         msg = {
             'id': f'sys-in-{room_id}-{time.time()}',
@@ -102,19 +103,20 @@ def handle_join_game_room(data):
         if len(room_chats[room_id]) > 50: room_chats[room_id].pop(0) 
         emit('chat_message', msg, to=room_id)
 
-    # ฟังก์ชันหน่วงเวลาส่งแชทเก่า รายชื่อ (เอาโหลดเตาออกไปแล้วเพราะ React จะทวงเอง)
     def delayed_sync(target_sid, target_room, players_data, chats_data):
         socketio.sleep(0.8) 
         socketio.emit('update_player_list', players_data, to=target_room)
         socketio.emit('load_chat_history', chats_data, to=target_sid)
+        
+        # 🌟 ถ้าโต๊ะนี้กำลังเปิดเพลงอยู่ ให้ส่งชื่อเพลงไปให้คนที่เพิ่งเข้าห้องด้วย
+        if target_room in room_music and room_music[target_room]:
+            socketio.emit('youtube_started', room_music[target_room], to=target_sid)
 
-    # เตรียมข้อมูลสำเนาส่งให้คนเข้าใหม่
     current_players = list(room_members[room_id].values())
     current_chats = list(room_chats[room_id])
     
     socketio.start_background_task(delayed_sync, sid, room_id, current_players, current_chats)
 
-# 🌟 ระบบรับคำขอโหลดสถานะเตา (React จะเป็นคนทวงมา)
 @socketio.on('request_pan_sync')
 def handle_request_pan_sync(data):
     room_id = data.get('room_id')
@@ -135,7 +137,6 @@ def handle_disconnect():
     target_room_id = None
     user_to_remove = None
     
-    # 1. หาว่าคนที่เน็ตหลุด/พับจอ อยู่โต๊ะไหน
     for room_id, members in room_members.items():
         if sid in members:
             target_room_id = room_id
@@ -144,29 +145,20 @@ def handle_disconnect():
             
     if not target_room_id: return
 
-    # กฎ 3 วินาที (ป้องกันอาการเข้าๆ ออกๆ ตอนกด F5 รีเฟรชหน้าเว็บ)
     def delayed_cleanup(r_id, disconnected_sid, username):
         socketio.sleep(3)
         if r_id not in room_members: return
         
-        # ถ้าผ่านไป 3 วิแล้วยังไม่กลับมา (แปลว่าพับจอไปหน้าอื่นจริงๆ ไม่ใช่แค่รีเฟรช)
         if disconnected_sid in room_members[r_id]:
-            # ลบแค่ Connection ID (sid) ออกจาก RAM
             del room_members[r_id][disconnected_sid]
             
-            # อัปเดตรายชื่อให้คนที่ยังอยู่ (ถ้ามี) เห็นว่าเพื่อนพับจอไปแล้ว
             socketio.emit('update_player_list', list(room_members[r_id].values()), to=r_id)
             
-            # ส่งแชทแจ้งเตือนแบบน่ารักๆ
             msg = {'id': f'sys-out-{disconnected_sid}-{time.time()}', 'type': 'system', 'text': f'--- {username} แวะไปเดินเล่นริมหาด (พับจอ) 🏃‍♂️ ---'}
             if r_id in room_chats:
                 room_chats[r_id].append(msg)
                 if len(room_chats[r_id]) > 50: room_chats[r_id].pop(0)
             socketio.emit('chat_message', msg, to=r_id)
-            
-            # 🌟 จุดสำคัญที่แก้: เรา "เอาคำสั่งลบ Database ออกไปทั้งหมด" ครับ!
-            # ไม่ลบ user ออกจาก DB และ ไม่ลบห้องทิ้ง ปล่อยให้เตาตั้งรอไว้ก่อนเลย
-            # จะลบทิ้งก็ต่อเมื่อเรียกฟังก์ชัน handle_leave_game_room เท่านั้น
 
     socketio.start_background_task(delayed_cleanup, target_room_id, sid, user_to_remove)    
 
@@ -191,7 +183,8 @@ def handle_leave_game_room(data):
                 db.db.rooms.update_one({'room_id': room_id}, {'$pull': {'players': username}})
                 if len(room_members.get(room_id, {})) == 0:
                     if room_id in room_members: del room_members[room_id]
-                    if room_id in room_meats: del room_meats[room_id] # ล้างเตาเมื่อห้องว่าง
+                    if room_id in room_meats: del room_meats[room_id] 
+                    if room_id in room_music: del room_music[room_id] # 🌟 ล้างเพลงเมื่อโต๊ะว่าง
                     db.db.rooms.delete_one({'room_id': room_id})
             except Exception as e: print(f"DB Error: {e}")
 
@@ -204,53 +197,41 @@ def handle_send_message(data):
     emit('chat_message', data, to=room_id)
 
 # ==========================================
-# 🥩 ระบบย่างหมู Real-time (อัปเดตลงสมุดจดเตา)
+# 🥩 ระบบย่างหมู Real-time
 # ==========================================
 @socketio.on('add_meat')
 def handle_add_meat(data):
     room_id = data.get('room_id')
     meat_id = data.get('uniqueId') 
-    
     if room_id not in room_meats: room_meats[room_id] = {}
-    if meat_id: 
-        room_meats[room_id][meat_id] = data 
-    
+    if meat_id: room_meats[room_id][meat_id] = data 
     emit('meat_added', data, to=room_id, include_self=False)
 
 @socketio.on('move_meat')
 def handle_move_meat(data):
     room_id = data.get('room_id')
     meat_id = data.get('uniqueId') 
-    
     if room_id in room_meats and meat_id in room_meats[room_id]:
         room_meats[room_id][meat_id].update({'x': data.get('x'), 'y': data.get('y')})
-        
     emit('meat_moved', data, to=room_id, include_self=False)
 
 @socketio.on('flip_meat')
 def handle_flip_meat(data):
     room_id = data.get('room_id')
     meat_id = data.get('uniqueId') 
-    
     if room_id in room_meats and meat_id in room_meats[room_id]:
-        # 🌟 อัปเดตด้านที่กำลังย่างในสมุดจด
         current_side = room_meats[room_id][meat_id].get('activeSide', 'A')
         room_meats[room_id][meat_id]['activeSide'] = 'B' if current_side == 'A' else 'A'
-        
-        # 🌟 สลับภาพซ้าย-ขวาในสมุดจดด้วย (-1 หรือ 1)
         current_flip = room_meats[room_id][meat_id].get('flip', 1)
         room_meats[room_id][meat_id]['flip'] = current_flip * -1
-        
     emit('meat_flipped', data, to=room_id, include_self=False)
 
 @socketio.on('remove_meat')
 def handle_remove_meat(data):
     room_id = data.get('room_id')
     meat_id = data.get('uniqueId') 
-    
     if room_id in room_meats and meat_id in room_meats[room_id]:
         del room_meats[room_id][meat_id]
-        
     emit('meat_removed', data, to=room_id, include_self=False)
 
 # ==========================================
@@ -274,9 +255,20 @@ def handle_feed_friend(data):
 @socketio.on('play_youtube')
 def handle_play_youtube(data):
     room_id = data.get('room_id')
-    emit('youtube_started', {'url': data.get('url'), 'requester': data.get('username'), 'title': data.get('title', 'ไม่ทราบชื่อเพลง')}, to=room_id)
+    
+    # 🌟 แพ็กข้อมูลเพลงเตรียมส่ง
+    music_data = {
+        'url': data.get('url'), 
+        'requester': data.get('username'), 
+        'title': data.get('title', 'ไม่ทราบชื่อเพลง')
+    }
+    
+    # 🌟 1. จดลงสมุดของโต๊ะนั้นๆ (เผื่อมีคนรีเฟรชจะได้ส่งให้ใหม่)
+    room_music[room_id] = music_data
+    
+    # 🌟 2. กระจายเสียงให้ทุกคนในห้องฟังทันที
+    emit('youtube_started', music_data, to=room_id)
     emit('chat_message', {'id': f'sys-music-{time.time()}', 'type': 'system', 'text': f"🎵 {data.get('username')} เปิดเพลง: {data.get('title', '')}"}, to=room_id)
-
 
 # ==========================================
 # 🍻 ระบบชนแก้ว (Cheers!)
@@ -289,22 +281,18 @@ def handle_send_cheers(data):
 
     if not room_id or not sender or not target: return
 
-    # 🌟 1. ประกาศให้ทุกคนในโต๊ะเห็นแอนิเมชันพร้อมกัน!
     emit('receive_cheers', {
         'sender': sender,
         'target': target,
         'message': f'🍻 {sender} ขอชนแก้วกับ {target}!'
     }, to=room_id)
 
-    # 🌟 2. อัปเดต Database สองเด้ง!
     if db:
         try:
-            # เด้งที่ 1: เพิ่มแต้มสะสมให้คนที่ "โดนชน"
             db.db.users.update_one(
                 {'username': target},
                 {'$inc': {'stats.cheersCount': 1}}
             )
-            # เด้งที่ 2: เพิ่มยอดเควสต์รายวันให้คนที่ "เป็นคนชน"
             db.db.users.update_one(
                 {'username': sender},
                 {'$inc': {'daily_quest.cheers_today': 1}}
