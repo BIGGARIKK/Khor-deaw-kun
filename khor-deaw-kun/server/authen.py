@@ -10,6 +10,7 @@ import uuid
 from extensions import socketio
 import events
 import string
+
 app = Flask(__name__)
 CORS(app)
 # เชื่อมต่อ Database
@@ -49,29 +50,31 @@ def signup():
         'email': email,
         
         # 1. รูปโปรไฟล์และสถานะ
-        'profile_image': default_avatar, # เก็บชื่อไฟล์หรือ URL
-        'badge': 'NEWCOMER 🌊', # ฉายา
-        'vibe_status': 'chill', # อารมณ์ปัจจุบัน (chill, tipsy, wasted)
+        'profile_image': default_avatar, 
+        'badge': 'NEWCOMER 🌊', 
+        'vibe_status': 'chill', 
         
         # 2. สถิติ
         'stats': {
             'postCount': 0, 
-            'cheersCount': 0, # จำนวนครั้งที่ไปชนแก้วคนอื่น
+            'cheersCount': 0, 
             'followerCount': 0, 
             'followingCount': 0
         },
         
         # 3. ระบบ Daily Quest (เก็บเป็น Object)
         'daily_quest': {
-            'last_updated': today_str, # เก็บวันที่ล่าสุดที่ทำเควสต์
-            'cheers_today': 0,         # ความคืบหน้าวันนี้
-            'target': 5,               # เป้าหมาย
-            'is_completed': False      # ทำสำเร็จหรือยัง
+            'last_updated': today_str, 
+            'cheers_today': 0,         
+            'target': 5,               
+            'is_completed': False      
         },
         
-        # 4. ความสัมพันธ์
+        # 4. ความสัมพันธ์ และข้อมูลที่เพิ่มมาใหม่
         'followers': [],
-        'following': []
+        'following': [],
+        'socials': {'line': '', 'facebook': '', 'instagram': ''},
+        'vibe_sliders': {'sleepy': 0, 'hungry': 0, 'energy': 0}
     }
     
     mongo.db.users.insert_one(new_user)
@@ -88,7 +91,6 @@ def signin():
 
     if user and check_password_hash(user['password'], password):
         access_token = create_access_token(identity=username)
-        # 🌟 ส่งรูปโปรไฟล์กลับไปด้วยเผื่อเอาไปโชว์ที่ Navbar
         return jsonify({
             'message': 'Sign in successful!', 
             'username': username, 
@@ -108,10 +110,8 @@ def get_profile():
     user = mongo.db.users.find_one({'username': username}, {'_id': 0, 'password': 0})
     
     if user:
-        # 🌟 เช็คว่า Quest ของเมื่อวานหรือเปล่า ถ้าใช่ให้ Reset ก่อนส่งให้หน้าบ้าน
         today_str = datetime.now().strftime("%Y-%m-%d")
         if user.get('daily_quest', {}).get('last_updated') != today_str:
-            # ข้ามวันแล้ว รีเซ็ตเควสต์!
             mongo.db.users.update_one(
                 {'username': username},
                 {'$set': {
@@ -151,7 +151,6 @@ def delete_user(username):
 @app.route('/posts' , methods=['POST'])
 @jwt_required()
 def create_post():
-
     current_user = get_jwt_identity()
     data = request.get_json()
     text = data.get('text' , '').strip()
@@ -178,7 +177,6 @@ def create_post():
         {'$inc': {'stats.postCount': 1}}
     )
 
-    print(new_post)
     return jsonify({
         'message': 'Shout successful!',
         'post_id': str(result.inserted_id)
@@ -189,18 +187,26 @@ def create_post():
 @app.route('/posts' ,methods=['GET'])
 @jwt_required()
 def get_posts():
-    
     posts_cursor = mongo.db.posts.find().sort("create_at" ,-1)
-
     posts_list = []
     for post in posts_cursor:
         post["_id"] = str(post['_id'])
         posts_list.append(post)
+    return jsonify(posts_list) , 200
 
+@app.route('/posts/me' ,methods=['GET'])
+@jwt_required()
+def get_my_posts():
+    current_user = get_jwt_identity()
+    posts_cursor = mongo.db.posts.find({'author_username': current_user}).sort("create_at" ,-1)
+    posts_list = []
+    for post in posts_cursor:
+        post["_id"] = str(post['_id'])
+        posts_list.append(post)
     return jsonify(posts_list) , 200
     
 # ==========================================
-# 💬 COMMENT ON A POST (คอมเมนต์ใต้โพสต์)
+# 💬 COMMENT ON A POST
 # ==========================================
 @app.route('/posts/<post_id>/comment' ,  methods=['POST'])
 @jwt_required()
@@ -230,7 +236,7 @@ def add_comment(post_id):
     return jsonify({'message': 'Comment added successfully!', 'comment': new_comment}), 201
 
 # ==========================================
-# 🛠️ UPDATE PROFILE (อัปเดตข้อมูลโปรไฟล์ & Vibe)
+# 🛠️ UPDATE PROFILE (อัปเดตข้อมูลโปรไฟล์ Vibe และ Socials)
 # ==========================================
 @app.route('/profile', methods=['PUT'])
 @jwt_required()
@@ -238,24 +244,29 @@ def update_profile():
     current_user = get_jwt_identity()
     data = request.get_json()
     
-    # สร้างกล่องเปล่าไว้เก็บว่าผู้ใช้ส่งอะไรมาอัปเดตบ้าง
     update_fields = {}
     
-    # 1. ถ้าส่งรูปมา ก็เก็บลงกล่อง
     if 'profile_image' in data:
         update_fields['profile_image'] = data['profile_image']
-        
-        # (อย่าลืมคำสั่ง update_many เพื่อเปลี่ยนรูปในโพสต์เก่าด้วย ถ้ามี)
         mongo.db.posts.update_many(
             {'author_username': current_user},
             {'$set': {'author_image': data['profile_image']}}
         )
         
-    # 🌟 2. ถ้าส่ง vibe มา ก็เก็บลงกล่องด้วย!
     if 'vibe' in data:
         update_fields['vibe'] = data['vibe'].strip()
         
-    # 3. สั่งเซฟลง Database ทีเดียวเลย (ถ้ามีอะไรให้เซฟ)
+    # 🌟 เพิ่มการอัปเดตช่องทางติดต่อ
+    if 'socials' in data:
+        update_fields['socials'] = data['socials']
+        
+    # 🌟 เพิ่มการอัปเดตแถบพลังงาน
+    if 'vibe_sliders' in data:
+        update_fields['vibe_sliders'] = data['vibe_sliders']
+
+    if 'stories' in data:
+        update_fields['stories'] = data['stories']
+        
     if update_fields:
         mongo.db.users.update_one(
             {'username': current_user},
@@ -265,37 +276,27 @@ def update_profile():
         
     return jsonify({'message': 'No data provided to update'}), 400
 
-
-from bson.objectid import ObjectId
-
 # ==========================================
-# 🍻 TOGGLE LIKE (กดชนแก้ว / ยกเลิกชนแก้ว)
+# 🍻 TOGGLE LIKE 
 # ==========================================
 @app.route('/posts/<post_id>/like', methods=['POST'])
 @jwt_required()
 def toggle_like(post_id):
-    current_user = get_jwt_identity() # คนที่กดไลก์คือใคร?
+    current_user = get_jwt_identity() 
     
-    # 1. ไปหาโพสต์นี้มาก่อน
     post = mongo.db.posts.find_one({'_id': ObjectId(post_id)})
     if not post:
         return jsonify({'message': 'Post not found'}), 404
         
-    # 2. เช็คว่าในโพสต์นี้ มีชื่อเราอยู่ในช่อง likes แล้วหรือยัง?
     current_likes = post.get('likes', [])
     
     if current_user in current_likes:
-        # 🔴 ถ้ามีชื่อเราอยู่แล้ว แปลว่าเขาจะ "ยกเลิกไลก์ (Unlike)"
-        # ใช้คำสั่ง $pull เพื่อดึงชื่อเราออกจาก Array
         mongo.db.posts.update_one(
             {'_id': ObjectId(post_id)},
             {'$pull': {'likes': current_user}}
         )
         return jsonify({'message': 'Unliked', 'liked': False}), 200
-        
     else:
-        # 🟢 ถ้ายังไม่มีชื่อเรา แปลว่าเขา "กดไลก์ (Like)"
-        # ใช้คำสั่ง $push เพื่อยัดชื่อเราเข้า Array
         mongo.db.posts.update_one(
             {'_id': ObjectId(post_id)},
             {'$push': {'likes': current_user}}
@@ -303,14 +304,11 @@ def toggle_like(post_id):
         return jsonify({'message': 'Liked', 'liked': True}), 200
 
 # ==========================================
-# 🏠 ROOMS SYSTEM (ระบบห้องหมูกระทะ)
+# 🏠 ROOMS SYSTEM 
 # ==========================================
-
-# ฟังก์ชันช่วยสุ่มรหัสห้อง 6 ตัวอักษร (เช่น AB12CD)
 def generate_room_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
-# 1. สร้างห้องใหม่
 @app.route('/create-room', methods=['POST'])
 @jwt_required()
 def create_room():
@@ -318,21 +316,20 @@ def create_room():
     data = request.get_json()
     
     room_id = generate_room_id()
-    status = data.get('status', 'public') # public หรือ private
+    status = data.get('status', 'public') 
     password = data.get('password', '')
     
     new_room = {
         'room_id': room_id,
         'room_name': data.get('room_name', f"โต๊ะของ {current_user}"),
         'host_username': current_user,
-        'players': [current_user], # สร้างปุ๊บ ตัวเอก (Host) เข้าไปนั่งรอเลย
+        'players': [current_user], 
         'max_players': int(data.get('max_players', 6)),
         'status': status,
         'password': password, 
         'created_at': datetime.utcnow()
     }
     
-    # บันทึกลง Collection ใหม่ชื่อ 'rooms' (MongoDB จะสร้างให้เองอัตโนมัติ)
     mongo.db.rooms.insert_one(new_room)
     
     return jsonify({
@@ -341,7 +338,6 @@ def create_room():
         'room_name': new_room['room_name']
     }), 201
 
-# 2. เข้าร่วมห้อง
 @app.route('/join-room', methods=['POST'])
 @jwt_required()
 def join_room_api():
@@ -350,20 +346,16 @@ def join_room_api():
     room_id = data.get('room_id')
     password_attempt = data.get('password', '')
 
-    # ไปหาห้องจาก Database
     room = mongo.db.rooms.find_one({'room_id': room_id})
     if not room:
         return jsonify({'message': 'ไม่พบห้องนี้ในระบบ!'}), 404
 
-    # เช็คว่าห้องเต็มหรือยัง?
     if len(room['players']) >= room['max_players']:
         return jsonify({'message': 'โต๊ะเต็มแล้วจ้า!'}), 400
 
-    # เช็คว่าเป็นห้อง Private ไหม? ถ้ารหัสไม่ตรงให้เตะออก
     if room['status'] == 'private' and room['password'] != password_attempt:
         return jsonify({'message': 'รหัสผ่านห้องไม่ถูกต้อง!'}), 403
 
-    # ถ้าผ่านเงื่อนไขหมด และยังไม่ได้อยู่ในห้อง ให้เพิ่มชื่อเข้าไป
     if current_user not in room['players']:
         mongo.db.rooms.update_one(
             {'room_id': room_id},
@@ -375,24 +367,58 @@ def join_room_api():
         'room_id': room_id
     }), 200
 
-# 3. โหลดรายชื่อห้องทั้งหมด (เอาไปโชว์หน้า Hub / Lobby)
 @app.route('/rooms', methods=['GET'])
 @jwt_required()
 def get_all_rooms():
-    # ดึงห้องทั้งหมดเรียงตามเวลาสร้างล่าสุด
     rooms_cursor = mongo.db.rooms.find().sort("created_at", -1)
-    
     rooms_list = []
     for room in rooms_cursor:
         room["_id"] = str(room['_id'])
-        
-        # 🌟 ทริคความปลอดภัย: ไม่ส่ง Password ห้องกลับไปให้หน้าบ้านเห็นเด็ดขาด!
         if 'password' in room:
             del room['password'] 
-            
         rooms_list.append(room)
 
     return jsonify(rooms_list), 200
+
+    # ==========================================
+# 🤝 TOGGLE FOLLOW
+# ==========================================
+@app.route('/users/<username>/follow', methods=['POST'])
+@jwt_required()
+def toggle_follow(username):
+    current_user = get_jwt_identity() # คนที่กดปุ่ม
+    
+    if current_user == username:
+        return jsonify({'message': 'You cannot follow yourself!'}), 400
+        
+    target_user = mongo.db.users.find_one({'username': username}) # คนที่ถูกกดฟอล
+    
+    if not target_user:
+        return jsonify({'message': 'User not found'}), 404
+        
+    # เช็คว่าเราฟอลเขาอยู่หรือยัง
+    if current_user in target_user.get('followers', []):
+        # Unfollow: เอาเราออกจาก followers เขา และเอาเขาออกจาก following เรา
+        mongo.db.users.update_one(
+            {'username': username},
+            {'$pull': {'followers': current_user}}
+        )
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$pull': {'following': username}}
+        )
+        return jsonify({'message': 'Unfollowed', 'is_following': False}), 200
+    else:
+        # Follow: เพิ่มเราเข้าไปใน followers เขา และเพิ่มเขาใน following เรา
+        mongo.db.users.update_one(
+            {'username': username},
+            {'$push': {'followers': current_user}}
+        )
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$push': {'following': username}}
+        )
+        return jsonify({'message': 'Followed', 'is_following': True}), 200
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5000)
