@@ -28,6 +28,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         setCommentList(Array.isArray(comments) ? comments : []);
     }, [comments]);
 
+    // 🌟 3. อัปเดต Likes เมื่อ Database ส่งมา
     useEffect(() => {
         const likesArray = Array.isArray(likes) ? likes : [];
         setLikesCount(likesArray.length);
@@ -36,6 +37,8 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
             (likeName) => likeName.trim().toLowerCase() === currentUser?.trim().toLowerCase()
         );
         setIsLiked(isUserLiked); 
+        
+
     }, [likes, currentUser]);
 
     // --- ฟังก์ชันลบโพสต์ ---

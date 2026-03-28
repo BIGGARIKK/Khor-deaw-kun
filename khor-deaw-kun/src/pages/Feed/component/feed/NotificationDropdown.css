@@ -1,12 +1,11 @@
-/* พื้นหลังดำโปร่งใส คลุมเต็มจอ */
-/* 🌟 1. พื้นหลังดำโปร่งใส คลุมเต็มจอแบบเป๊ะๆ (แก้ปัญหา 100vw เบี้ยว) */
+/* 🌟 1. พื้นหลังดำโปร่งใส คลุมเต็มจอแบบเป๊ะๆ */
 .noti-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* สีดำโปร่งใส 50% */
+    background-color: rgba(0, 0, 0, 0.55); /* เข้มขึ้นนิดนึงให้กล่องแจ้งเตือนเด่นๆ */
     z-index: 9999;
     display: flex;
     justify-content: center;
@@ -14,73 +13,85 @@
     padding: 20px; /* กันขอบจอมือถือ */
     box-sizing: border-box;
     animation: fadeIn 0.2s ease-out;
+    backdrop-filter: blur(3px); /* ✨ เพิ่มเบลอพื้นหลังให้ดูพรีเมียม */
 }
 
-/* 🌟 2. ตัวกล่องที่จะเด้งอยู่ตรงกลาง (ล้างค่า margin ที่กวนอยู่ทิ้งไป) */
+/* 🌟 2. ตัวกล่องที่จะเด้งอยู่ตรงกลาง */
 .noti-modal-content {
-    background-color: #e4aa40;
+    /* background-color: #FFF8F6; สีพื้นหลังสว่างๆ ให้อ่านง่าย */
     width: 100%;
-    max-width: 400px;
-    margin: 0 !important; /* 🚨 สำคัญมาก: บังคับล้าง margin จากคลาส .wooden-box */
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    max-width: 420px; /* ขยายกว้างขึ้นนิดนึงให้รูปกับข้อความไม่อึดอัด */
+    margin: 0 !important; 
+    border: 3px solid #8D6E63; /* กรอบสีไม้ */
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 0 15px rgba(255,255,255,0.5);
     display: flex;
     flex-direction: column;
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
 }
 
-/* ... โค้ดส่วนอื่นๆ (เช่น .noti-header, .noti-list) ปล่อยไว้เหมือนเดิมได้เลยครับ ... */
-
-/* ส่วนหัวกระดาษ */
+/* 🌟 ส่วนหัวตาราง */
 .noti-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    border-bottom: 2px solid #3E2723;
-    background-color: #fff0cc; /* สีพื้นหัวตารางน่ารักๆ */
+    padding: 16px 20px;
+    /* background: linear-gradient(145deg, #D7CCC8 0%, #EFEBE9 100%); */
+    border-bottom: 2px solid #BCAAA4;
 }
 
 .noti-header h3 {
     margin: 0;
-    font-size: 1.2rem;
-    color: #3E2723;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #4E342E;
 }
 
-/* ปุ่มกากบาทปิด */
+/* 🌟 ปุ่มกากบาทปิด */
 .noti-close-btn {
-    background: transparent;
-    border: none;
-    color: #3E2723;
+    background: #FFF;
+    border: 2px solid #D7CCC8;
+    color: #5D4037;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 5px;
+    padding: 6px;
     border-radius: 50%;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 .noti-close-btn:hover {
-    background: rgba(62, 39, 35, 0.1);
+    background: #FFCCBC;
+    border-color: #FF8A65;
+    color: #D8435A;
+    transform: rotate(90deg) scale(1.1); /* ลูกเล่นหมุนปุ่มตอนเอาเมาส์ชี้ */
 }
 
-/* รายการแจ้งเตือน */
+/* 🌟 รายการแจ้งเตือน */
 .noti-list {
-    max-height: 60vh; /* ให้ความสูงมากสุดแค่ 60% ของจอ จะได้ไม่ล้น */
+    max-height: 60vh; 
     overflow-y: auto;
-    padding: 10px 0;
+    padding: 0; /* เอา padding ออกเพื่อให้พื้นหลัง hover เต็มช่อง */
+    margin: 0;
+    
+    /* แต่ง Scrollbar ให้เข้ากับธีม */
+    scrollbar-width: thin;
+    scrollbar-color: #A1887F transparent;
 }
+.noti-list::-webkit-scrollbar { width: 6px; }
+/* .noti-list::-webkit-scrollbar-thumb { background: #A1887F; border-radius: 10px; } */
 
+/* 🌟 แต่ละรายการ */
 .noti-item {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px 20px;
+    padding: 14px 20px;
     cursor: pointer;
-    border-bottom: 1px dashed #e0e0e0;
-    transition: background 0.2s;
+    /* border-bottom: 1px solid #EFEBE9; */
+    transition: all 0.2s ease;
+    /* background-color: #FFF; */
 }
 
 .noti-item:last-child {
@@ -88,67 +99,94 @@
 }
 
 .noti-item:hover {
-    background-color: rgba(244, 140, 42, 0.05);
+    /* background-color: #FAFAFA; */
+    transform: translateX(4px); /* เลื่อนขวานิดๆ ให้รู้ว่ากดได้ */
 }
 
+/* 🌟 สถานะยังไม่อ่าน */
 .noti-item.unread {
-    background-color: rgba(132, 224, 69, 0.1); /* สีเขียวอ่อนสำหรับอันที่ยังไม่อ่าน */
+    background-color: rgba(132, 224, 69, 0.08); /* สีเขียวอ่อนๆ */
+    border-left: 4px solid #84E045; /* แถบสีเขียวด้านซ้ายให้ดูเด่นๆ */
 }
 
-.noti-icon {
-    font-size: 1.5rem;
-    background: white;
-    min-width: 45px;
-    height: 45px;
+/* 🌟 รูปโปรไฟล์ (ของใหม่ที่เพิ่งอัปเดตไป) */
+.noti-avatar-container {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #d7ccc8;
+    padding: 2px;
+    background: linear-gradient(135deg, #F48C2A, #84E045); /* กรอบสีรุ้ง/ไล่สีรอบรูป */
+    margin-right: 14px;
+}
+
+.noti-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #FFF; /* ขอบขาวตัดกับไล่สีด้านหลัง */
+    /* background-color: #FFF; */
+}
+
+/* 🌟 เนื้อหาแจ้งเตือน */
+.noti-content {
+    flex: 1;
+    min-width: 0; /* กัน text ทะลุกรอบ */
 }
 
 .noti-content p {
     margin: 0;
     font-size: 0.95rem;
-    color: #1A1A1A;
+    color: #3E2723;
     line-height: 1.4;
+    word-wrap: break-word; /* ตัดคำถ้ายาวเกิน */
 }
 
 .noti-content strong {
     color: #D8435A;
+    font-weight: 700;
 }
 
 .noti-time {
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: 4px;
+    font-size: 0.75rem;
+    color: #8D6E63;
+    margin-top: 5px;
     display: block;
+    font-weight: 500;
 }
 
+/* 🌟 จุดแจ้งเตือนสีเขียว */
 .noti-dot {
     width: 10px;
     height: 10px;
     background-color: #84E045;
     border-radius: 50%;
-    margin-left: auto;
+    margin-left: 10px;
     flex-shrink: 0;
+    box-shadow: 0 0 5px rgba(132, 224, 69, 0.6); /* เรืองแสงนิดๆ */
 }
 
+/* 🌟 ข้อความเมื่อไม่มีแจ้งเตือน */
 .noti-empty {
     text-align: center;
-    padding: 30px;
-    color: #888;
-    font-style: italic;
+    padding: 40px 20px;
+    color: #A1887F;
+    font-weight: 500;
     font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
-/* Animations */
+/* 🌟 Animations */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from { opacity: 0; backdrop-filter: blur(0px); }
+    to { opacity: 1; backdrop-filter: blur(3px); }
 }
 
 @keyframes popIn {
-    0% { opacity: 0; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1); }
+    0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
 }
