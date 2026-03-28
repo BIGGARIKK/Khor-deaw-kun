@@ -59,7 +59,7 @@ function RightSidebar() {
                 )}
             </div>
             
-            <h3 className="trending-title" style={{marginTop: '25px'}}>🟢 เพื่อนของคุณ (Mutuals)</h3>
+            <h3 className="trending-title" style={{marginTop: '25px'}}>🟢 Friends</h3>
             <div className="buddy-list">
                 {mutualFriends.length > 0 ? (
                     mutualFriends.map((friendName, index) => (

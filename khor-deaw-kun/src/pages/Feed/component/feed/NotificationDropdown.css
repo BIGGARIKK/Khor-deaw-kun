@@ -116,7 +116,7 @@
     flex-shrink: 0;
     border-radius: 50%;
     padding: 2px;
-    background: linear-gradient(135deg, #F48C2A, #84E045); /* กรอบสีรุ้ง/ไล่สีรอบรูป */
+    /* background: linear-gradient(135deg, #F48C2A, #84E045); กรอบสีรุ้ง/ไล่สีรอบรูป */
     margin-right: 14px;
 }
 

@@ -14,6 +14,7 @@
     font-family: 'Schoolbell', 'Playpen Sans Thai', cursive;
     box-sizing: border-box;
     position: relative;
+    padding-bottom: 150px; /* ปรับระยะห่างไม่ให้โดน Bottom Bar บัง */
 }
 
 /* 👤 User Profile Bar */
@@ -52,10 +53,12 @@
     text-shadow: 2px 2px 0px #3E2723;
 }
 
-/* 🪵 Search Area (ปรับแก้ตามที่คุณส่งมา) */
+/* =========================================
+   🪵 Search Area (กล่องค้นหาและเมนู) - อัปเดตใหม่
+   ========================================= */
 .search-room-area {
     width: 100%;
-    max-width: 700px;
+    max-width: 500px; /* บีบกล่องให้กระชับ ไม่กว้างเกินไป */
     margin: 20px 0 40px 0;
     display: flex;
     justify-content: center;
@@ -67,13 +70,15 @@
     background-color: #5C4033; 
     border: 4px solid #3E2723;
     border-radius: 15px;
-    padding: 15px 35px;
+    padding: 20px 30px;
     display: flex;
+    flex-direction: column; /* 🌟 เรียงซ้อนกันแนวตั้ง */
     align-items: center;
-    gap: 20px;
+    gap: 15px;
     box-shadow: 0px 8px 0px #2A1B15;
     overflow: hidden;
     z-index: 1;
+    width: 100%;
 }
 
 .search-board::before {
@@ -93,12 +98,20 @@
     color: #FFD285;
     font-weight: bold;
     text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+    margin-bottom: -5px;
 }
 
-.search-form { display: flex; gap: 12px; }
+/* 🔍 กล่องกรอกเลขโต๊ะ */
+.search-form { 
+    display: flex; 
+    gap: 12px; 
+    width: 100%;
+    justify-content: center;
+}
 
 .search-input {
-    width: 150px;
+    flex: 1;
+    max-width: 200px;
     height: 45px;
     background: rgba(255, 255, 255, 0.9);
     border: 3px solid #3E2723;
@@ -110,6 +123,7 @@
     outline: none;
     box-shadow: inset 0px 4px 4px rgba(0,0,0,0.1);
     transition: all 0.2s;
+    text-transform: uppercase;
 }
 
 .search-input:focus {
@@ -132,8 +146,63 @@
     font-family: 'Schoolbell', cursive;
     transition: all 0.1s;
 }
+.search-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0px 0px 0px #1A1A1A;
+}
 
-/* 📋 Room Cards List */
+/* 🌟 ส่วนปุ่มด้านล่าง (รีเฟรช และ สร้างห้อง) */
+.search-actions {
+    display: flex;
+    width: 100%;
+    gap: 12px;
+    margin-top: 5px;
+    justify-content: space-between;
+}
+
+.btn-wood-small {
+    background-color: #FFD54F;
+    color: #3E2723;
+    border: 3px solid #3E2723;
+    border-radius: 12px;
+    padding: 10px 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #3E2723;
+    transition: 0.1s;
+    font-family: 'Playpen Sans Thai', cursive;
+}
+.btn-wood-small:active {
+    transform: translateY(3px);
+    box-shadow: 0px 0px 0px #3E2723;
+}
+
+.create-room-btn {
+    background-color: #84E045;
+    color: #1A1A1A;
+    border: 3px solid #3E2723;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #3E2723;
+    transition: 0.1s;
+    flex: 1; /* ขยายปุ่มให้เต็มพื้นที่ที่เหลือ */
+    font-family: 'Playpen Sans Thai', cursive;
+}
+.create-room-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0px 0px 0px #3E2723;
+}
+.create-room-btn:hover {
+    background-color: #95EF56;
+}
+
+/* =========================================
+   📋 Room Cards List
+   ========================================= */
 .room-cards-list {
     display: flex;
     flex-direction: column;
@@ -196,24 +265,31 @@
     transition: all 0.1s;
 }
 
-/* ⚓ Bottom Nav Bar */
-.bottom-nav-container {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 600px; height: 75px;
-    background: #3E2723; border-radius: 20px 20px 0 0;
-    display: flex; justify-content: space-around; align-items: center;
-    z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+/* ปุ่ม Join ตอนโต๊ะเต็ม */
+.join-btn-small:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    box-shadow: 1px 1px 0px #666;
+    transform: none;
 }
-/* ⚓ New Bottom Nav Bar - ปรับให้ใหญ่และเป็นลายไม้ */
+
+/* Theme Colors */
+.moograta-theme .room-card-inner { background-color: #E2A069; }
+.cafe-theme .room-card-inner { background-color: #D1BFA4; }
+
+/* =========================================
+   ⚓ Bottom Nav Bar
+   ========================================= */
 .bottom-nav-container {
     position: fixed;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
-    max-width: 750px; /* ขยายให้กว้างขึ้น */
-    height: 90px;    /* ขยายให้สูงขึ้น */
-    background-color: #5C4033; /* ไม้เข้มเหมือนป้าย Search */
+    max-width: 750px; 
+    height: 90px;    
+    background-color: #5C4033; 
     border-top: 5px solid #3E2723;
     border-radius: 30px 30px 0 0;
     display: flex;
@@ -221,10 +297,9 @@
     align-items: center;
     z-index: 1000;
     box-shadow: 0 -10px 25px rgba(0,0,0,0.4);
-    overflow: visible; /* ยอมให้ Profile ลอยทะลุบาร์ */
+    overflow: visible; 
 }
 
-/* 🪵 ใส่ลายไม้ให้ Bottom Bar */
 .bottom-nav-container::before {
     content: "";
     position: absolute;
@@ -245,7 +320,7 @@
     flex-direction: column;
     align-items: center;
     color: #FFD285;
-    font-size: 1.8rem; /* ไอคอนใหญ่ขึ้น */
+    font-size: 1.8rem; 
     cursor: pointer;
     transition: transform 0.2s;
 }
@@ -264,14 +339,13 @@
 /* 🥥 Profile กลางบาร์ที่ลอยเด่น */
 .nav-profile-center {
     position: relative;
-    top: -40px; /* ดันขึ้นไปให้ลอยเหนือพ้นบาร์ไม้ */
+    top: -40px; 
     z-index: 10;
 }
 
 .profile-frame {
     width: 90px;
     height: 90px;
-    /* background-color: #D29A62; สีไม้สว่าง */
     border: 5px solid #3E2723;
     border-radius: 50%;
     display: flex;
@@ -292,52 +366,6 @@
 
 .profile-img {
     font-size: 3.5rem;
-    /* หากใช้รูปจริงให้ใส่ background-image และ background-size: cover */
-}
-
-/* ปรับระยะห่างรายการห้องไม่ให้โดน Bottom Bar บัง */
-.room-selection-bg {
-    padding-bottom: 150px;
-}
-
-/* Theme Colors */
-.moograta-theme .room-card-inner { background-color: #E2A069; }
-.cafe-theme .room-card-inner { background-color: #D1BFA4; }
-
-/* =========================================
-   ➕ ปุ่มเปิดโต๊ะใหม่ (Create Room)
-   ========================================= */
-.create-room-btn {
-    background-color: #84E045;
-    color: #1A1A1A;
-    border: 3px solid #3E2723;
-    border-radius: 15px;
-    padding: 10px 20px;
-    font-weight: bold;
-    font-size: 1.1rem;
-    cursor: pointer;
-    box-shadow: 3px 3px 0px #3E2723;
-    transition: 0.1s;
-    margin-top: 15px;
-    width: 100%; /* ให้ปุ่มกว้างเต็มกล่อง */
-}
-
-.create-room-btn:active {
-    transform: translateY(3px);
-    box-shadow: 0px 0px 0px #3E2723;
-}
-
-.create-room-btn:hover {
-    background-color: #95EF56;
-}
-
-/* ปุ่ม Join ตอนโต๊ะเต็ม */
-.join-btn-small:disabled {
-    background-color: #ccc;
-    color: #666;
-    cursor: not-allowed;
-    box-shadow: 1px 1px 0px #666;
-    transform: none;
 }
 
 /* =========================================

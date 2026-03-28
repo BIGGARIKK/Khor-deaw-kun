@@ -10,11 +10,28 @@ const getAvatarUrl = (imageName, userName) => {
     return `/src/assets/avatars/${imageName}`; 
 };
 
-const formatTimeAgo = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const now = new Date();
+// 🌟 ฟังก์ชันจัดการเวลาแบบ "ครอบจักรวาล" (กันบั๊ก Invalid Date 100%)
+const formatTimeAgo = (dateInput) => {
+    // 1. ถ้าไม่มีข้อมูลส่งมา ให้ตีความว่าเพิ่งเกิด
+    if (!dateInput) return 'เมื่อกี้';
+
+    let date;
+
+    // 2. ดักจับกรณี PyMongo ส่งมาเป็น Object { $date: ... }
+    if (typeof dateInput === 'object' && dateInput.$date) {
+        date = new Date(dateInput.$date);
+    } else {
+        // 3. กรณีส่งมาเป็น String ปกติ หรือ Timestamp
+        date = new Date(dateInput);
+    }
+
+    // 4. ถ้าพยายามแปลงแล้วยังพังอีก (Invalid Date ค่า getTime() จะเป็น NaN)
+    if (isNaN(date.getTime())) {
+        console.error("❌ เจอวันที่แปลกประหลาดอ่านไม่ออก:", dateInput);
+        return 'ไม่นานมานี้'; // เปลี่ยนข้อความไม่ให้หน้าเว็บดู Error
+    }
     
+    const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
     if (diffInSeconds < 0 || diffInSeconds < 60) return 'เมื่อกี้';

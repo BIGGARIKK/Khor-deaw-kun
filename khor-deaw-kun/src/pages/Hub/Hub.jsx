@@ -195,13 +195,6 @@ function Hub() {
 
     return (
         <div className="room-selection-bg">
-            <div className="user-profile-bar">
-                <div className="user-info">
-                    <div className="user-avatar">😎</div>
-                    <span className="user-name">{currentUser}</span>
-                </div>
-                <div className="user-stats">🍻 x 120</div>
-            </div>
 
             <div className="header-container">
                 <h1 className="page-title">Select Your Table 🍻</h1>

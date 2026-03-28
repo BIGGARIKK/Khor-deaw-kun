@@ -8,11 +8,8 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
 
-  // 🌟 State สำหรับระบบ Online Status
   const [status, setStatus] = useState(userData?.online_status || 'online');
   const statusRef = useRef(status); 
-  
-  // 🌟 จำค่าที่ผู้ใช้กดล็อคด้วยตัวเอง (เก็บลง localStorage เพื่อให้จำข้ามการรีเฟรชได้)
   const manualStatusRef = useRef(localStorage.getItem('manual_status') || null); 
 
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
@@ -57,7 +54,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     offline: { color: '#aaaaaa', label: 'Offline' }   
   };
 
-  // 🌟 ฟังก์ชันเปลี่ยนสถานะแบบแยกระบบ Auto / Manual
   const handleStatusChange = async (newStatus, isManual = false) => {
     if (statusRef.current === newStatus && !isManual) return; 
 
@@ -66,11 +62,9 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
 
     if (isManual) {
       if (newStatus === 'online') {
-        // ถ้ากดเลือก Online ให้ยกเลิกการล็อค แล้วกลับไปใช้ระบบตรวจจับออโต้
         manualStatusRef.current = null;
         localStorage.removeItem('manual_status');
       } else {
-        // ถ้าเลือกสีอื่น (เหลือง, แดง, เทา) ให้ "ล็อค" สีนั้นไว้ตลอดกาล
         manualStatusRef.current = newStatus;
         localStorage.setItem('manual_status', newStatus);
       }
@@ -87,7 +81,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     }
   };
 
-  // 🌟 ระบบตรวจจับ (จะทำงานก็ต่อเมื่อไม่ได้ "ล็อค" สถานะไว้)
   useEffect(() => {
     if (!isOwnProfile) return;
 
@@ -95,7 +88,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     let busyTimer;
 
     const resetActivityTimers = () => {
-      // 🛑 ถ้ามีการล็อคค่าเอาไว้ (manualStatusRef มีค่า) ให้หยุดการทำงานตรงนี้ไปเลย
       if (manualStatusRef.current) return;
 
       clearTimeout(awayTimer);
@@ -119,7 +111,7 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     };
 
     const handleVisibilityChange = () => {
-      if (manualStatusRef.current) return; // ถ้าล็อคไว้ ไม่ต้องสนใจว่าสลับแท็บหรือไม่
+      if (manualStatusRef.current) return; 
       if (document.hidden) {
         handleStatusChange('offline', false);
       } else {
@@ -139,7 +131,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
       }
     };
 
-    // ตอนเปิดเว็บมาครั้งแรก ให้เช็คว่าเคยล็อคค่าไว้ไหม ถ้าล็อคก็ให้ยิง API แจ้งหลังบ้านเลย
     if (manualStatusRef.current) {
        handleStatusChange(manualStatusRef.current, false);
     } else {
@@ -168,8 +159,9 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
   }, [isOwnProfile]);
 
   const handleEditClick = () => {
-    setEditName(userData.display_name || userData.username);
-    setEditBio(userData.bio || "");
+    // ใช้ ?. ป้องกันจอดับเผื่อข้อมูลมาช้า
+    setEditName(userData?.display_name || userData?.username || '');
+    setEditBio(userData?.bio || "");
     setIsEditing(true);
   };
 
@@ -182,47 +174,30 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
   };
 
   const handleSave = async () => {
-
     if (!editName || editName.trim() === '') {
       alert("Please enter your name! 📝");
-      return; // สั่งหยุดทำงาน ไม่ให้ไปต่อ
+      return; 
     }
 
-    if (setUserData) {
-      try {
-        // 🌟 ส่ง display_name ไปที่ Backend
-        await apiRequest('/profile', 'PUT', { bio: editBio, display_name: editName });
-        
-        // 🌟 อัปเดต State ให้หน้าจอเปลี่ยนตามทันที
-        setUserData(prev => ({ ...prev, bio: editBio, display_name: editName }));
-        
-        // 🌟 เก็บลง LocalStorage เพื่อให้หน้าอื่นดึงไปใช้ง่ายๆ
-        localStorage.setItem('display_name', editName);
-        
-        setIsEditing(false);
-      } catch (error) {
-        console.error("Failed to save bio or name:", error);
-        alert("บันทึกข้อมูลไม่สำเร็จ!");
-      }
-    }
-
-    const newUsername = editName.trim();
+    const newDisplayName = editName.trim();
     const newBio = editBio.trim();
 
     try {
-      // 🌟 ยิง API ไปอัปเดตลง Database (คุณอาจจะต้องเช็คฝั่ง Backend ด้วยว่ารับค่า bio และ username หรือยัง)
+      // 🌟 ยิง API แค่เรื่อง display_name และ bio ไม่ไปแตะ username หลักเด็ดขาด
       await apiRequest('/profile', 'PUT', { 
-        username: newUsername, 
+        display_name: newDisplayName, 
         bio: newBio 
       });
 
-      // 🌟 อัปเดต LocalStorage หากมีการเปลี่ยน Username (สำคัญมากสำหรับระบบ Login)
-      if (newUsername !== myLoggedInUsername) {
-        localStorage.setItem('username', newUsername);
+      if (setUserData) {
+        setUserData(prev => ({ 
+          ...prev, 
+          display_name: newDisplayName, 
+          bio: newBio 
+        }));
       }
 
-      // 🌟 อัปเดตข้อมูลบนหน้าจอ
-      setUserData(prev => ({ ...prev, username: newUsername, bio: newBio }));
+      localStorage.setItem('display_name', newDisplayName);
       setIsEditing(false);
 
     } catch (error) {
@@ -234,9 +209,7 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
   const handleToggleFollow = async () => {
     try {
       const response = await apiRequest(`/users/${userData.username}/follow`, 'POST');
-      
       setIsFollowing(response.is_following);
-
       setUserData(prev => {
         let updatedFollowers = [...(prev.followers || [])];
         if (response.is_following) {
@@ -277,7 +250,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
       ></div>
       
       <div className="profile-header-content">
-        
         <div className="left-profile-col">
           <div 
             className="avatar-wrapper"
@@ -292,7 +264,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
             }}
             onMouseLeave={() => setIsHoveringAvatar(false)}
           >
-
             {isHoveringAvatar && !isStatusMenuOpen && status === 'online' && (
               <div key={phraseIndices[currentAvatarIndex]} className="main-avatar-speech-bubble">
                 {allAvatarPhrases[currentAvatarIndex][phraseIndices[currentAvatarIndex]]}
@@ -325,7 +296,7 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
                     <div 
                       key={key} 
                       className="status-option"
-                      onClick={() => handleStatusChange(key, true)} // 🌟 ส่ง true เพื่อบอกว่าคนกดเปลี่ยนเอง
+                      onClick={() => handleStatusChange(key, true)}
                     >
                       <div className="status-color-circle" style={{ backgroundColor: value.color }}></div>
                       {value.label}
@@ -344,7 +315,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
               {isFollowing ? 'Following ' : 'Follow '}
             </button>
           )}
-
         </div>
         
         <div className="profile-text-info">
@@ -385,13 +355,13 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
           ) : (
             <>
               <h1 className="profile-name">
-            <span 
-            className="highlight-text"
-        style={{ color: typeof bannerColor === 'object' ? bannerColor.color : bannerColor }}
-        >
-           {userData.display_name || userData.username}
-    </span> 
-  </h1>
+                <span 
+                  className="highlight-text"
+                  style={{ color: typeof bannerColor === 'object' ? bannerColor.color : bannerColor }}
+                >
+                  {userData?.display_name || userData?.username}
+                </span> 
+              </h1>
               <p className="profile-bio">{userData?.bio || ""}</p>
             </>
           )}
@@ -403,7 +373,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
           <TbEdit size={20} /> Edit
         </button>
       )}
-
     </div>
   );
 };

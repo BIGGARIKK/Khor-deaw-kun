@@ -82,19 +82,7 @@ function Sidebar() {
                 )}
             </div>
 
-            {/* 🎵 Widget 2: ตู้เพลงริมหาด */}
-            <div className="wooden-box widget-box">
-                <div className="widget-header">
-                    <h3>🎵 Now Playing</h3>
-                </div>
-                <div className="jukebox-container">
-                    <div className="vinyl-record"><div className="vinyl-center"></div></div>
-                    <div className="song-info">
-                        <strong className="song-title">ทะเลสีดำ</strong>
-                        <span className="song-artist">Lula</span>
-                    </div>
-                </div>
-            </div>
+
 
             {/* 🏆 Widget 3: Daily Quests */}
             <div className="wooden-box widget-box">
@@ -166,14 +154,7 @@ function Sidebar() {
                 )}
             </div>
 
-            {/* 🌊 Widget 4: บรรยากาศหาดจำลอง */}
-            <div className="wooden-box widget-box vibe-box">
-                <div className="vibe-icon">🌙</div>
-                <div className="vibe-text">
-                    <strong>บรรยากาศตอนนี้</strong>
-                    <span>ลมทะเลเย็นสบาย คลื่นสงบ</span>
-                </div>
-            </div>
+
 
         </div>
     );
