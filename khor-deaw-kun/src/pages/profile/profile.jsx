@@ -8,7 +8,6 @@ import './profile.css';
 import LeftPanel from './component/LeftPanel';
 import ProfileHeader from './component/ProfileHeader';
 import RightPanel from './component/RightPanel';
-// ✨ เพิ่มการ Import MyPosts ที่นี่
 import MyPosts from './component/MyPosts'; 
 
 import AvatarModal from './component/AvatarModal';
@@ -45,7 +44,7 @@ const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [bannerColor, setBannerColor] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * BANNER_PRESETS.length);
+  const randomIndex = Math.floor(Math.random() * BANNER_PRESETS.length);
     return BANNER_PRESETS[randomIndex];
   });
   const colorInputRef = useRef(null);
@@ -54,6 +53,8 @@ const Profile = () => {
   const fileInputRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
+  const myLoggedInUsername = localStorage.getItem('username');
+  const checkIsOwnProfile = userData?.username === myLoggedInUsername;
 
   const avatarPresets = [myAv1, myAv2, myAv3, myAv4, myAv5, myAv6, myAv7, myAv8, myAv9];
   const [avatarImage, setAvatarImage] = useState(() => {
@@ -68,34 +69,22 @@ const Profile = () => {
 
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
 
-  const userPosts = [
-    { id: 1, time: "1 min ago", text: "หยุดน่ารักได้มั้ย ใจเราก็แค่นี้อะ 🥺 #รักน้องแมวมาก", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 105, comments: 20 },
-    { id: 2, time: "2 hours ago", text: "วันนี้เขียนโค้ดทั้งวันเลย สมองเบลอไปหมดแล้ววว 💻😵‍💫", hasImage: false, imageUrl: "", likes: 42, comments: 5 },
-    { id: 3, time: "Yesterday", text: "แวะมากินของอร่อยๆ เยียวยาจิตใจ 🍜✨", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 210, comments: 45 },
-    { id: 4, time: "3 days ago", text: "บางทีการได้พักผ่อนเงียบๆ โง่ๆ ก็ชาร์จพลังได้ดีนะ 🔋😴", hasImage: false, imageUrl: "", likes: 89, comments: 12 },
-    { id: 5, time: "Last week", text: "รอคอยให้ถึงวันหยุดเสาร์อาทิตย์ไม่ไหวแล้ววว อยากนอนนน", hasImage: false, imageUrl: "", likes: 55, comments: 2 },
-    { id: 6, time: "2 weeks ago", text: "ช่วงนี้ติดดูอนิเมะหนักมาก ดูโต้รุ่งมา 2 วันติดแล้ว 🎬🍿", hasImage: false, imageUrl: "", likes: 112, comments: 18 },
-    { id: 7, time: "3 weeks ago", text: "อยากกินชาบูเยียวยาจิตใจจังเลยยยยยยยยย 🥓🔥", hasImage: false, imageUrl: "", likes: 230, comments: 55 },
-    { id: 8, time: "1 month ago", text: "ฝนตกหนักมาก รักษาสุขภาพกันด้วยนะครับทุกคน 🌧️🤧", hasImage: false, imageUrl: "", likes: 78, comments: 4 },
-    { id: 9, time: "1 month ago", text: "เริ่มวันใหม่ด้วยกาแฟหอมๆ สักแก้ว ☕️🌿", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 145, comments: 22 },
-    { id: 10, time: "2 months ago", text: "นานๆ ทีได้ออกมารับอากาศบริสุทธิ์ ธรรมชาติบำบัดสุดๆ ⛰️🌲", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 320, comments: 45 },
-    { id: 11, time: "2 months ago", text: "มุมโปรดเวลาปั่นงาน จัดโต๊ะใหม่เรียบร้อย น่านั่งขึ้นเยอะ 💻✨", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 88, comments: 14 },
-    { id: 12, time: "3 months ago", text: "เจอเจ้านี่เดินเตาะแตะอยู่แถวบ้าน น่ารักเกินต้านทาน 🐶❤️", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 412, comments: 65 },
-    { id: 13, time: "3 months ago", text: "เติมน้ำตาลให้ร่างกายหน่อย เค้กร้านนี้อร่อยมากกกก 🍰🍓", hasImage: true, imageUrl: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", likes: 275, comments: 38 }
-  ];
-
-  const imagePosts = userPosts.filter(post => post.hasImage);
-  const textPosts = userPosts.filter(post => !post.hasImage);
+  const [userPosts, setUserPosts] = useState([]);
 
   useEffect(() => {
-    const loadProfile = async () => {
+    const loadProfileAndPosts = async () => {
       try {
-        const data = await apiRequest('/profile', 'GET');
-        setUserData(data);
+        // ดึงข้อมูลโปรไฟล์
+        const profileData = await apiRequest('/profile', 'GET');
+        setUserData(profileData);
 
-        // ดึงรูปที่เซฟไว้ใน DB มาโชว์ (ถ้ามี)
-        if (data && data.profile_image) {
-          const match = data.profile_image.match(/\d+/);
+        // 🌟 1. ดึงข้อมูล Stories จาก Database มาใส่ State
+        if (profileData && profileData.stories) {
+          setStories(profileData.stories);
+        }
+
+        if (profileData && profileData.profile_image) {
+          const match = profileData.profile_image.match(/\d+/);
           if (match) {
             const index = parseInt(match[0], 10) - 1;
             if (index >= 0 && index < avatarPresets.length) {
@@ -103,12 +92,22 @@ const Profile = () => {
             }
           }
         }
+
+        // ดึงข้อมูลโพสต์ของเราเอง
+        const myPostsData = await apiRequest('/posts/me', 'GET');
+        if (myPostsData) {
+          setUserPosts(myPostsData);
+        }
+
       } catch (error) {
-        alert(error.message || 'Failed to fetch profile data!');
+        console.error("Failed to fetch data:", error);
       }
     };
-    loadProfile();
-  }, []);
+    loadProfileAndPosts();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const imagePosts = userPosts.filter(post => post.image_url && post.image_url.trim() !== "");
+  const textPosts = userPosts.filter(post => !post.image_url || post.image_url.trim() === "");
 
   const handleUpdateAvatar = async (selectedAvatar) => {
     setAvatarImage(selectedAvatar);
@@ -196,6 +195,7 @@ const Profile = () => {
     );
   }
 
+  // 🌟 2. แปลงรูปเป็น Base64 แล้วยิงเซฟลง Database
   const handleFileChange = (e) => {
     if (stories.length >= 10) {
       alert("You can upload up to 10 stories only! 📸");
@@ -204,26 +204,46 @@ const Profile = () => {
 
     const file = e.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setStories((prev) => {
-        const newStories = [...prev, imageUrl];
-        setCurrentStoryIndex(newStories.length - 1);
-        return newStories;
-      });
-      setStoryProgress(0);
-      setIsStoryOpen(true);
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result;
+        const newStories = [...stories, base64String];
+        
+        try {
+          // ยิง API บันทึกสตอรี่ใหม่ลง Database
+          await apiRequest('/profile', 'PUT', { stories: newStories });
+          
+          setStories(newStories);
+          setCurrentStoryIndex(newStories.length - 1);
+          setStoryProgress(0);
+          setIsStoryOpen(true);
+        } catch (error) {
+          console.error("Failed to save story:", error);
+          alert("อัปโหลดสตอรี่ไม่สำเร็จ!");
+        }
+      };
+      reader.readAsDataURL(file); // เริ่มการแปลงไฟล์
     }
   };
 
-  const handleDeleteStory = (e) => {
+  // 🌟 3. ยิง API เวลาลบสตอรี่เพื่อเอาออกจาก Database
+  const handleDeleteStory = async (e) => {
     e.stopPropagation();
     const newStories = stories.filter((_, index) => index !== currentStoryIndex);
-    setStories(newStories);
-    setStoryProgress(0);
-    if (currentStoryIndex > 0) {
-      setCurrentStoryIndex(currentStoryIndex - 1);
-    } else if (newStories.length === 0) {
-      setIsStoryOpen(false);
+    
+    try {
+      await apiRequest('/profile', 'PUT', { stories: newStories });
+      
+      setStories(newStories);
+      setStoryProgress(0);
+      if (currentStoryIndex > 0) {
+        setCurrentStoryIndex(currentStoryIndex - 1);
+      } else if (newStories.length === 0) {
+        setIsStoryOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to delete story:", error);
+      alert("ลบสตอรี่ไม่สำเร็จ!");
     }
   };
 
@@ -261,12 +281,14 @@ const Profile = () => {
           <LeftPanel
             navigate={navigate}
             userData={userData}
+            setUserData={setUserData}        
+            actualPostCount={userPosts.length} 
             isContactOpen={isContactOpen}
             setIsContactOpen={setIsContactOpen}
+            isOwnProfile={checkIsOwnProfile}
           />
         </div>
 
-        {/* ✨ คอลัมน์กลาง (2.2fr ใหญ่สุด) */}
         <div className="center-panel">
           <ProfileHeader
             userData={userData}
@@ -276,6 +298,7 @@ const Profile = () => {
             avatarImage={avatarImage}
             setIsAvatarModalOpen={setIsAvatarModalOpen}
             avatarPresets={avatarPresets}
+            isOwnProfile={checkIsOwnProfile} 
           />
 
           <div className="feed-carousel-section">
@@ -292,16 +315,19 @@ const Profile = () => {
             <div className="carousel-content">
               {imagePosts.length > 0 ? (
                 <PostCard
-                  author={userData.username}
-                  time={imagePosts[currentPostIndex].time}
+                  postId={imagePosts[currentPostIndex]._id}
+                  author={imagePosts[currentPostIndex].author_username}
+                  image_author={imagePosts[currentPostIndex].author_image || userData.profile_image}
+                  time={new Date(imagePosts[currentPostIndex].create_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                   text={imagePosts[currentPostIndex].text}
-                  hasImage={imagePosts[currentPostIndex].hasImage}
-                  imageUrl={imagePosts[currentPostIndex].imageUrl}
-                  likes={imagePosts[currentPostIndex].likes}
-                  comments={imagePosts[currentPostIndex].comments}
+                  hasImage={true}
+                  imageUrl={imagePosts[currentPostIndex].image_url}
+                  likes={imagePosts[currentPostIndex].likes || []}
+                  comments={imagePosts[currentPostIndex].comment || []} 
+                  currentUser={userData.username}
                 />
               ) : (
-                <div className="doodle-box loading-box">No image posts yet 📸</div>
+                <div className="doodle-box loading-box">ยังไม่มีโพสต์รูปภาพเลย 📸</div>
               )}
             </div>
 
@@ -328,15 +354,18 @@ const Profile = () => {
             }}
           />
 
-          {/* ✨ เรียกใช้ Component MyPosts ที่เราแยกมาแล้วส่ง Props ให้มัน */}
-          <MyPosts textPosts={textPosts} username={userData.username} />
+          <MyPosts 
+            textPosts={textPosts} 
+            username={userData.username} 
+            userAvatar={userData.profile_image} 
+          />
           
         </div>
 
       </div>
 
       {isColorModalOpen && <BannerColorModal setIsColorModalOpen={setIsColorModalOpen} bannerColor={bannerColor} setBannerColor={setBannerColor} bannerPresets={BANNER_PRESETS} />}
-      {isAvatarModalOpen && <AvatarModal setIsAvatarModalOpen={setIsAvatarModalOpen} avatarPresets={avatarPresets} avatarImage={avatarImage} setAvatarImage={setAvatarImage} />}
+      {isAvatarModalOpen && <AvatarModal setIsAvatarModalOpen={setIsAvatarModalOpen} avatarPresets={avatarPresets} avatarImage={avatarImage} setAvatarImage={setAvatarImage} handleUpdateAvatar={handleUpdateAvatar} />}
       {isStoryOpen && <StoryModal setIsStoryOpen={setIsStoryOpen} stories={stories} currentStoryIndex={currentStoryIndex} fileInputRef={fileInputRef} handleDeleteStory={handleDeleteStory} handleStoryNavigation={handleStoryNavigation} handleFileChange={handleFileChange} storyProgress={storyProgress} handlePointerDown={handlePointerDown} handlePointerUp={handlePointerUp} setIsPaused={setIsPaused} handleAddStoryClick={handleAddStoryClick} />}
     </div>
   );
