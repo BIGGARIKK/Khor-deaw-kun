@@ -1,78 +1,115 @@
-/* RightPanel.css */
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  overflow: visible !important;
-  margin-top: 40px; /* <--- ลองปรับตัวเลขตรงนี้ดูนะครับ (เช่น 30px, 40px, 50px) จนกว่าจะอยู่กึ่งกลางพอดี */
-  width: 95%;
+/* คอนเทนเนอร์หลักฝั่งขวา */
+.right-panel-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 320px; /* ล็อคความกว้างไม่ให้บาน */
 }
 
-.polaroid-wrapper {
-  position: relative;
-  padding: 16px 16px 25px 16px; 
-  background-color: #fff;
-  transform: rotate(2deg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 16px; 
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
-  transition: all 0.3s ease;
-  overflow-y: hidden; 
-  overflow-x: visible;
-   
+.profile-widget-box {
+    padding: 20px !important;
+    width: 100% !important;
+    box-sizing: border-box;
 }
 
-.story-wooden-bg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* ✨ บังคับให้ขอบของรูปไม้เป็นมุมโค้งตามกรอบขาว ✨ */
-  border-radius: 16px; 
+.widget-title {
+    margin: 0 0 15px 0;
+    font-size: 1.3rem;
+    color: #3E2723;
+    border-bottom: 2px dashed rgba(62, 39, 35, 0.3);
+    padding-bottom: 10px;
+    font-weight: bold;
+    text-align: left;
 }
 
-.story-trigger {
-  cursor: pointer;
-  border: 3px solid transparent !important;
-  background:
-    linear-gradient(#ffffff, #ffffff) padding-box,
-    conic-gradient(from var(--story-angle),
-      #ff6b81, #FF9F43, #ffe066, #84E045, #4A90E2, #ff6b81) border-box !important;
-  animation: spinStoryBorder 2.5s linear infinite;
+/* 🌟 Photo Grid - บังคับ 3 คอลัมน์ */
+.photo-grid-layout {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px;
+    width: 100%;
 }
 
-.polaroid-wrapper.story-trigger:hover {
-  background:
-    linear-gradient(#ffffff, #ffffff) padding-box,
-    linear-gradient(#84E045, #84E045) border-box !important;
-  transform: rotate(0deg) scale(1.02);
-  animation: none;
+.photo-grid-item {
+    aspect-ratio: 1/1; /* บังคับเป็นจัตุรัส */
+    width: 100%;
+    background: #5C4033;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #3E2723;
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
-.story-cover-img {
-  width: 100%;
-  height: 85px; /* ✨ 4. รูปภาพเตี้ยลงกะทัดรัด */
-  object-fit: contain;
-  background-color: #e6e6e6;
-  border-radius: 6px;
+.photo-grid-item:hover {
+    transform: scale(1.05);
 }
 
-.story-placeholder-gray {
-  width: 100%;
-  height: 85px; /* ✨ 4. ให้เท่ากับรูปด้านบน */
-  background-color: #e6e6e6;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.photo-grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* บังคับรูปให้เต็มกรอบจัตุรัส ไม่เบี้ยว */
+    display: block;
 }
 
-.polaroid-caption {
-  margin-top: 20px; /* ✨ เพิ่มระยะห่างจากรูป */
-  font-size: 1.1rem; /* ✨ ขยายตัวอักษรให้ใหญ่ขึ้น */
-  font-weight: bold;
-  color: #333;
-  font-family: 'Mali', cursive;
+/* Following List */
+.following-list-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.following-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #3E2723;
+    font-weight: bold;
+}
+
+.mini-avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #3E2723;
+    background: #FFD285;
+    overflow: hidden;
+}
+
+.mini-avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.empty-txt {
+    text-align: center;
+    opacity: 0.6;
+    font-style: italic;
+    color: #3E2723;
+}
+
+/* 🔍 Zoom Modal */
+.photo-zoom-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.9);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 10000;
+}
+
+.img-full {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 15px;
+    border: 4px solid white;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.close-zoom-btn {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: none; border: none; color: white;
+    cursor: pointer;
 }

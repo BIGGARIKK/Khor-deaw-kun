@@ -1,78 +1,73 @@
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { TbX } from "react-icons/tb";
 import './RightPanel.css';
 
-const RightPanel = ({ setIsStoryOpen, stories = [] }) => {
-   const firstStoryImage = stories.length > 0 ? stories[0] : null;
+const RightPanel = ({ userPosts, userData }) => {
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-   return (
-      <div className="right-panel">
-         
-         {/* ================= กล่อง Story (My Story) ================= */}
-         <div className="wooden-box polaroid-wrapper story-trigger" onClick={() => setIsStoryOpen(true)}>
+  // กรองเอารูปภาพ (สูงสุด 9 รูปเพื่อให้เป็น Grid 3x3 สวยๆ)
+  const galleryPhotos = userPosts
+    .filter(p => p.image_url && p.image_url.trim() !== "")
+    .slice(0, 9);
 
-            {firstStoryImage ? (
-               <div style={{ position: 'relative', width: '100%', height: '180px' }}>
-
-                  {stories.slice(1, 5).map((img, idx) => (
-                     <div key={idx} style={{
-                        position: 'absolute',
-                        top: 0, left: -6,
-                        width: '100%', height: '100%',
-                        borderRadius: '8px',
-                        border: '2px solid #fff',
-                        boxShadow: '2px 2px 5px rgba(0,0,0,0.15)',
-                        transform: `translate(${(idx + 1) * 3}px, ${(idx + 1) * 3}px) rotate(${idx % 2 === 0 ? 4 + idx : -4 - idx}deg)`,
-                        zIndex: 5 - idx,
-                        overflow: 'hidden',
-                        backgroundColor: '#e6e6e6'
-                     }}>
-                        <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                     </div>
-                  ))}
-
-                  <div className="story-cover-wrapper" style={{
-                     position: 'relative',
-                     zIndex: 10,
-                     backgroundImage: `url(${firstStoryImage})`,
-                     backgroundSize: 'cover',
-                     backgroundPosition: 'center',
-                     borderRadius: '8px',
-                     overflow: 'hidden',
-                     height: '180px',
-                     display: 'flex',
-                     alignItems: 'center',
-                     justifyContent: 'center',
-                     border: '2px solid #fff',
-                     boxShadow: '0px 0px 5px rgba(0,0,0,0.1)'
-                  }}>
-                     <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(8px)' }}></div>
-                     <img
-                        src={firstStoryImage}
-                        alt="My Story"
-                        style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', objectFit: 'contain' }}
-                     />
-                  </div>
-
-               </div>
-            ) : (
-               <div className="story-placeholder-gray" style={{
-                  width: '100%',
-                  height: '180px',
-                  backgroundColor: '#e6e6e6',
-                  borderRadius: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-               }}>
-                  <span style={{ color: '#888', fontWeight: 'bold', fontSize: '0.9rem' }}>No Story Yet</span>
-               </div>
-            )}
-
-            <div className="polaroid-caption">My Story ✨</div>
-         </div>
-         {/* ================= สิ้นสุดกล่อง Story ================= */}
-
+  return (
+    <div className="right-panel-container">
+      
+      {/* 🖼️ Widget: Photos (ใช้คลาส wooden-box ของคุณ) */}
+      <div className="wooden-box profile-widget-box">
+        <h3 className="widget-title">📸 Photos</h3>
+        <div className="photo-grid-layout">
+          {galleryPhotos.length > 0 ? (
+            galleryPhotos.map((p, i) => (
+              <div 
+                key={i} 
+                className="photo-grid-item" 
+                onClick={() => setSelectedPhoto(p.image_url)}
+              >
+                <img src={p.image_url} alt="Gallery" />
+              </div>
+            ))
+          ) : (
+            <p className="empty-txt">ยังไม่มีรูปถ่าย.. 🌊</p>
+          )}
+        </div>
       </div>
-   );
+
+      {/* 👥 Widget: Following */}
+      <div className="wooden-box profile-widget-box">
+        <h3 className="widget-title">🤝 Following</h3>
+        <div className="following-list-col">
+          {userData?.following?.length > 0 ? (
+            userData.following.slice(0, 5).map((f, i) => (
+              <div key={i} className="following-row">
+                <div className="mini-avatar-circle">
+                   <img src={`/src/assets/avatars/${(i % 9) + 1}.png`} alt="friend" />
+                </div>
+                <span className="friend-name">{f}</span>
+              </div>
+            ))
+          ) : (
+            <p className="empty-txt">ยังไม่มีเพื่อนร่วมตี้ 🍻</p>
+          )}
+        </div>
+      </div>
+
+      {/* Modal ดูรูปใหญ่ */}
+      {selectedPhoto && createPortal(
+        <div className="photo-zoom-overlay" onClick={() => setSelectedPhoto(null)}>
+          <div className="photo-zoom-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-zoom-btn" onClick={() => setSelectedPhoto(null)}>
+              <TbX size={35} />
+            </button>
+            <img src={selectedPhoto} alt="Zoom" className="img-full" />
+          </div>
+        </div>,
+        document.body
+      )}
+
+    </div>
+  );
 };
 
 export default RightPanel;
