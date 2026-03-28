@@ -5,15 +5,21 @@ import { TbSunset, TbMap2, TbBell, TbSettings, TbX, TbChevronRight } from "react
 import { apiRequest } from '../../../../service/api';
 import './BottomBar.css';
 
-// ⚙️ Import หน้า Settings มาใช้เป็น Modal
-// เช็ค Path อีกทีนะครับว่าอยู่ที่ '../../Settings/Setting' หรือเปล่า ตามที่คุณวางไฟล์ไว้
+// ⚙️ Import Components อื่นๆ
 import Settings from './Setting'; 
+// 🌟 Import กล่องแจ้งเตือนที่เราเพิ่งสร้าง
+import NotificationDropdown from './NotificationDropdown'; 
 
 function BottomBar() {
     const navigate = useNavigate();
     const location = useLocation();
+    
+    // States ควบคุมการเปิด/ปิดหน้าต่างต่างๆ
     const [showProfileSheet, setShowProfileSheet] = useState(false);
-    const [showSettingsModal, setShowSettingsModal] = useState(false); // ⚙️ เพิ่ม State สำหรับเปิด/ปิด Gear
+    const [showSettingsModal, setShowSettingsModal] = useState(false); 
+    // 🌟 เพิ่ม State ควบคุมการเปิดกล่องแจ้งเตือน
+    const [showNotifications, setShowNotifications] = useState(false); 
+    
     const [userData, setUserData] = useState(null);
     const [currentVibe, setCurrentVibe] = useState('chill');
 
@@ -22,11 +28,8 @@ function BottomBar() {
             try {
                 const data = await apiRequest("/profile", "GET");
                 setUserData(data);
-                if (data.vibe_status) {
-                    setCurrentVibe(data.vibe_status);
-                } else if (data.vibe) {
-                    setCurrentVibe(data.vibe);
-                }
+                if (data.vibe_status) setCurrentVibe(data.vibe_status);
+                else if (data.vibe) setCurrentVibe(data.vibe);
             } catch (error) {
                 console.error('Failed to fetch profile data:', error);
             }
@@ -48,6 +51,13 @@ function BottomBar() {
 
     return (
         <>
+            {/* 🌟 แสดงกล่องแจ้งเตือนเหนือ Bottom Bar ถ้ายูสเซอร์กดปุ่มกระดิ่ง */}
+            {showNotifications && (
+                <div style={{ position: 'fixed', bottom: '80px', right: '20px', zIndex: 1000 }}>
+                    <NotificationDropdown onClose={() => setShowNotifications(false)} />
+                </div>
+            )}
+
             <div className="bottom-nav-container">
                 <div className={`nav-item ${isActive('/beach')}`} onClick={() => navigate("/beach")}>
                     <TbSunset size={28} />
@@ -69,12 +79,12 @@ function BottomBar() {
                     </div>
                 </div>
 
-                <div className={`nav-item ${isActive('/shouts')}`}>
+                {/* 🌟 เปลี่ยนปุ่ม Shouts ให้มาสลับเปิด/ปิดกล่องแจ้งเตือนแทนการเปลี่ยนหน้า */}
+                <div className={`nav-item ${showNotifications ? 'active' : ''}`} onClick={() => setShowNotifications(!showNotifications)}>
                     <TbBell size={28} />
                     <span className="nav-label">Shouts</span>
                 </div>
 
-                {/* ⚙️ ปุ่ม Gear: เปลี่ยนจาก navigate เป็นการเปิด Modal แทน */}
                 <div className="nav-item" onClick={() => setShowSettingsModal(true)}>
                     <TbSettings size={28} />
                     <span className="nav-label">Gear</span>
@@ -82,7 +92,7 @@ function BottomBar() {
             </div>
 
             {/* =========================================
-                ⚙️ Settings Modal (เด้งขึ้นมากลางจอ)
+                ⚙️ Settings Modal
             ========================================= */}
             {showSettingsModal && createPortal(
                 <Settings onClose={() => setShowSettingsModal(false)} />,
@@ -90,7 +100,7 @@ function BottomBar() {
             )}
 
             {/* =========================================
-                🌟 Profile Bottom Sheet (เลื่อนจากข้างล่าง)
+                🌟 Profile Bottom Sheet
             ========================================= */}
             {showProfileSheet && createPortal(
                 <div className="profile-sheet-overlay" onClick={() => setShowProfileSheet(false)}>

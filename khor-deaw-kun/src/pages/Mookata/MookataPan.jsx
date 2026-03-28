@@ -3,14 +3,21 @@ import panImage from '../../assets/Mookata/pan.png';
 
 function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRotation, currentFlip, players, socket, roomId }) {
 
-    // (ดึงชื่อตัวเองมาเช็คว่าจานไหนเป็นของเรา)
     const myName = localStorage.getItem('username') || 'Guest';
 
     // ==========================================
     // 👂 1. ดักฟังความเคลื่อนไหวจากเพื่อนในห้อง!
     // ==========================================
     useEffect(() => {
-        if (!socket) return;
+        if (!socket || !roomId) return; // 🌟 ป้องกันกรณีที่ Socket หรือ roomId ยังมาไม่ถึง
+
+        // 🌟 พอหน้าเว็บเปิดมาปุ๊บ ให้ตะโกนขอข้อมูลเตาจาก Server เลย!
+        socket.emit('request_pan_sync', { room_id: roomId });
+
+        // 🌟 ดักรอรับข้อมูลที่ Server จะส่งกลับมา
+        socket.on('load_pan_state', (savedMeats) => {
+            setItemsOnPan(savedMeats || []); 
+        });
 
         socket.on('meat_added', (newItem) => {
             setItemsOnPan(prev => {
@@ -39,12 +46,13 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         });
 
         return () => {
+            socket.off('load_pan_state'); 
             socket.off('meat_added');
             socket.off('meat_moved');
             socket.off('meat_flipped');
             socket.off('meat_removed');
         };
-    }, [socket, setItemsOnPan]);
+    }, [socket, roomId, setItemsOnPan]); // 🌟 เพิ่ม roomId เป็น Dependency
 
     // ==========================================
     // 🕰️ ระบบจับเวลาสุก/ไหม้
@@ -101,7 +109,6 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
     const isInsidePanArea = (x, y, containerWidth, containerHeight) => {
         const centerX = containerWidth / 2;
         const centerY = containerHeight / 2;
-        // 🌟 แก้ตัวเลขนี้: ลดรัศมีจาก 280 เหลือ 220 ให้พอดีกับเตาไซส์ใหม่
         const radius = 220; 
         const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
         return distance <= radius;
@@ -195,29 +202,33 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
             // ==========================================
             // 🌟 ระบบ Daily Quest: อัปเดตเควสต์ "ป้อนหมูเพื่อน"
             // ==========================================
-            // เช็คว่าคนที่โดนป้อน "ไม่ใช่ตัวเราเอง"
             if (targetPlayerName !== myName) {
-                const today = new Date().toLocaleDateString(); // ดึงวันที่วันนี้
+                const today = new Date().toLocaleDateString();
                 const savedDate = localStorage.getItem('quest_date');
                 let feedCount = parseInt(localStorage.getItem('quest_feed_count') || '0');
 
-                // ถ้าระบบจำว่าเป็นวันเก่า ให้รีเซ็ตเควสต์กลับเป็น 0
                 if (savedDate !== today) {
                     feedCount = 0;
                     localStorage.setItem('quest_date', today);
                 }
 
-                // ถ้ายังทำเควสต์ไม่ครบ 5 ครั้ง ให้บวกเพิ่ม
                 if (feedCount < 5) {
                     feedCount += 1;
                     localStorage.setItem('quest_feed_count', feedCount);
-                    
-                    // กระจายข่าวบอกหน้าจออื่นๆ (เช่น Sidebar) ว่าเควสต์ขยับแล้วนะ!
                     window.dispatchEvent(new Event('quest_updated'));
                 }
             }
-            // ==========================================
         }
+    };
+
+    // 🌟 5. ฟังก์ชันล้างเตา (แจ้งคนอื่นในห้องด้วยว่าเราล้างเตาแล้ว)
+    const handleClearPan = () => {
+        itemsOnPan.forEach(item => {
+            if (socket) {
+                socket.emit('remove_meat', { uniqueId: item.uniqueId, room_id: roomId });
+            }
+        });
+        setItemsOnPan([]);
     };
 
     return (
@@ -273,8 +284,7 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                 })}
             </div>
 
-            {/* 🌟 โซนจานข้าวของเพื่อนแต่ละคน (อัปเดต UI ให้เข้ากัน) */}
-            {/* 🌟 โซนจานข้าวของเพื่อนแต่ละคน */}
+            {/* โซนจานข้าวของเพื่อนแต่ละคน */}
             <div className="players-action-board">
                 {players.map((playerObj, index) => {
                     const playerName = playerObj.username;
@@ -285,7 +295,7 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                     return (
                         <div key={index} className={`player-plate-unit ${isMe ? 'is-me' : ''}`}>
                             
-                            {/* 1. กล่องวงกลมใส่รูป (รับการดรอปหมู) */}
+                            {/* กล่องวงกลมใส่รูป (รับการดรอปหมู) */}
                             <div
                                 className="player-plate-zone"
                                 onDragOver={handleDragOver}
@@ -306,10 +316,10 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                                 )}
                             </div>
                             
-                            {/* 2. ป้าย "จานของคุณ" (ให้อยู่ตรงกลางระหว่างรูปกับกล่องชื่อ) */}
+                            {/* ป้าย "จานของคุณ" */}
                             {isMe && <div className="plate-tag">จานของคุณ</div>}
                             
-                            {/* 3. กล่องรวมชื่อและคะแนน */}
+                            {/* กล่องรวมชื่อและคะแนน */}
                             <div className="plate-labels-wrapper">
                                 <div className="plate-owner-name">{playerName}</div>
                                 <div className={`player-score ${playerScore < 0 ? 'negative' : ''}`}>
@@ -323,9 +333,7 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
             </div>
 
             <div className="pan-controls-mini">
-                <button onClick={() => {
-                    setItemsOnPan([]);
-                }}>🧽 ล้างเตา</button>
+                <button onClick={handleClearPan}>🧽 ล้างเตา</button>
             </div>
         </div>
     );

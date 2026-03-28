@@ -22,11 +22,10 @@ function Hub() {
     const [newPassword, setNewPassword] = useState('');
 
     // ==========================================
-    // 🔄 ดึงข้อมูลห้องทั้งหมดจาก Backend (ฉบับแก้ 401)
+    // 🔄 ดึงข้อมูลห้องทั้งหมดจาก Backend
     // ==========================================
     useEffect(() => {
         const fetchRooms = async () => {
-            // 🌟 1. ดึงกล่อง user มาแกะเอา Token ออกมา
             const userString = localStorage.getItem('user');
             let currentToken = null;
 
@@ -39,7 +38,6 @@ function Hub() {
                 }
             }
 
-            // 🚨 2. ถ้าไม่มี Token จริงๆ ให้เตะกลับไป Login
             if (!currentToken) {
                 console.warn("No token found, redirecting...");
                 navigate('/signin');
@@ -49,7 +47,6 @@ function Hub() {
             try {
                 const response = await fetch('http://localhost:5000/rooms', {
                     headers: { 
-                        // 🌟 3. ใช้ currentToken ที่แกะได้ส่งไป
                         'Authorization': `Bearer ${currentToken}` 
                     }
                 });
@@ -58,7 +55,6 @@ function Hub() {
                     const data = await response.json();
                     setRooms(data);
                 } else if (response.status === 401) {
-                    // ถ้า Token หมดอายุ หรือพัง ให้เตะออก
                     navigate('/signin');
                 }
             } catch (error) {
@@ -69,7 +65,7 @@ function Hub() {
         };
 
         fetchRooms();
-    }, [navigate]); // 🌟 เอา token ออกจาก dependency เพราะเราดึงสดข้างในแล้ว
+    }, [navigate]);
 
     const handleSearchRoom = (e) => {
         e.preventDefault();
@@ -83,10 +79,9 @@ function Hub() {
     };
 
     // ==========================================
-    // 🚪 ระบบเข้าห้อง (Join Room) - ฉบับแก้ไข Token
+    // 🚪 ระบบเข้าห้อง (Join Room)
     // ==========================================
     const handleJoinRoom = async (room) => {
-        // 🌟 1. ดึงและแกะห่อ Token เหมือนตอนสร้างห้องเป๊ะๆ
         const userString = localStorage.getItem('user');
         let currentToken = null;
 
@@ -99,7 +94,6 @@ function Hub() {
             }
         }
 
-        // 🚨 ถ้าไม่มี Token ให้เตะออกไป Login
         if (!currentToken) {
             alert("กรุณาล็อกอินใหม่ครับ เซสชันหมดอายุ 🍻");
             navigate('/signin');
@@ -117,7 +111,6 @@ function Hub() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // 🌟 2. ใช้ currentToken ที่แกะมาแล้วส่งไป
                     'Authorization': `Bearer ${currentToken}`
                 },
                 body: JSON.stringify({ room_id: room.room_id, password: password })
@@ -136,37 +129,27 @@ function Hub() {
     };
 
     // ==========================================
-    // 🛠️ ฟังก์ชันยืนยันการสร้างห้อง (ส่งไปหา Backend)
+    // 🛠️ ฟังก์ชันยืนยันการสร้างห้อง
     // ==========================================
     const submitCreateRoom = async () => {
-        // 🌟 1. ดึงข้อมูลจาก localStorage
         const userString = localStorage.getItem('user');
-        
-        // 🌟 2. ใช้ let แทน const เพราะเราต้องเปลี่ยนค่าจาก null เป็นข้อมูลจริง
         let currentToken = null; 
 
         if (userString) {
             try {
-                // แกะห่อ JSON
                 const userData = JSON.parse(userString);
-                // จิ้มเอา access_token ออกมา
                 currentToken = userData.access_token;
             } catch (e) {
                 console.error("Parse JSON error", e);
             }
         }
 
-        // ลองปริ้นท์เช็คดู
-        console.log("👉 Token ที่ดึงมาได้:", currentToken);
-
-        // 🚨 ด่านสกัด: ถ้าไม่มี Token ให้เตะออก
         if (!currentToken || currentToken === 'null' || currentToken === 'undefined') {
             alert("คุณยังไม่ได้ล็อกอิน หรือเซสชันหมดอายุ! กรุณาล็อกอินใหม่ครับ 🍻");
             navigate('/signin'); 
             return;
         }
 
-        // เช็คชื่อห้อง
         if (!newRoomName.trim()) {
             alert("กรุณาตั้งชื่อโต๊ะด้วยครับ!");
             return;
@@ -177,7 +160,6 @@ function Hub() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // 🌟 3. ใช้ตัวแปร currentToken ที่เราแกะห่อมาแล้ว
                     'Authorization': `Bearer ${currentToken}` 
                 },
                 body: JSON.stringify({
@@ -200,9 +182,6 @@ function Hub() {
         }
     };
 
-    // ==========================================
-    // 🧹 ฟังก์ชันเปิด Popup (พร้อม Reset ค่าเดิม)
-    // ==========================================
     const openCreateModal = () => {
         setNewRoomName(`${currentUser}'s Table`);
         setNewMaxPlayers(6);
@@ -210,6 +189,9 @@ function Hub() {
         setNewPassword('');
         setShowCreateModal(true);
     };
+
+    // 🌟 พระเอกของงานนี้: กรองเอาเฉพาะห้องที่มีคนอยู่ (players.length > 0)
+    const activeRooms = rooms.filter(room => room.players && room.players.length > 0);
 
     return (
         <div className="room-selection-bg">
@@ -240,7 +222,6 @@ function Hub() {
                         <button type="submit" className="search-btn">Go!</button>
                     </form>
                     
-                    {/* 🌟 เปลี่ยนปุ่มมาเรียกเปิด Popup แทน */}
                     <button onClick={openCreateModal} className="create-room-btn">
                         ➕ เปิดโต๊ะใหม่
                     </button>
@@ -248,15 +229,16 @@ function Hub() {
             </div>
 
             <div className="room-cards-list">
+                {/* 🌟 เช็คและแสดงผลจาก activeRooms แทน rooms */}
                 {loading ? (
                     <div className="loading-text" style={{textAlign: 'center', marginTop: '50px'}}>กำลังจัดโต๊ะ... 🥩</div>
-                ) : rooms.length === 0 ? (
+                ) : activeRooms.length === 0 ? (
                     <div className="empty-rooms" style={{textAlign: 'center', marginTop: '50px'}}>
                         <h3>ยังไม่มีใครเปิดโต๊ะเลย 🥲</h3>
                         <p>มากดเปิดโต๊ะใหม่เป็นคนแรกสิ!</p>
                     </div>
                 ) : (
-                    rooms.map((room) => (
+                    activeRooms.map((room) => (
                         <div key={room.room_id} className={`room-item-row ${room.status === 'private' ? 'cafe-theme' : 'moograta-theme'}`}>
                             <div className="room-card-inner">
                                 <div className="room-content-flex">
@@ -289,9 +271,7 @@ function Hub() {
 
             <BottomBar />
 
-            {/* ==========================================
-                🌟 MODAL (Popup เปิดโต๊ะใหม่)
-                ========================================== */}
+            {/* MODAL (Popup เปิดโต๊ะใหม่) */}
             {showCreateModal && (
                 <div className="modal-overlay">
                     <div className="modal-box">

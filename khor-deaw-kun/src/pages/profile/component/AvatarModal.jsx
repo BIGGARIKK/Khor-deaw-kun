@@ -2,8 +2,8 @@ import './AvatarModal.css';
 import { createPortal } from 'react-dom';
 import { useState } from 'react';
 
-
-const AvatarModal = ({ setIsAvatarModalOpen, avatarPresets, avatarImage, setAvatarImage }) => {
+// 🌟 1. รับ handleUpdateAvatar เข้ามาใน Props ด้วย (เราไม่ต้องใช้ setAvatarImage ตรงนี้แล้ว)
+const AvatarModal = ({ setIsAvatarModalOpen, avatarPresets, avatarImage, handleUpdateAvatar }) => {
   const [hoveredAvatar, setHoveredAvatar] = useState(null);
 
   const hoverPhrases = [
@@ -15,10 +15,10 @@ const AvatarModal = ({ setIsAvatarModalOpen, avatarPresets, avatarImage, setAvat
     "Beep...", 
     "I’m happy to meet you.", 
     "Hi! nice to meet.", 
-    "@*&#!%~"];
+    "@*&#!%~"
+  ];
 
   return createPortal(
-    // ส่วนนี้คือพื้นหลังที่กดแล้วจะปิดหน้าต่าง (มีอยู่เดิมแล้ว)
     <div className="ig-story-overlay" onClick={() => setIsAvatarModalOpen(false)} style={{ zIndex: 10000 }}>
       
       <div className="avatar-modal-box" onClick={(e) => e.stopPropagation()}>
@@ -41,8 +41,10 @@ const AvatarModal = ({ setIsAvatarModalOpen, avatarPresets, avatarImage, setAvat
                 <img
                   src={img}
                   onClick={() => { 
-                    setAvatarImage(img); 
-                    setIsAvatarModalOpen(false); 
+                    // 🌟 2. เรียกใช้ฟังก์ชัน handleUpdateAvatar เพื่อเซฟรูปลง Database พร้อมเปลี่ยนรูปบนจอทันที
+                    if (handleUpdateAvatar) {
+                      handleUpdateAvatar(img);
+                    }
                   }}
                   className={`avatar-option ${isSelected ? 'selected' : ''}`}
                   alt={`Avatar ${idx + 1}`}

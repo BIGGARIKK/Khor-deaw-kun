@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { TbEdit, TbCheck, TbX, TbTrash } from "react-icons/tb";
-import { apiRequest } from "../../../service/api"; // 🌟 อย่าลืม import API Request
+import { apiRequest } from "../../../service/api"; 
 import './ProfileHeader.css';
 
 const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen, avatarImage, setIsAvatarModalOpen, avatarPresets, isOwnProfile = true }) => {
@@ -17,10 +17,8 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
   
   const [isFollowing, setIsFollowing] = useState(false);
   
-  // 🌟 ดึงชื่อของเราที่ล็อกอินอยู่
   const myLoggedInUsername = localStorage.getItem('username'); 
 
-  // 🌟 เช็คสถานะเริ่มต้นว่าเรา Follow เขาอยู่หรือเปล่า
   useEffect(() => {
     if (userData?.followers && myLoggedInUsername) {
       setIsFollowing(userData.followers.includes(myLoggedInUsername));
@@ -64,30 +62,50 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     }
   };
 
-  const handleSave = () => {
+  // 🌟 ฟังก์ชันนี้ถูกแก้ไขเพื่อให้ส่งข้อมูลไปเซฟที่ Database
+  const handleSave = async () => {
     if (!editName || editName.trim() === '') {
       alert("Please enter your name!");
       return;
     }
-    setUserData(prev => ({ ...prev, username: editName.trim(), bio: editBio }));
-    setIsEditing(false);
+
+    const newUsername = editName.trim();
+    const newBio = editBio.trim();
+
+    try {
+      // 🌟 ยิง API ไปอัปเดตลง Database (คุณอาจจะต้องเช็คฝั่ง Backend ด้วยว่ารับค่า bio และ username หรือยัง)
+      await apiRequest('/profile', 'PUT', { 
+        username: newUsername, 
+        bio: newBio 
+      });
+
+      // 🌟 อัปเดต LocalStorage หากมีการเปลี่ยน Username (สำคัญมากสำหรับระบบ Login)
+      if (newUsername !== myLoggedInUsername) {
+        localStorage.setItem('username', newUsername);
+      }
+
+      // 🌟 อัปเดตข้อมูลบนหน้าจอ
+      setUserData(prev => ({ ...prev, username: newUsername, bio: newBio }));
+      setIsEditing(false);
+
+    } catch (error) {
+      console.error("Failed to update profile info:", error);
+      alert("บันทึกข้อมูลไม่สำเร็จ ลองใหม่อีกครั้งนะครับ 😅");
+    }
   };
 
-  // 🌟 ฟังก์ชันจัดการปุ่ม Follow โดยยิง API และอัปเดตตัวเลข
   const handleToggleFollow = async () => {
     try {
       const response = await apiRequest(`/users/${userData.username}/follow`, 'POST');
       
-      // เปลี่ยนสีและข้อความปุ่ม
       setIsFollowing(response.is_following);
 
-      // 🌟 อัปเดตตัวเลข Follower เข้าไปใน userData (ทำให้แถบซ้ายตัวเลขเด้งขึ้นทันที)
       setUserData(prev => {
         let updatedFollowers = [...(prev.followers || [])];
         if (response.is_following) {
-          updatedFollowers.push(myLoggedInUsername); // ถ้าฟอล ให้เพิ่มชื่อเรา
+          updatedFollowers.push(myLoggedInUsername);
         } else {
-          updatedFollowers = updatedFollowers.filter(name => name !== myLoggedInUsername); // ถ้าอันฟอล ให้ลบชื่อเราออก
+          updatedFollowers = updatedFollowers.filter(name => name !== myLoggedInUsername);
         }
         return { ...prev, followers: updatedFollowers };
       });
@@ -185,7 +203,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
             </div>
           </div>
 
-          {/* 🌟 ปรับให้เรียกใช้ฟังก์ชันใหม่ (ยิง API แทนการสลับ State ธรรมดา) */}
           {!isOwnProfile && (
             <button 
               className={`doodle-follow-btn ${isFollowing ? 'following' : ''}`}

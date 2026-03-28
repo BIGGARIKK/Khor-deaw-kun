@@ -5,7 +5,6 @@ import RightSidebar from './component/feed/RightSidebar';
 import BottomBar from './component/feed/BottomBar';
 import CreatePostBox from './component/feed/CreatePostBox';
 import PostCard from './component/feed/PostCard';
-
 // 🌟 import apiRequest
 import { apiRequest } from '../../service/api'; 
     
@@ -77,6 +76,8 @@ function Feed() {
 
     return (
         <div className="app-container">
+
+
             <div className="top-header">
                 <h1 className="logo-neon">Khor Deaw Kun</h1>
             </div>

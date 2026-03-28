@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import IngredientMenu from './IngredientMenu';
 import { io } from 'socket.io-client'; //
 import MookataPan from './MookataPan';
@@ -7,9 +7,9 @@ import { useParams } from 'react-router-dom';
 import RoomChat from './RoomChat';
 import './GrillRoom.css';
 import YouTubeJukebox from './YouTubeJukebox'; // 🌟 นำเข้าตู้เพลง
-const socket = io('http://localhost:5000');
 function GrillRoom() {
     const navigate = useNavigate();
+    const socketRef = useRef(null);
     const [itemsOnPan, setItemsOnPan] = useState([]);
     const [selectedIngredient, setSelectedIngredient] = useState(null);
     const [currentRotation, setCurrentRotation] = useState(0);
@@ -20,37 +20,55 @@ function GrillRoom() {
 
     const { roomId } = useParams();
 
+    // ✅ สร้าง socket ใน useEffect เพื่อให้ component พร้อมแล้ว
     useEffect(() => {
-        if (!socket) return;
+        socketRef.current = io('http://localhost:5000');
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!socketRef.current) return;
 
         // 👂 ฟังคำสั่งอัปเดตรายชื่อจาก Server
-        socket.on('update_player_list', (playerList) => {
+        socketRef.current.on('update_player_list', (playerList) => {
             console.log("👥 สมาชิกในโต๊ะปัจจุบัน:", playerList);
             setPlayers(playerList);
         });
 
-        return () => socket.off('update_player_list');
-    }, [socket]);
+        return () => socketRef.current.off('update_player_list');
+    }, []);
 
     useEffect(() => {
-        if (!socket) return;
+        if (!socketRef.current) return;
         const myProfileImg = localStorage.getItem('profile_image') || '';
 
         // 🌟 2. เมื่อเข้าหน้าห้องแล้ว ให้ส่งคำขอจองโต๊ะไปที่ Server ทันที
-        // 🌟 3. ตะโกนบอก Server ทันทีที่เข้าหน้าหน้า: "ฉันขอจองโต๊ะเบอร์นี้!"
-        socket.emit('join_game_room', {
+        socketRef.current.emit('join_game_room', {
             room_id: roomId,
             username: localStorage.getItem('username'),
             profile_image: myProfileImg
         });
 
-        // ... (ฟังเหตุการณ์ Socket อื่นๆ เหมือนเดิม) ...
+        // ✅ ฟัง chat history
+        socketRef.current.on('load_chat_history', (chatHistory) => {
+            console.log("💬 โหลดประวัติแชท:", chatHistory);
+        });
+
+        // ✅ ฟัง chat messages ในห้อง
+        socketRef.current.on('chat_message', (message) => {
+            console.log("💬 มีข้อความใหม่:", message);
+        });
+
     }, [roomId]);
 
     useEffect(() => {
-        if (!socket) return;
+        if (!socketRef.current) return;
 
-        socket.on('score_updated', (data) => {
+        socketRef.current.on('score_updated', (data) => {
             // อัปเดตคะแนนให้คนโดนป้อน
             setPlayers(prevPlayers => prevPlayers.map(p => {
                 // 🌟 แก้ตรงนี้: เปลี่ยนจาก p.id เป็น p.username
@@ -61,8 +79,8 @@ function GrillRoom() {
             }));
         });
 
-        return () => socket.off('score_updated');
-    }, [socket]);
+        return () => socketRef.current.off('score_updated');
+    }, []);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -81,8 +99,8 @@ function GrillRoom() {
     };
 
     const handleLeaveRoomCompletely = () => {
-        if (socket) {
-            socket.emit('leave_game_room', { room_id: roomId });
+        if (socketRef.current) {
+            socketRef.current.emit('leave_game_room', { room_id: roomId });
         }
         // ฉีกกระดาษเลขห้องทิ้ง เพราะไม่ได้อยู่โต๊ะนี้แล้ว
         localStorage.removeItem('active_room');
@@ -139,7 +157,7 @@ function GrillRoom() {
                     currentRotation={currentRotation}
                     currentFlip={currentFlip}
                     players={players}
-                    socket={socket}
+                    socket={socketRef.current}
                     roomId={roomId}
                 />
 
@@ -148,14 +166,14 @@ function GrillRoom() {
                     
                     {/* 🎵 ตู้เพลง */}
                     <YouTubeJukebox 
-                        socket={socket} 
+                        socket={socketRef.current} 
                         roomId={roomId} 
                         myName={localStorage.getItem('username')} 
                     />
 
                     {/* 💬 กล่องแชท (ของเดิม) */}
                     <RoomChat
-                        socket={socket}
+                        socket={socketRef.current}
                         roomId={roomId}
                         players={players}
                     />

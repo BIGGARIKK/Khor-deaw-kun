@@ -13,25 +13,40 @@ function RoomChat({ socket, roomId, players }) {
     // ==========================================
     // 👂 ดักฟังข้อความใหม่ และ โหลดประวัติเก่า จาก Server
     // ==========================================
+    // ==========================================
+    // 👂 ดักฟังข้อความใหม่ และ โหลดประวัติเก่า จาก Server
     useEffect(() => {
         if (!socket) return;
 
-        // 🌟 1. รับประวัติแชททั้งหมดตอนเพิ่งเข้ามา
-        socket.on('load_chat_history', (historyMessages) => {
-            setMessages(historyMessages); 
-        });
+        // ฟังก์ชันดักฟังแชทใหม่
+        const handleChatMessage = (msg) => {
+            setMessages((prev) => {
+                // เช็คกันบั๊กข้อความซ้ำ (เผื่อ Server ส่งมาซ้อน)
+                if (prev.some(m => m.id === msg.id)) return prev;
+                return [...prev, msg];
+            });
+        };
 
-        // 🌟 2. ดักฟังข้อความใหม่ๆ ที่เด้งเข้ามา (เหลืออันนี้ไว้แค่อันเดียวพอ!)
-        socket.on('chat_message', (data) => {
-            setMessages((prevMessages) => [...prevMessages, data]);
-        });
+        // ฟังก์ชันโหลดประวัติเก่า
+        const handleLoadHistory = (history) => {
+            console.log("📜 ประวัติแชทมาถึงแล้ว:", history);
+            if (history && history.length > 0) {
+                setMessages(history);
+            }
+        };
+
+        socket.on('chat_message', handleChatMessage);
+        socket.on('load_chat_history', handleLoadHistory);
+
+        // 🌟 พิเศษ: ส่งสัญญาณบอก Server ว่า "ฉันพร้อมรับแชทแล้วนะ!"
+        // (ถ้า Server มีระบบหน่วงเวลาอยู่แล้ว ตัวนี้จะเป็นตัวช่วยยืนยันอีกแรง)
+        socket.emit('request_chat_sync', { room_id: roomId });
 
         return () => {
-            socket.off('load_chat_history');
-            socket.off('chat_message');
+            socket.off('chat_message', handleChatMessage);
+            socket.off('load_chat_history', handleLoadHistory);
         };
-    }, [socket]);
-
+    }, [socket, roomId]);
     // 🌟 เลื่อนจอลงล่างสุดอัตโนมัติเวลาแชทอัปเดต
     useEffect(() => {
         if (activeTab === 'chat') {
