@@ -1,15 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { apiRequest } from '../../service/api';
-import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import PostCard from '../Feed/component/feed/PostCard';
 import './profile.css';
 
 import LeftPanel from './component/LeftPanel';
 import ProfileHeader from './component/ProfileHeader';
-import RightPanel from './component/RightPanel';
-import MyPosts from './component/MyPosts';
-
+import RightPanel from './component/RightPanel'; // 🌟 เรียกใช้ Widget ใหม่
 import AvatarModal from './component/AvatarModal';
 import BannerColorModal from './component/BannerColorModal';
 
@@ -23,6 +20,7 @@ import myAv7 from '../../assets/avatars/7.png';
 import myAv8 from '../../assets/avatars/8.png';
 import myAv9 from '../../assets/avatars/9.png';
 
+// ฟังก์ชันแปลงเวลา
 const formatDate = (dateInput) => {
   if (!dateInput) return 'ไม่ทราบเวลา';
   let date;
@@ -36,11 +34,7 @@ const formatDate = (dateInput) => {
     date = new Date(safeString);
   }
   if (isNaN(date.getTime())) return 'ไม่นานมานี้';
-  return date.toLocaleDateString('th-TH', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric' 
-  });
+  return date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
 export const BANNER_PRESETS = [
@@ -67,7 +61,6 @@ const Profile = () => {
   const [bannerColor, setBannerColor] = useState(BANNER_PRESETS[0]);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
   const [userPosts, setUserPosts] = useState([]);
-  const [currentPostIndex, setCurrentPostIndex] = useState(0);
 
   const myLoggedInUsername = localStorage.getItem('username');
   const targetUser = username || myLoggedInUsername;
@@ -76,6 +69,47 @@ const Profile = () => {
   const avatarPresets = [myAv1, myAv2, myAv3, myAv4, myAv5, myAv6, myAv7, myAv8, myAv9];
   const [avatarImage, setAvatarImage] = useState(avatarPresets[0]);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!targetUser) return;
+    const loadProfileAndPosts = async () => {
+      try {
+        const profileData = await apiRequest(`/profile/${targetUser}`, 'GET');
+        setUserData(profileData);
+        if (profileData?.banner) setBannerColor(profileData.banner);
+        
+        if (profileData?.profile_image) {
+          const match = profileData.profile_image.match(/\d+/);
+          if (match) {
+            const index = parseInt(match[0], 10) - 1;
+            if (index >= 0 && index < avatarPresets.length) setAvatarImage(avatarPresets[index]);
+          }
+        }
+
+        const userPostsData = await apiRequest(`/posts/${targetUser}`, 'GET');
+        if (userPostsData) {
+            const sortedPosts = [...userPostsData].sort((a, b) => 
+                new Date(b.create_at?.$date || b.create_at) - new Date(a.create_at?.$date || a.create_at)
+            );
+            setUserPosts(sortedPosts);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+    loadProfileAndPosts();
+  }, [targetUser]);
+
+  const handleUpdateAvatar = async (selectedAvatar) => {
+    setAvatarImage(selectedAvatar);
+    try {
+      const avatarIndex = avatarPresets.indexOf(selectedAvatar);
+      const fileName = avatarIndex !== -1 ? `${avatarIndex + 1}.png` : '1.png';
+      await apiRequest('/profile', 'PUT', { profile_image: fileName });
+    } catch (error) {
+      console.error("Failed to update avatar:", error);
+    }
+  };
 
   const handleBannerChange = async (newColor) => {
     setBannerColor(newColor);
@@ -86,73 +120,12 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    if (!targetUser) return;
-
-    const loadProfileAndPosts = async () => {
-      try {
-        const profileData = await apiRequest(`/profile/${targetUser}`, 'GET');
-        setUserData(profileData);
-
-        if (profileData?.banner) setBannerColor(profileData.banner);
-        
-        if (profileData?.profile_image) {
-          const match = profileData.profile_image.match(/\d+/);
-          if (match) {
-            const index = parseInt(match[0], 10) - 1;
-            if (index >= 0 && index < avatarPresets.length) {
-              setAvatarImage(avatarPresets[index]);
-            }
-          }
-        }
-
-        const userPostsData = await apiRequest(`/posts/${targetUser}`, 'GET');
-        if (userPostsData) setUserPosts(userPostsData);
-
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      }
-    };
-
-    loadProfileAndPosts();
-  }, [targetUser]);
-
-  const imagePosts = userPosts.filter(post => post.image_url && post.image_url.trim() !== "");
-  const textPosts = userPosts.filter(post => !post.image_url || post.image_url.trim() === "");
-
-  const handleUpdateAvatar = async (selectedAvatar) => {
-    setAvatarImage(selectedAvatar);
-    try {
-      const avatarIndex = avatarPresets.indexOf(selectedAvatar);
-      const fileName = avatarIndex !== -1 ? `${avatarIndex + 1}.png` : '1.png';
-      await apiRequest('/profile', 'PUT', { profile_image: fileName });
-    } catch (error) {
-      console.error("Failed to update avatar:", error);
-      alert("บันทึกรูปไม่สำเร็จ ลองใหม่อีกครั้งนะครับ 😅");
-    }
-  };
-
-  useEffect(() => {
-    if (isColorModalOpen || isAvatarModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [isColorModalOpen, isAvatarModalOpen]);
-
-  if (!userData) {
-    return (
-      <div className="profile-page">
-        <div className="doodle-box loading-box">Loading Profile... ⏳</div>
-      </div>
-    );
-  }
+  if (!userData) return <div className="profile-page"><div className="doodle-box loading-box">Loading Profile... ⏳</div></div>;
 
   return (
     <div className="profile-page">
       <div className="profile-container">
-        {/* ✨ คอลัมน์ซ้าย */}
+        
         <div className="left-panel-wrapper">
           <LeftPanel
             navigate={navigate}
@@ -177,75 +150,41 @@ const Profile = () => {
             isOwnProfile={checkIsOwnProfile}
           />
 
-          <div className="feed-carousel-section">
-            {currentPostIndex > 0 && imagePosts.length > 0 && (
-              <button
-                type="button"
-                className="carousel-btn prev-btn"
-                onClick={() => setCurrentPostIndex(prev => prev - 1)}
-              >
-                <TbChevronLeft size={28} />
-              </button>
-            )}
-
-            <div className="carousel-content">
-              {imagePosts.length > 0 ? (
+          <div className="unified-feed-section" style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
+            {userPosts.length > 0 ? (
+              userPosts.map((post) => (
                 <PostCard
-                  postId={imagePosts[currentPostIndex]._id}
-                  author={imagePosts[currentPostIndex].author_username}
-                  image_author={imagePosts[currentPostIndex].author_image || userData?.profile_image}
-                  time={formatDate(imagePosts[currentPostIndex].create_at)}
-                  text={imagePosts[currentPostIndex].text}
-                  hasImage={true}
-                  imageUrl={imagePosts[currentPostIndex].image_url}
-                  likes={imagePosts[currentPostIndex].likes || []}
-                  comments={imagePosts[currentPostIndex].comment || []}
+                  key={post._id}
+                  postId={post._id}
+                  author={post.author_username}
+                  image_author={post.author_image || userData?.profile_image}
+                  time={formatDate(post.create_at)}
+                  text={post.text}
+                  hasImage={!!post.image_url}
+                  imageUrl={post.image_url}
+                  likes={post.likes || []}
+                  comments={post.comment || []}
                   currentUser={myLoggedInUsername}
+                  onPostDeleted={(deletedId) => setUserPosts(prev => prev.filter(p => p._id !== deletedId))}
                 />
-              ) : (
-                <div className="doodle-box loading-box">ยังไม่มีโพสต์รูปภาพเลย 📸</div>
-              )}
-            </div>
-
-            {currentPostIndex < imagePosts.length - 1 && imagePosts.length > 0 && (
-              <button
-                type="button"
-                className="carousel-btn next-btn"
-                onClick={() => setCurrentPostIndex(prev => prev + 1)}
-              >
-                <TbChevronRight size={28} />
-              </button>
+              ))
+            ) : (
+              <div className="wooden-box" style={{ textAlign: 'center', padding: '40px', color: '#5C4033' }}>
+                <h3>ยังไม่มีโพสต์เลย 🍻</h3>
+              </div>
             )}
           </div>
         </div>
 
-        {/* ✨ คอลัมน์ขวา */}
+        {/* ✨ คอลัมน์ขวา (เพิ่ม Widget ให้ดูไม่โล่ง) */}
         <div className="right-panel-wrapper">
-          <MyPosts
-            textPosts={textPosts}
-            username={userData.username}
-            userAvatar={userData.profile_image}
-          />
+           <RightPanel userPosts={userPosts} userData={userData} />
         </div>
+
       </div>
 
-      {isColorModalOpen && (
-        <BannerColorModal 
-          setIsColorModalOpen={setIsColorModalOpen} 
-          bannerColor={bannerColor} 
-          setBannerColor={handleBannerChange} 
-          bannerPresets={BANNER_PRESETS} 
-        />
-      )}
-      {isAvatarModalOpen && (
-        <AvatarModal 
-          setIsAvatarModalOpen={setIsAvatarModalOpen} 
-          avatarPresets={avatarPresets} 
-          avatarImage={avatarImage} 
-          setAvatarImage={setAvatarImage} 
-          handleUpdateAvatar={handleUpdateAvatar} 
-        />
-      )}
+      {isColorModalOpen && <BannerColorModal setIsColorModalOpen={setIsColorModalOpen} bannerColor={bannerColor} setBannerColor={handleBannerChange} bannerPresets={BANNER_PRESETS} />}
+      {isAvatarModalOpen && <AvatarModal setIsAvatarModalOpen={setIsAvatarModalOpen} avatarPresets={avatarPresets} avatarImage={avatarImage} setAvatarImage={setAvatarImage} handleUpdateAvatar={handleUpdateAvatar} />}
     </div>
   );
 };
