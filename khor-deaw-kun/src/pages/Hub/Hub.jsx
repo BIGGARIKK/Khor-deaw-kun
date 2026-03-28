@@ -10,7 +10,6 @@ function Hub() {
     const [loading, setLoading] = useState(true);
 
     const currentUser = localStorage.getItem('username') || 'Guest';
-    const token = localStorage.getItem('access_token'); 
 
     // ==========================================
     // 🌟 State สำหรับจัดการ Popup สร้างห้อง
@@ -20,6 +19,25 @@ function Hub() {
     const [newMaxPlayers, setNewMaxPlayers] = useState(6);
     const [newIsPrivate, setNewIsPrivate] = useState(false);
     const [newPassword, setNewPassword] = useState('');
+
+    // ==========================================
+    // 🔐 State สำหรับจัดการ Popup ใส่รหัสเข้าห้อง
+    // ==========================================
+    const [showJoinModal, setShowJoinModal] = useState(false);
+    const [joinRoomTarget, setJoinRoomTarget] = useState(null);
+    const [joinPassword, setJoinPassword] = useState('');
+
+    // ==========================================
+    // 🚨 State สำหรับจัดการ Popup แจ้งเตือน Error
+    // ==========================================
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    // ฟังก์ชันช่วยเปิดแจ้งเตือนแทน alert()
+    const showError = (msg) => {
+        setErrorMessage(msg);
+        setShowErrorModal(true);
+    };
 
     // ==========================================
     // 🔄 ดึงข้อมูลห้องทั้งหมดจาก Backend
@@ -72,16 +90,31 @@ function Hub() {
         if (!searchId) return;
         const foundRoom = rooms.find(r => r.room_id === searchId);
         if (foundRoom) {
-            handleJoinRoom(foundRoom);
+            handleJoinClick(foundRoom);
         } else {
-            alert("❌ ไม่พบเลขโต๊ะนี้ในระบบครับ!");
+            showError("❌ ไม่พบเลขโต๊ะนี้ในระบบครับ!");
         }
     };
 
     // ==========================================
-    // 🚪 ระบบเข้าห้อง (Join Room)
+    // 🚪 จัดการปุ่ม Join (แยกแยะ Public/Private)
     // ==========================================
-    const handleJoinRoom = async (room) => {
+    const handleJoinClick = (room) => {
+        if (room.status === 'private') {
+            // ถ้าเป็นห้อง Private ให้เปิด Modal กรอกรหัส
+            setJoinRoomTarget(room);
+            setJoinPassword('');
+            setShowJoinModal(true);
+        } else {
+            // ถ้าเป็น Public ให้ยิง API เข้าห้องเลย
+            executeJoinRoom(room, '');
+        }
+    };
+
+    // ==========================================
+    // 🚀 ยิง API เข้าห้อง (ใช้ทั้ง Public และ Private)
+    // ==========================================
+    const executeJoinRoom = async (room, password) => {
         const userString = localStorage.getItem('user');
         let currentToken = null;
 
@@ -95,15 +128,9 @@ function Hub() {
         }
 
         if (!currentToken) {
-            alert("กรุณาล็อกอินใหม่ครับ เซสชันหมดอายุ 🍻");
+            showError("กรุณาล็อกอินใหม่ครับ เซสชันหมดอายุ 🍻");
             navigate('/signin');
             return;
-        }
-
-        let password = '';
-        if (room.status === 'private') {
-            password = prompt(`โต๊ะนี้เป็นโต๊ะส่วนตัว (Private)\nกรุณากรอกรหัสผ่านสำหรับห้อง ${room.room_name}:`);
-            if (password === null) return; 
         }
 
         try {
@@ -119,12 +146,14 @@ function Hub() {
             const data = await response.json();
 
             if (response.ok) {
+                setShowJoinModal(false); // ปิดหน้าต่างถ้าเข้าสำเร็จ
                 navigate(`/room/${room.room_id}`); 
             } else {
-                alert(`❌ เข้าห้องไม่ได้: ${data.message}`);
+                showError(`❌ เข้าห้องไม่ได้: ${data.message}`);
+                setJoinPassword(''); // เคลียร์รหัสผ่านให้กรอกใหม่
             }
         } catch (error) {
-            alert("❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+            showError("❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
         }
     };
 
@@ -145,13 +174,13 @@ function Hub() {
         }
 
         if (!currentToken || currentToken === 'null' || currentToken === 'undefined') {
-            alert("คุณยังไม่ได้ล็อกอิน หรือเซสชันหมดอายุ! กรุณาล็อกอินใหม่ครับ 🍻");
+            showError("คุณยังไม่ได้ล็อกอิน หรือเซสชันหมดอายุ! กรุณาล็อกอินใหม่ครับ 🍻");
             navigate('/signin'); 
             return;
         }
 
         if (!newRoomName.trim()) {
-            alert("กรุณาตั้งชื่อโต๊ะด้วยครับ!");
+            showError("กรุณาตั้งชื่อโต๊ะด้วยครับ!");
             return;
         }
 
@@ -176,10 +205,10 @@ function Hub() {
                 navigate(`/room/${data.room_id}`); 
                 localStorage.setItem('activeRoomId', data.room_id);
             } else {
-                alert("❌ สร้างห้องไม่สำเร็จ: " + (data.message || 'เกิดข้อผิดพลาด'));
+                showError("❌ สร้างห้องไม่สำเร็จ: " + (data.message || 'เกิดข้อผิดพลาด'));
             }
         } catch (error) {
-            alert("❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+            showError("❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
         }
     };
 
@@ -191,12 +220,11 @@ function Hub() {
         setShowCreateModal(true);
     };
 
-    // 🌟 พระเอกของงานนี้: กรองเอาเฉพาะห้องที่มีคนอยู่ (players.length > 0)
+    // 🌟 กรองเอาเฉพาะห้องที่มีคนอยู่
     const activeRooms = rooms.filter(room => room.players && room.players.length > 0);
 
     return (
         <div className="room-selection-bg">
-
             <div className="header-container">
                 <h1 className="page-title">Select Your Table 🍻</h1>
                 <p className="page-subtitle">หาโต๊ะที่ใช่ ในบรรยากาศที่ชอบ</p>
@@ -223,7 +251,6 @@ function Hub() {
             </div>
 
             <div className="room-cards-list">
-                {/* 🌟 เช็คและแสดงผลจาก activeRooms แทน rooms */}
                 {loading ? (
                     <div className="loading-text" style={{textAlign: 'center', marginTop: '50px'}}>กำลังจัดโต๊ะ... 🥩</div>
                 ) : activeRooms.length === 0 ? (
@@ -251,7 +278,7 @@ function Hub() {
                                     </div>
                                     <button 
                                         className="join-btn-small"
-                                        onClick={() => handleJoinRoom(room)}
+                                        onClick={() => handleJoinClick(room)}
                                         disabled={room.players.length >= room.max_players}
                                     >
                                         {room.players.length >= room.max_players ? 'Full' : 'Join'}
@@ -265,7 +292,9 @@ function Hub() {
 
             <BottomBar />
 
-            {/* MODAL (Popup เปิดโต๊ะใหม่) */}
+            {/* ========================================== */}
+            {/* MODAL 1: Popup เปิดโต๊ะใหม่ */}
+            {/* ========================================== */}
             {showCreateModal && (
                 <div className="modal-overlay">
                     <div className="modal-box">
@@ -324,6 +353,64 @@ function Hub() {
                     </div>
                 </div>
             )}
+
+            {/* ========================================== */}
+            {/* MODAL 2: Popup กรอกรหัสผ่าน (Join Private Room) */}
+            {/* ========================================== */}
+            {showJoinModal && joinRoomTarget && (
+                <div className="modal-overlay">
+                    <div className="modal-box">
+                        <h2>🔒 ใส่รหัสผ่านเข้าห้อง</h2>
+                        <p style={{marginBottom: '15px', color: '#ccc'}}>
+                            กรุณากรอกรหัสผ่านสำหรับห้อง <strong>{joinRoomTarget.room_name}</strong>
+                        </p>
+                        
+                        <div className="form-group">
+                            <input 
+                                type="password" 
+                                value={joinPassword} 
+                                onChange={(e) => setJoinPassword(e.target.value)}
+                                placeholder="ใส่รหัสผ่าน..."
+                                autoFocus
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') executeJoinRoom(joinRoomTarget, joinPassword);
+                                }}
+                            />
+                        </div>
+
+                        <div className="modal-actions">
+                            <button className="cancel-btn" onClick={() => setShowJoinModal(false)}>ยกเลิก</button>
+                            <button className="confirm-btn" onClick={() => executeJoinRoom(joinRoomTarget, joinPassword)}>ตกลง</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ========================================== */}
+            {/* MODAL 3: Popup แจ้งเตือนข้อผิดพลาด (Error Modal) */}
+            {/* ========================================== */}
+            {showErrorModal && (
+                <div className="modal-overlay">
+                    <div className="modal-box" style={{ textAlign: 'center', maxWidth: '320px' }}>
+                        <div style={{ fontSize: '40px', marginBottom: '10px' }}>❌</div>
+                        <h3 style={{ marginTop: '0', color: '#ff4d4f' }}>แจ้งเตือน</h3>
+                        <p style={{ margin: '15px 0 25px 0', color: '#333', fontSize: '1rem', lineHeight: '1.5' }}>
+                            {errorMessage}
+                        </p>
+                        
+                        <div className="modal-actions" style={{ justifyContent: 'center' }}>
+                            <button 
+                                className="confirm-btn" 
+                                style={{ backgroundColor: '#ff4d4f', width: '100%', color: 'white' }}
+                                onClick={() => setShowErrorModal(false)}
+                            >
+                                ตกลง
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

@@ -369,7 +369,7 @@
 }
 
 /* =========================================
-   🌟 MODAL (Popup หน้าต่างสร้างห้อง)
+   🌟 MODAL (Popup หน้าต่างสร้างห้อง & ใส่รหัส) - ปรับธีมไม้
    ========================================= */
 .modal-overlay {
     position: fixed;
@@ -386,23 +386,47 @@
 }
 
 .modal-box {
-    background-color: #FFF9F0;
+    position: relative;
+    background-color: #5C4033; /* เปลี่ยนเป็นสีไม้เข้ม ให้เข้ากับ Search Board */
     border: 4px solid #3E2723;
     border-radius: 20px;
     padding: 25px;
     width: 90%;
     max-width: 400px;
-    box-shadow: 8px 8px 0px #3E2723;
+    box-shadow: 0px 8px 0px #2A1B15; /* แก้ไขเงาให้เข้ากับป้ายไม้ */
     display: flex;
     flex-direction: column;
     gap: 15px;
     animation: slideUp 0.3s ease-out;
+    overflow: hidden; /* เพื่อไม่ให้ลายไม้ทะลุขอบ */
+    z-index: 1;
+}
+
+/* เพิ่มลายไม้ให้ Modal */
+.modal-box::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('src/assets/Hub/cartoon-wood-pattern.avif'); 
+    background-repeat: repeat;
+    background-size: 250px;
+    z-index: -1; 
+    opacity: 0.35; 
+    pointer-events: none;
 }
 
 .modal-box h2 {
-    color: #3E2723;
+    color: #FFD285; /* ตัวอักษรสีเหลืองทอง */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* เพิ่มเงาให้ข้อความเด้งขึ้นมา */
     margin: 0 0 10px 0;
     text-align: center;
+}
+
+/* ข้อความบรรยาย เช่น "กรุณากรอกรหัสผ่าน..." */
+.modal-box p {
+    color: white !important; 
+    text-shadow: 1px 1px 2px #3E2723;
+    margin-top: 0;
 }
 
 .form-group {
@@ -413,7 +437,8 @@
 
 .form-group label {
     font-weight: bold;
-    color: #3E2723;
+    color: #FFD285; /* เปลี่ยนจากสีน้ำตาลเข้มเป็นสีเหลืองทอง */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
 .form-group input[type="text"],
@@ -425,12 +450,16 @@
     font-size: 1rem;
     font-family: inherit;
     outline: none;
+    background: rgba(255, 255, 255, 0.9); /* ให้กล่องกรอกดูใสๆ เหมือนช่องค้นหา */
+    color: #3E2723;
+    box-shadow: inset 0px 4px 4px rgba(0,0,0,0.1);
 }
 
 .form-group input:focus,
 .form-group select:focus {
     border-color: #F48C2A;
-    background-color: #FFFAEC;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(244, 140, 42, 0.5);
 }
 
 .checkbox-group label {
@@ -438,6 +467,7 @@
     align-items: center;
     gap: 10px;
     cursor: pointer;
+    color: white; /* เปลี่ยนตัวอักษร Checkbox ให้เป็นสีขาว */
 }
 
 .checkbox-group input[type="checkbox"] {
@@ -470,6 +500,7 @@
     box-shadow: 0px 0px 0px #3E2723;
 }
 
+/* ปุ่มสีเดิมยังดูสวยและเข้ากับป้ายไม้อยู่ครับ */
 .cancel-btn {
     background-color: #FFDEE4;
     color: #3E2723;
