@@ -262,102 +262,138 @@
    💬 RIGHT CHAT (แชทบีชฝั่งขวา)
    ========================================= */
 /* =========================================
-   💬 RIGHT CHAT (แชทบีชฝั่งขวา - ตีมการ์ตูนน่ารัก)
+   💬 RIGHT CHAT (แชทบีชและรายชื่อสมาชิกฝั่งขวา)
    ========================================= */
 .room-chat-container {
     width: 380px;
     height: 75vh;
     box-sizing: border-box;
-    /* 🌟 ใช้สีพื้นหลังโทนครีมอ่อนๆ เข้ากับสีไม้ */
-    background-color: #FDF5E6; 
+    background-color: #FDF5E6; /* สีพื้นหลังกล่องหลัก */
     border: 4px solid #3E2723;
     border-radius: 20px;
-    
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    
-    /* เงาหนาๆ สไตล์ป๊อปอัปเกม */
-    box-shadow: 8px 8px 0px #3E2723;
+    box-shadow: 8px 8px 0px #3E2723; /* เงาหนาๆ สไตล์เกม */
 }
 
-/* 🌟 เอา Header กลับมา แล้วแต่งให้เป็นแถบสีส้มด้านบน */
-.chat-header {
-    background-color: #FFD285;
-    padding: 15px;
-    border-bottom: 4px solid #3E2723;
-    text-align: center;
+/* =========================================
+   🗂️ ส่วนหัวของกล่องแชท (Tabs Navigation)
+   ========================================= */
+.chat-tabs {
+    display: flex;
+    border-bottom: 3px solid #3E2723;
+    background-color: #FFDEE4;
 }
 
-.chat-header h3 {
-    margin: 0;
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #666;
+    cursor: pointer;
+    transition: 0.2s;
+    outline: none;
+    font-family: inherit;
+}
+
+.tab-btn:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.tab-btn.active {
+    background-color: #FFF9F0;
     color: #3E2723;
-    font-size: 1.5rem;
-    text-shadow: 1px 1px 0px #fff; /* ขอบตัวหนังสือสีขาวให้เด้งๆ */
+    border-bottom: 4px solid #F48C2A;
 }
 
-/* พื้นที่แสดงข้อความ */
+/* =========================================
+   💬 แท็บแชท (Chat Tab)
+   ========================================= */
 .chat-messages {
     flex: 1;
-    padding: 20px;
-    background-color: #FFF9F0; /* สีพื้นหลังแชทสว่างขึ้นนิดนึงให้อ่านง่าย */
     overflow-y: auto;
+    padding: 15px;
+    background-color: #FFF9F0;
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    flex-direction: column; 
+    gap: 12px;
 }
 
-/* 🌟 แต่ง Scrollbar แชทให้เข้าตีม (ถ้าเบราว์เซอร์รองรับ) */
-.chat-messages::-webkit-scrollbar {
-    width: 10px;
-}
-.chat-messages::-webkit-scrollbar-track {
-    background: transparent;
-}
+/* แต่ง Scrollbar แชทให้เข้าตีม */
+.chat-messages::-webkit-scrollbar { width: 10px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
 .chat-messages::-webkit-scrollbar-thumb {
     background: #F48C2A;
     border-radius: 10px;
     border: 2px solid #3E2723;
 }
 
-/* =========================================
-   🎈 CHAT BUBBLES (ลูกโป่งข้อความ)
-   ========================================= */
-
-/* 🌟 ลูกโป่งข้อความของผู้เล่น */
-.chat-bubble.user {
-    font-size: 1.1rem;
-    line-height: 1.4;
-    background-color: #fff;
-    padding: 12px 18px;
-    
-    /* 🌟 ทำให้มุมซ้ายล่างเหลี่ยมๆ เหมือนเป็นหางลูกโป่งคำพูด */
-    border-radius: 20px 20px 20px 4px; 
-    border: 3px solid #3E2723;
-    
-    width: fit-content;
-    max-width: 85%;
-    color: #3E2723;
-    box-shadow: 3px 3px 0px rgba(62, 39, 35, 0.15);
+/* 📦 กรอบห่อหุ้มแชทแต่ละอัน (ตัวกำหนดซ้าย-ขวา) */
+.chat-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
 }
 
-.chat-bubble.user strong {
-    font-size: 0.95rem;
-    display: block;
+/* 🌟 ฝั่งเรา (ชิดขวา) */
+.chat-wrapper.is-me {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+/* 👥 ฝั่งเพื่อน (ชิดซ้าย) */
+.chat-wrapper.is-other {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+
+/* ชื่อคนส่ง (ตัวเล็กๆ บนกล่องข้อความ) */
+.chat-sender {
+    font-size: 0.75rem;
+    color: #888;
     margin-bottom: 4px;
-    color: #F48C2A; /* ชื่อคนพิมพ์สีส้มเด่นๆ */
-    border-bottom: 2px dashed #E0D4C3; /* เส้นปะคั่นชื่อกับข้อความ */
-    padding-bottom: 4px;
+    font-weight: bold;
 }
 
-/* 🌟 ข้อความแจ้งเตือน (เข้าร่วมห้อง) ทำเป็นป้ายประกาศ */
+/* 🎨 ดีไซน์ตัวกล่องข้อความ (Bubbles) */
+.chat-bubble.user {
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 1rem;
+    line-height: 1.4;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+    word-break: break-word;
+    border: 2px solid #3E2723;
+}
+
+/* 🌟 กล่องข้อความของเรา (เด่นๆ สีส้มหมูกระทะ) */
+.chat-wrapper.is-me .chat-bubble.user {
+    background-color: #F48C2A; 
+    color: #1A1A1A;
+    font-weight: bold;
+    border-bottom-right-radius: 4px; /* หางลูกโป่งฝั่งขวา */
+}
+
+/* 👥 กล่องข้อความของเพื่อน (สีขาวคลีนๆ) */
+.chat-wrapper.is-other .chat-bubble.user {
+    background-color: #FFFFFF;
+    color: #3E2723;
+    border-bottom-left-radius: 4px; /* หางลูกโป่งฝั่งซ้าย */
+}
+
+/* 🤖 ข้อความแจ้งเตือนระบบ (อยู่ตรงกลาง) */
 .chat-bubble.system {
+    align-self: center;
     color: #D8435A;
     font-weight: bold;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     text-align: center;
     background-color: #FFDEE4;
-    border: 2px dashed #D8435A; /* กรอบเส้นปะสีชมพู */
+    border: 2px dashed #D8435A;
     border-radius: 20px;
     margin: 5px auto;
     padding: 6px 15px;
@@ -365,32 +401,26 @@
 }
 
 /* =========================================
-   ⌨️ CHAT INPUT (กล่องพิมพ์แชทด้านล่าง)
-   ========================================= */
-/* =========================================
-   ⌨️ CHAT INPUT (แก้ปัญหาล้นขอบ / จัดระเบียบใหม่)
+   ⌨️ CHAT INPUT (กล่องพิมพ์แชท)
    ========================================= */
 .chat-input-area {
     display: flex;
-    padding: 15px;
+    padding: 12px;
+    background-color: #FFF0CC;
+    border-top: 3px solid #3E2723;
     gap: 10px;
-    background-color: transparent; /* ให้พื้นหลังกลืนไปกับลายไม้ */
-    border-top: 4px solid #3E2723;
-    width: 100%;
-    box-sizing: border-box; /* 🌟 สำคัญมาก: ป้องกันไม่ให้ Padding ดันกล่องจนทะลุ */
 }
 
 .chat-input-area input {
-    flex: 1; /* ให้ยืดเต็มพื้นที่ที่เหลือ */
-    min-width: 0; /* 🌟 ตัวทีเด็ด!: ป้องกันไม่ให้ Input ดันกรอบจนปุ่ม Send ตกขอบ */
-    padding: 12px 15px;
+    flex: 1;
+    min-width: 0;
+    padding: 10px 15px;
     border: 3px solid #3E2723;
     border-radius: 15px;
     font-family: inherit;
-    font-size: 1.1rem;
+    font-size: 1rem;
     outline: none;
-    box-sizing: border-box;
-    box-shadow: inset 2px 2px 0px rgba(0,0,0,0.05); /* เงาจมด้านในนิดๆ */
+    box-shadow: inset 2px 2px 0px rgba(0,0,0,0.05);
 }
 
 .chat-input-area input:focus {
@@ -399,23 +429,93 @@
 }
 
 .chat-input-area button {
-    flex-shrink: 0; /* 🌟 ห้ามปุ่มหดตัว หรือเบี้ยวเด็ดขาด */
-    background-color: #F48C2A; /* ปุ่มสีส้มเข้ม */
+    flex-shrink: 0;
+    background-color: #F48C2A;
     color: #1A1A1A;
     border: 3px solid #3E2723;
     border-radius: 15px;
-    padding: 0 18px;
+    padding: 0 15px;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
     box-shadow: 3px 3px 0px #3E2723;
     transition: 0.1s;
-    box-sizing: border-box;
 }
 
 .chat-input-area button:active {
     transform: translateY(3px);
     box-shadow: 0px 0px 0px #3E2723;
+}
+
+/* =========================================
+   👥 แท็บรายชื่อสมาชิก (Members List)
+   ========================================= */
+.members-list-area {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #FFF9F0;
+    padding: 15px;
+}
+
+.members-instruction {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.player-badges-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.member-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background-color: white;
+    border: 2px solid #3E2723;
+    border-radius: 12px;
+    box-shadow: 2px 2px 0px rgba(62, 39, 35, 0.2);
+}
+
+/* 🌟 ไฮไลท์การ์ดที่เป็นชื่อเรา */
+.member-card.is-me {
+    background-color: #FFF0CC;
+    border-color: #F48C2A;
+}
+
+.member-avatar {
+    width: 35px;
+    height: 35px;
+    background-color: #3E2723;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.member-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.member-name {
+    font-weight: bold;
+    color: #3E2723;
+    font-size: 1.05rem;
+}
+
+.member-status {
+    font-size: 0.8rem;
+    color: #84E045;
+    font-weight: bold;
 }
 /* =========================================
    🛑 ซ่อน Scrollbar ของเมนู (แต่ยังเลื่อนได้ปกติ)
@@ -489,60 +589,106 @@
 }
 
 /* =========================================
-   🍽️ & 🗑️ ACTION ZONES (จาน และ ถังขยะ)
+   🍽️ โซนจานข้าวเพื่อน (ลากหมูมาป้อน)
    ========================================= */
-.action-zones-container {
+.players-action-board {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 30px;
-    margin-top: 20px;
+    flex-wrap: wrap; /* เผื่อคนเยอะจะได้ปัดลงบรรทัดใหม่ */
+    gap: 20px;
+    margin-top: 30px;
     width: 100%;
 }
 
-.drop-zone {
-    width: 140px;
-    height: 140px;
-    border: 4px dashed #3E2723;
-    border-radius: 20px;
+.player-plate-zone {
+    width: 110px;
+    height: 110px;
+    background-color: #FAFAFA;
+    border: 4px solid #E0D4C3;
+    border-radius: 50%; /* ทำให้กลมเหมือนจาน */
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    background-color: rgba(255, 255, 255, 0.7);
-    transition: 0.2s;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 
+        inset 0 -10px 15px rgba(0,0,0,0.05), /* เงาด้านในให้ดูเป็นหลุมจาน */
+        4px 4px 0px rgba(62, 39, 35, 0.2); /* เงาด้านนอกสไตล์การ์ตูน */
 }
 
-/* ตอนลากของมาจ่อ ให้กล่องมันขยาย+เปลี่ยนสี */
-.drop-zone:hover {
-    transform: scale(1.1);
+/* 🌟 จานของเราเอง (ไฮไลท์สีเด่นๆ) */
+.player-plate-zone.is-me {
+    background-color: #FFF0CC;
+    border-color: #F48C2A;
 }
 
-.plate-zone {
-    background-color: #E8F8DE; /* สีเขียวอ่อน น่ากิน */
+/* อนิเมชั่นตอนลากเนื้อหมูมาจ่อที่จาน (เหมือนจานอ้าปากรับ) */
+.player-plate-zone:hover {
+    transform: scale(1.15) translateY(-10px);
     border-color: #84E045;
-}
-.plate-zone:hover { box-shadow: 0 0 15px rgba(132, 224, 69, 0.6); }
-
-.trash-zone {
-    background-color: #FFDEE4; /* สีแดงอ่อน อันตราย */
-    border-color: #FF6B81;
-}
-.trash-zone:hover { box-shadow: 0 0 15px rgba(255, 107, 129, 0.6); }
-
-.zone-icon {
-    font-size: 3rem;
-    margin-bottom: 5px;
-    pointer-events: none; /* ห้ามเมาส์โดนไอคอนตอน Drop */
+    background-color: #E8F8DE;
+    box-shadow: 
+        inset 0 -10px 15px rgba(0,0,0,0.05),
+        0px 15px 0px rgba(132, 224, 69, 0.3);
 }
 
-.zone-text {
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: #3E2723;
+.plate-icon {
+    font-size: 2.5rem;
     pointer-events: none;
+    margin-bottom: -5px;
+    filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.2));
 }
 
+.plate-owner-name {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #3E2723;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+
+.plate-tag {
+    position: absolute;
+    bottom: -15px;
+    background-color: #F48C2A;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 10px;
+    border-radius: 10px;
+    border: 2px solid #3E2723;
+    box-shadow: 2px 2px 0px #3E2723;
+}
+
+/* =========================================
+   🖼️ รูปโปรไฟล์ในจานหมูกระทะ
+   ========================================= */
+.plate-profile-img {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%; /* ทำให้รูปกลมดิก */
+    object-fit: cover; /* จัดทรงรูปไม่ให้เบี้ยว */
+    border: 3px solid #3E2723;
+    pointer-events: none; /* ห้ามเมาส์ไปติดรูปตอนลากหมูใส่จาน */
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    margin-bottom: 2px;
+}
+
+/* ทำให้ตอนโฮเวอร์ จานและรูปเด้งขึ้นมาพร้อมกัน */
+.player-plate-zone:hover .plate-profile-img {
+    transform: scale(1.1);
+    transition: 0.2s;
+    border-color: #F48C2A;
+}
 /* =========================================
    📊 MEAT STATUS BADGE (ป้าย % สุก และ เตือนไหม้)
    ========================================= */
@@ -694,3 +840,4 @@
     transform: translateY(3px);
     box-shadow: 0px 0px 0px #3E2723;
 }
+

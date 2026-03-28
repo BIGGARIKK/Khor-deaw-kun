@@ -1,13 +1,57 @@
 import React, { useEffect } from 'react';
-import panImage from '../../assets/Mookata/pan.png'; // 🌟 เช็ค Path รูปกระทะให้ตรงกับของคุณนะ
+import panImage from '../../assets/Mookata/pan.png';
 
-function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRotation, currentFlip, players, setPlayers }) {
-    
+function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRotation, currentFlip, players, socket, roomId }) {
+
+    // (ดึงชื่อตัวเองมาเช็คว่าจานไหนเป็นของเรา)
+    const myName = localStorage.getItem('username') || 'Guest';
+
     // ==========================================
-    // ⏲️ ระบบจับเวลาสุก/ไหม้ (ทำงานทุก 1 วิ)
+    // 👂 1. ดักฟังความเคลื่อนไหวจากเพื่อนในห้อง!
     // ==========================================
     useEffect(() => {
-        const cookTimer = setInterval(() => {
+        if (!socket) return;
+
+        socket.on('meat_added', (newItem) => {
+            setItemsOnPan(prev => {
+                if (prev.find(item => item.uniqueId === newItem.uniqueId)) return prev;
+                return [...prev, newItem];
+            });
+        });
+
+        socket.on('meat_moved', (data) => {
+            setItemsOnPan(prev => prev.map(item =>
+                item.uniqueId === data.uniqueId ? { ...item, x: data.x, y: data.y } : item
+            ));
+        });
+
+        socket.on('meat_flipped', (data) => {
+            setItemsOnPan(prev => prev.map(item => {
+                if (item.uniqueId === data.uniqueId) {
+                    return { ...item, activeSide: item.activeSide === 'A' ? 'B' : 'A', flip: (item.flip || 1) * -1 };
+                }
+                return item;
+            }));
+        });
+
+        socket.on('meat_removed', (data) => {
+            setItemsOnPan(prev => prev.filter(item => item.uniqueId !== data.uniqueId));
+        });
+
+        return () => {
+            socket.off('meat_added');
+            socket.off('meat_moved');
+            socket.off('meat_flipped');
+            socket.off('meat_removed');
+        };
+    }, [socket, setItemsOnPan]);
+
+    // ==========================================
+    // 🕰️ ระบบจับเวลาสุก/ไหม้
+    // ==========================================
+    useEffect(() => {
+        if (!socket) return;
+        socket.on('server_tick', () => {
             setItemsOnPan(prevItems => {
                 if (prevItems.length === 0) return prevItems;
                 return prevItems.map(item => {
@@ -25,15 +69,19 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                     return { ...item, sideA: newSideA, sideB: newSideB, status: newStatus };
                 });
             });
-        }, 1000);
-        return () => clearInterval(cookTimer);
-    }, [setItemsOnPan]);
+        });
+
+        return () => socket.off('server_tick');
+    }, [socket, setItemsOnPan]);
 
     // ==========================================
-    // 🔄 กดคลิกที่หมูเพื่อพลิกด้าน
+    // 🔄 2. พลิกหมู / ขยับหมู / วางหมู
     // ==========================================
     const handleFlipItemOnPan = (e, item) => {
-        e.stopPropagation(); // กันทะลุไปโดนกระทะ
+        e.stopPropagation();
+        if (socket) {
+            socket.emit('flip_meat', { uniqueId: item.uniqueId, room_id: roomId });
+        }
         setItemsOnPan(prevItems => prevItems.map(i => {
             if (i.uniqueId === item.uniqueId) {
                 return { ...i, activeSide: i.activeSide === 'A' ? 'B' : 'A', flip: (i.flip || 1) * -1 };
@@ -42,31 +90,22 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         }));
     };
 
-    // ==========================================
-    // 🤏 ตอนเริ่มจับลากหมูที่อยู่บนเตา
-    // ==========================================
     const handleDragStartPanItem = (e, item) => {
         e.dataTransfer.setData('application/json', JSON.stringify({
-            source: 'pan', // บอกว่าลากมาจากบนเตา
-            uniqueId: item.uniqueId,
-            status: item.status
+            source: 'pan', uniqueId: item.uniqueId, status: item.status
         }));
     };
 
-    const handleDragOver = (e) => e.preventDefault(); 
+    const handleDragOver = (e) => e.preventDefault();
 
-    // คำนวณรัศมีกระทะ ป้องกันหมูลอยนอกเตา
     const isInsidePanArea = (x, y, containerWidth, containerHeight) => {
         const centerX = containerWidth / 2;
         const centerY = containerHeight / 2;
-        const radius = 280; 
+        const radius = 280;
         const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-        return distance <= radius; 
+        return distance <= radius;
     };
 
-    // ==========================================
-    // 🥘 วางหมูลงบนเตา (จากเมนู หรือ ย้ายที่บนเตา)
-    // ==========================================
     const handleDropOnPan = (e) => {
         e.preventDefault();
         const dataString = e.dataTransfer.getData('application/json');
@@ -80,23 +119,25 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         if (!isInsidePanArea(x, y, rect.width, rect.height)) return;
 
         if (droppedData.source === 'pan') {
-            // ย้ายที่หมูชิ้นเดิม
-            setItemsOnPan(prev => prev.map(item => 
+            if (socket) {
+                socket.emit('move_meat', { uniqueId: droppedData.uniqueId, x, y, room_id: roomId });
+            }
+            setItemsOnPan(prev => prev.map(item =>
                 item.uniqueId === droppedData.uniqueId ? { ...item, x, y } : item
             ));
         } else {
-            // วางหมูชิ้นใหม่
             const newItem = {
                 ...droppedData,
-                uniqueId: Date.now(),
+                uniqueId: `meat-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 x, y,
-                sideA: 0, sideB: 0, activeSide: 'A', status: 'raw'
+                sideA: 0, sideB: 0, activeSide: 'A', status: 'raw',
+                room_id: roomId
             };
+            if (socket) socket.emit('add_meat', newItem);
             setItemsOnPan([...itemsOnPan, newItem]);
         }
     };
 
-    // คลิกวางหมูจากเมนู
     const handleDropIngredientClick = (e) => {
         if (!selectedIngredient) return;
         const rect = e.currentTarget.getBoundingClientRect();
@@ -107,51 +148,56 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
 
         const newItem = {
             ...selectedIngredient,
-            uniqueId: Date.now(),
-            x: x,  y: y,
+            uniqueId: `meat-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            x, y,
             rotation: currentRotation,
             flip: currentFlip,
-            sideA: 0, sideB: 0, activeSide: 'A', status: 'raw'
+            sideA: 0, sideB: 0, activeSide: 'A', status: 'raw',
+            room_id: roomId
         };
+
+        if (socket) socket.emit('add_meat', newItem);
         setItemsOnPan([...itemsOnPan, newItem]);
     };
 
     // ==========================================
-    // 🎯 ระบบลากป้อนเพื่อน (Drop to Player)
+    // 🎯 4. คีบกิน/ป้อนเพื่อน ลงจาน!
     // ==========================================
-    const handleDropToPlayer = (e, targetPlayerId) => {
+    const handleDropToPlayer = (e, targetPlayerName) => {
         e.preventDefault();
-        
-        // รับข้อมูลที่ส่งมาจากการลาก
         const dataString = e.dataTransfer.getData('application/json');
         if (!dataString) return;
 
         const data = JSON.parse(dataString);
 
-        // เช็คว่าลากมาจากบนเตาจริงๆ
         if (data.source === 'pan') {
-            const isCooked = data.status === 'cooked';
+            // 🌟 คำนวณคะแนนตามความสุก
+            let pointChange = 0;
+            if (data.status === 'cooked') pointChange = 100; // สุกพอดี อร่อย!
+            else if (data.status === 'burnt') pointChange = -50; // ไหม้! โดนตัดแต้ม
+            else pointChange = -10; // ดิบ! ท้องเสีย โดนหักแต้ม
 
-            // อัปเดตคะแนนคนโดนป้อน!
-            setPlayers(prev => prev.map(p => {
-                if (p.id === targetPlayerId) {
-                    let pointChange = -50; // โทษฐานป้อนของดิบ/ของไหม้ (-50 แต้ม)
-                    if (isCooked) pointChange = 100; // ป้อนของสุกอร่อย (+100 แต้ม)
-                    return { ...p, score: p.score + pointChange };
-                }
-                return p;
-            }));
+            if (socket) {
+                socket.emit('feed_friend', {
+                    targetId: targetPlayerName,
+                    pointChange: pointChange,
+                    room_id: roomId
+                });
 
-            // ลบหมูชิ้นนั้นออกจากเตา
+                socket.emit('remove_meat', {
+                    uniqueId: data.uniqueId,
+                    room_id: roomId
+                });
+            }
+
             setItemsOnPan(prev => prev.filter(i => i.uniqueId !== data.uniqueId));
         }
     };
 
     return (
         <div className="pan-container">
-            {/* โซนเตาหมูกระทะ */}
-            <div 
-                className="mookata-pan-area" 
+            <div
+                className="mookata-pan-area"
                 onClick={handleDropIngredientClick}
                 onDragOver={handleDragOver}
                 onDrop={handleDropOnPan}
@@ -164,13 +210,12 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                     const cookedPercent = Math.min(100, Math.floor(((Math.min(item.sideA, 4) + Math.min(item.sideB, 4)) / 8) * 100));
 
                     return (
-                        <div 
-                            key={item.uniqueId} 
+                        <div
+                            key={item.uniqueId}
                             className="item-on-pan"
                             style={{ position: 'absolute', left: `${item.x}px`, top: `${item.y}px` }}
-                            onClick={(e) => handleFlipItemOnPan(e, item)} 
+                            onClick={(e) => handleFlipItemOnPan(e, item)}
                         >
-                            {/* ป้าย UI บอก % สุก */}
                             <div className="meat-status-badge">
                                 {item.status === 'burnt' ? (
                                     <div className="status-text burnt">💀 ไหม้เกรียม!</div>
@@ -178,8 +223,8 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                                     <>
                                         <div className="status-text">สุก {cookedPercent}%</div>
                                         <div className="progress-mini">
-                                            <div 
-                                                className="progress-fill" 
+                                            <div
+                                                className="progress-fill"
                                                 style={{ width: `${cookedPercent}%`, backgroundColor: cookedPercent === 100 ? '#84E045' : '#F48C2A' }}
                                             ></div>
                                         </div>
@@ -190,38 +235,61 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                                 )}
                             </div>
 
-                            <img 
-                                src={item.image} alt={item.name} 
-                                className={`item-pan-img ${item.status}`} 
-                                draggable="true" 
-                                onDragStart={(e) => handleDragStartPanItem(e, item)} 
-                                style={{ transform: `rotate(${item.rotation || 0}deg) scaleX(${item.flip || 1})` }} 
+                            <img
+                                src={item.image} alt={item.name}
+                                className={`item-pan-img ${item.status}`}
+                                draggable="true"
+                                onDragStart={(e) => handleDragStartPanItem(e, item)}
+                                style={{ transform: `rotate(${item.rotation || 0}deg) scaleX(${item.flip || 1})` }}
                             />
                         </div>
                     );
                 })}
             </div>
-            
-            {/* 🌟 แถว Avatar ของเพื่อนร่วมห้อง */}
+
+            {/* 🌟 โซนจานข้าวของเพื่อนแต่ละคน (ดึงจาก players) */}
+            {/* 🌟 โซนจานข้าวของเพื่อนแต่ละคน */}
             <div className="players-action-board">
-                {players.map(player => (
-                    <div 
-                        key={player.id}
-                        className={`player-drop-zone ${player.isMe ? 'is-me' : ''}`}
-                        onDragOver={handleDragOver}
-                        onDrop={(e) => handleDropToPlayer(e, player.id)}
-                    >
-                        <div className="player-avatar">{player.avatar}</div>
-                        <div className="player-name">{player.name}</div>
-                        <div className={`player-score ${player.score < 0 ? 'negative' : ''}`}>
-                            ⭐ {player.score}
+                {players.map((playerObj, index) => {
+                    // 🌟 ดึงค่าจาก Object ที่ Server ส่งมา
+                    const playerName = playerObj.username;
+                    const playerImg = playerObj.profile_image;
+                    const isMe = playerName === myName;
+
+                    return (
+                        <div
+                            key={index}
+                            className={`player-plate-zone ${isMe ? 'is-me' : ''}`}
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDropToPlayer(e, playerName)}
+                        >
+                            {/* 🌟 เช็คว่ามีรูปไหม ถ้ามีโชว์รูป ถ้าไม่มีโชว์รูปหุ่นจำลอง */}
+                            {playerImg ? (
+                                <img
+                                    src={`../../assets/avatar/${playerImg}`}
+                                    alt={playerName}
+                                    className="plate-profile-img"
+                                    onError={(e) => {
+                                        // 🌟 กันเหนียว เผื่อไฟล์รูปหาย ให้ขึ้นรูปนี้แทน
+                                        e.target.onerror = null;
+                                        e.target.src = 'https://ui-avatars.com/api/?name=' + playerName + '&background=random';
+                                    }}
+                                />
+                            ) : (
+                                <div className="plate-icon">{isMe ? '😋' : '🍽️'}</div>
+                            )}
+
+                            <div className="plate-owner-name">{playerName}</div>
+                            {isMe && <div className="plate-tag">จานของคุณ</div>}
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <div className="pan-controls-mini">
-                <button onClick={() => setItemsOnPan([])}>🧽 ล้างเตา</button>
+                <button onClick={() => {
+                    setItemsOnPan([]);
+                }}>🧽 ล้างเตา</button>
             </div>
         </div>
     );

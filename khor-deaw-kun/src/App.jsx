@@ -29,6 +29,7 @@ function App() {
 
         <Route path="/Hub" element={<Hub />} />
         <Route path="/Mookata" element={<GrillRoom />} />
+        <Route path="/room/:roomId" element={<GrillRoom />} />
       </Routes>
     </BrowserRouter>
   )
