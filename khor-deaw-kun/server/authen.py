@@ -3,30 +3,35 @@ from flask_cors import CORS
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
+from bson.objectid import ObjectId
 import random 
 from datetime import datetime 
-from bson.objectid import ObjectId
 import uuid
-from extensions import socketio
-
 import re
 from collections import Counter
 import string
 
+from extensions import socketio
+import events
+
 app = Flask(__name__)
 CORS(app)
 
-# เชื่อมต่อ Database (ตรวจสอบ URI ให้ถูกต้อง)
+# ==========================================
+# ⚙️ APP CONFIGURATION
+# ==========================================
 app.config["MONGO_URI"] = "mongodb+srv://admin:123@cluster0.azgr14u.mongodb.net/khor_deaw_kun_db"
 app.config["JWT_SECRET_KEY"] = "my-super-secret-key"
+
 jwt = JWTManager(app)
 mongo = PyMongo(app)
 
 socketio.init_app(app)
-
-import events
 events.init_db(mongo)
 
+# ==========================================
+# 🎨 CONSTANTS
+# ==========================================
 BANNER_PRESETS = [
     {"id": 1, "color": "#ffb8b8", "pattern": "repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 15px, transparent 15px, transparent 30px)", "size": "100% 100%"},
     {"id": 2, "color": "#6de6e6", "pattern": "radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%)", "size": "20px 20px", "position": "0 0, 10px 10px"},
@@ -45,7 +50,6 @@ BANNER_PRESETS = [
 # ==========================================
 # 👤 USER SYSTEM (SIGNUP / SIGNIN / PROFILE)
 # ==========================================
-
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
@@ -160,6 +164,7 @@ def update_profile():
         
     if 'vibe_sliders' in data:
         update_fields['vibe_sliders'] = data['vibe_sliders']
+        
     if 'socials' in data:
         update_fields['socials'] = data['socials']
     if 'stories' in data: 
@@ -171,10 +176,57 @@ def update_profile():
         
     return jsonify({'message': 'No data provided to update'}), 400
 
+@app.route('/profile/<username>', methods=['GET'])
+def get_other_profile(username):
+    user = mongo.db.users.find_one({'username': username}, {'_id': 0, 'password': 0})
+    if user:
+        return jsonify(user), 200
+    return jsonify({'message': 'User not found'}), 404
+
+# ==========================================
+# 🤝 FOLLOW SYSTEM
+# ==========================================
+@app.route('/users/<username>/follow', methods=['POST'])
+@jwt_required()
+def toggle_follow(username):
+    current_user = get_jwt_identity() 
+    
+    if current_user == username:
+        return jsonify({'message': 'You cannot follow yourself!'}), 400
+        
+    target_user = mongo.db.users.find_one({'username': username})
+    
+    if not target_user:
+        return jsonify({'message': 'User not found'}), 404
+        
+    if current_user in target_user.get('followers', []):
+        mongo.db.users.update_one(
+            {'username': username},
+            {'$pull': {'followers': current_user}}
+        )
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$pull': {'following': username}}
+        )
+        return jsonify({'message': 'Unfollowed', 'is_following': False}), 200
+    else:
+        mongo.db.users.update_one(
+            {'username': username},
+            {'$push': {'followers': current_user}}
+        )
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$push': {'following': username}}
+        )
+        
+        # 🌟 แจ้งเตือนเมื่อกดติดตาม
+        create_notification(username, current_user, 'follow', 'เริ่มติดตามคุณแล้ว')
+        
+        return jsonify({'message': 'Followed', 'is_following': True}), 200
+
 # ==========================================
 # 📢 POST SYSTEM (CREATE / GET / EDIT / DELETE)
 # ==========================================
-
 @app.route('/posts', methods=['POST'])
 @jwt_required()
 def create_post():
@@ -260,7 +312,6 @@ def update_post(post_id):
 # ==========================================
 # 🍻 INTERACTION (LIKE / COMMENT)
 # ==========================================
-
 @app.route('/posts/<post_id>/like', methods=['POST'])
 @jwt_required()
 def toggle_like(post_id):
@@ -331,9 +382,66 @@ def add_comment(post_id):
     return jsonify({'message': 'Comment added successfully!', 'comment': new_comment}), 201
 
 # ==========================================
+# 🔔 GET NOTIFICATIONS
+# ==========================================
+@app.route('/notifications', methods=['GET'])
+@jwt_required()
+def get_notifications():
+    current_user = get_jwt_identity()
+    
+    # จำกัดรายการให้ดึงมาแค่ 30 รายการล่าสุด ป้องกันโหลดข้อมูลเยอะเกิน
+    notifs_cursor = mongo.db.notifications.find({'recipient_username': current_user}).sort('created_at', -1).limit(30)
+    
+    notifs_list = []
+    unread_count = 0
+    
+    for n in notifs_cursor:
+        n['_id'] = str(n['_id'])
+        if not n.get('is_read', False):
+            unread_count += 1
+        notifs_list.append(n)
+        
+    return jsonify({
+        'notifications': notifs_list,
+        'unread_count': unread_count
+    }), 200
+
+@app.route('/notifications/read', methods=['PUT'])
+@jwt_required()
+def mark_notifications_read():
+    current_user = get_jwt_identity()
+    
+    # อัปเดตรายการที่ยังไม่ได้อ่านให้เปลี่ยนเป็นอ่านแล้วทั้งหมด
+    mongo.db.notifications.update_many(
+        {'recipient_username': current_user, 'is_read': False},
+        {'$set': {'is_read': True}}
+    )
+    return jsonify({'message': 'ทำเครื่องหมายว่าอ่านแล้วทั้งหมด'}), 200
+
+# ==========================================
+# 🔥 TRENDING HASHTAGS
+# ==========================================
+@app.route('/trending', methods=['GET'])
+def get_trending():
+    try:
+        posts = mongo.db.posts.find({}, {"text": 1}).sort("create_at", -1).limit(100)
+        all_tags = []
+        for post in posts:
+            text = post.get('text', '')
+            tags = re.findall(r'#[^\s#]+', text)
+            all_tags.extend(tags)
+            
+        top_tags = Counter(all_tags).most_common(5)
+        trending_data = [{"tag": tag, "count": count} for tag, count in top_tags]
+        
+        return jsonify(trending_data), 200
+    except Exception as e:
+        print(f"Error fetching trending tags: {e}")
+        return jsonify({"error": "Failed to fetch trending"}), 500
+
+# ==========================================
 # 🏠 ROOMS SYSTEM
 # ==========================================
-
 def generate_room_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 

@@ -38,7 +38,6 @@
 
 .user-meta { display: flex; flex-direction: column; }
 .post-username { font-weight: bold; font-size: 1.3rem; }
-.post-username:hover { color: #ffe0c2; cursor: pointer; }
 .post-time { font-size: 0.9rem; opacity: 0.8; font-weight: bold;}
 .menu-container { position: relative; }
 .menu-trigger { cursor: pointer; padding: 5px; border-radius: 50%; transition: 0.2s; }
@@ -327,12 +326,6 @@
     100% { transform: scale(1); opacity: 1; }
 }
 
-
-/* =========================================
-   📸 สไตล์การแก้ไขรูปภาพใน Edit Modal
-   ========================================= */
-
-/* พื้นที่แสดงรูปภาพ */
 .edit-image-preview {
     position: relative;
     width: 100%;
@@ -401,4 +394,25 @@
     background: #FFD285;
     border-color: #f48c2a;
     color: #3E2723;
+}
+
+/* =========================================
+   👤 Profile Click Hover 
+   ========================================= */
+
+/* ให้เมาส์เป็นรูปนิ้วเวลากดที่ชื่อหรือรูป */
+.clickable-profile {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+/* เวลาเอาเมาส์ชี้ให้รูป/ชื่อ ขยับขึ้นนิดนึงแบบมีมิติ */
+.clickable-profile:hover {
+    transform: translateY(-2px);
+}
+
+/* เวลาเอาเมาส์ชี้ ให้ชื่อเพื่อนเปลี่ยนเป็นสีส้มเด่นๆ */
+.clickable-profile:hover .hover-name {
+    color: #F48C2A; 
+    text-decoration: underline; /* ใส่ขีดเส้นใต้ให้รู้ว่าเป็นลิงก์ */
 }
