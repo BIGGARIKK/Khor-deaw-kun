@@ -1,0 +1,154 @@
+/* พื้นหลังดำโปร่งใส คลุมเต็มจอ */
+/* 🌟 1. พื้นหลังดำโปร่งใส คลุมเต็มจอแบบเป๊ะๆ (แก้ปัญหา 100vw เบี้ยว) */
+.noti-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* สีดำโปร่งใส 50% */
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* กันขอบจอมือถือ */
+    box-sizing: border-box;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* 🌟 2. ตัวกล่องที่จะเด้งอยู่ตรงกลาง (ล้างค่า margin ที่กวนอยู่ทิ้งไป) */
+.noti-modal-content {
+    background-color: #e4aa40;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 !important; /* 🚨 สำคัญมาก: บังคับล้าง margin จากคลาส .wooden-box */
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+}
+
+/* ... โค้ดส่วนอื่นๆ (เช่น .noti-header, .noti-list) ปล่อยไว้เหมือนเดิมได้เลยครับ ... */
+
+/* ส่วนหัวกระดาษ */
+.noti-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 2px solid #3E2723;
+    background-color: #fff0cc; /* สีพื้นหัวตารางน่ารักๆ */
+}
+
+.noti-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #3E2723;
+}
+
+/* ปุ่มกากบาทปิด */
+.noti-close-btn {
+    background: transparent;
+    border: none;
+    color: #3E2723;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.noti-close-btn:hover {
+    background: rgba(62, 39, 35, 0.1);
+}
+
+/* รายการแจ้งเตือน */
+.noti-list {
+    max-height: 60vh; /* ให้ความสูงมากสุดแค่ 60% ของจอ จะได้ไม่ล้น */
+    overflow-y: auto;
+    padding: 10px 0;
+}
+
+.noti-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-bottom: 1px dashed #e0e0e0;
+    transition: background 0.2s;
+}
+
+.noti-item:last-child {
+    border-bottom: none;
+}
+
+.noti-item:hover {
+    background-color: rgba(244, 140, 42, 0.05);
+}
+
+.noti-item.unread {
+    background-color: rgba(132, 224, 69, 0.1); /* สีเขียวอ่อนสำหรับอันที่ยังไม่อ่าน */
+}
+
+.noti-icon {
+    font-size: 1.5rem;
+    background: white;
+    min-width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #d7ccc8;
+}
+
+.noti-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #1A1A1A;
+    line-height: 1.4;
+}
+
+.noti-content strong {
+    color: #D8435A;
+}
+
+.noti-time {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 4px;
+    display: block;
+}
+
+.noti-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #84E045;
+    border-radius: 50%;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.noti-empty {
+    text-align: center;
+    padding: 30px;
+    color: #888;
+    font-style: italic;
+    font-size: 1rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}

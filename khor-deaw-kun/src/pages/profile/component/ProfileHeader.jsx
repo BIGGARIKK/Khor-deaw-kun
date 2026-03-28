@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { TbEdit, TbCheck, TbX } from "react-icons/tb";
-import { apiRequest } from "../../../service/api";
+import { TbEdit, TbCheck, TbX, TbTrash } from "react-icons/tb";
+import { apiRequest } from "../../../service/api"; 
 import './ProfileHeader.css';
 
 const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen, avatarImage, setIsAvatarModalOpen, avatarPresets, isOwnProfile = true }) => {
@@ -205,18 +205,44 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
         alert("บันทึกข้อมูลไม่สำเร็จ!");
       }
     }
+
+    const newUsername = editName.trim();
+    const newBio = editBio.trim();
+
+    try {
+      // 🌟 ยิง API ไปอัปเดตลง Database (คุณอาจจะต้องเช็คฝั่ง Backend ด้วยว่ารับค่า bio และ username หรือยัง)
+      await apiRequest('/profile', 'PUT', { 
+        username: newUsername, 
+        bio: newBio 
+      });
+
+      // 🌟 อัปเดต LocalStorage หากมีการเปลี่ยน Username (สำคัญมากสำหรับระบบ Login)
+      if (newUsername !== myLoggedInUsername) {
+        localStorage.setItem('username', newUsername);
+      }
+
+      // 🌟 อัปเดตข้อมูลบนหน้าจอ
+      setUserData(prev => ({ ...prev, username: newUsername, bio: newBio }));
+      setIsEditing(false);
+
+    } catch (error) {
+      console.error("Failed to update profile info:", error);
+      alert("บันทึกข้อมูลไม่สำเร็จ ลองใหม่อีกครั้งนะครับ 😅");
+    }
   };
 
   const handleToggleFollow = async () => {
     try {
       const response = await apiRequest(`/users/${userData.username}/follow`, 'POST');
+      
       setIsFollowing(response.is_following);
+
       setUserData(prev => {
         let updatedFollowers = [...(prev.followers || [])];
         if (response.is_following) {
-          updatedFollowers.push(myLoggedInUsername); 
+          updatedFollowers.push(myLoggedInUsername);
         } else {
-          updatedFollowers = updatedFollowers.filter(name => name !== myLoggedInUsername); 
+          updatedFollowers = updatedFollowers.filter(name => name !== myLoggedInUsername);
         }
         return { ...prev, followers: updatedFollowers };
       });

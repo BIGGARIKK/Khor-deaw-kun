@@ -8,7 +8,9 @@ from datetime import datetime
 from bson.objectid import ObjectId
 import uuid
 from extensions import socketio
-import events
+
+import re
+from collections import Counter
 import string
 
 app = Flask(__name__)
@@ -22,6 +24,8 @@ mongo = PyMongo(app)
 
 socketio.init_app(app)
 
+import events
+events.init_db(mongo)
 
 BANNER_PRESETS = [
     {"id": 1, "color": "#ffb8b8", "pattern": "repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 15px, transparent 15px, transparent 30px)", "size": "100% 100%"},
@@ -137,12 +141,16 @@ def update_profile():
             {'$set': {'author_display_name': data['display_name'].strip()}}
         )
     
+    # 🌟 รับค่า profile_image
     if 'profile_image' in data:
         update_fields['profile_image'] = data['profile_image']
+        # ถ้าเปลี่ยนรูป ให้ไปอัปเดตรูปในโพสต์เก่าๆ ของเราด้วย
         mongo.db.posts.update_many(
             {'author_username': current_user},
             {'$set': {'author_image': data['profile_image']}}
         )
+        
+    # 🌟 รับค่า vibe
     if 'vibe' in data:
         update_fields['vibe'] = data['vibe'].strip()
 
@@ -165,7 +173,8 @@ def update_profile():
 
     if update_fields:
         mongo.db.users.update_one({'username': current_user}, {'$set': update_fields})
-        return jsonify({'message': 'Profile updated successfully!'}), 200
+        return jsonify({'message': 'Profile updated successfully!', 'new_username': update_fields.get('username', current_user)}), 200
+        
     return jsonify({'message': 'No data provided to update'}), 400
 
 # ==========================================
@@ -409,6 +418,35 @@ def get_other_profile(username):
     if user:
         return jsonify(user), 200
     return jsonify({'message': 'User not found'}), 404
+
+
+
+
+# 🌟 ดึง Trending Hashtags จากโพสต์ทั้งหมด
+@app.route('/trending', methods=['GET'])
+def get_trending():
+    try:
+        # ดึงโพสต์ล่าสุด 100 โพสต์มาหาแท็ก (จะได้ไม่หน่วงเซิร์ฟเวอร์)
+        posts = mongo.db.posts.find({}, {"text": 1}).sort("create_at", -1).limit(100)
+        
+        all_tags = []
+        for post in posts:
+            text = post.get('text', '')
+            # หาคำที่ขึ้นต้นด้วย # และตามด้วยตัวอักษร (ไม่เอาช่องว่าง)
+            # ใช้ [^\s#]+ เพื่อให้รองรับภาษาไทยด้วย
+            tags = re.findall(r'#[^\s#]+', text)
+            all_tags.extend(tags)
+            
+        # นับว่าแท็กไหนซ้ำเยอะสุด 5 อันดับแรก
+        top_tags = Counter(all_tags).most_common(5)
+        
+        # จัดรูปแบบส่งกลับไปให้ React
+        trending_data = [{"tag": tag, "count": count} for tag, count in top_tags]
+        
+        return jsonify(trending_data), 200
+    except Exception as e:
+        print(f"Error fetching trending tags: {e}")
+        return jsonify({"error": "Failed to fetch trending"}), 500
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5000)

@@ -129,12 +129,6 @@ function SignIn() {
 
             {/* 🌟 (ลบ Error Message แบบตัวอักษรสีแดงออกไปแล้ว) */}
 
-            {/* ลิงก์ Forgot Password อยู่ในป้ายไม้ */}
-            <div className="signin-options">
-              <span className='forgot-password'>
-                <Link to="/forgot-password">Forgot Password?</Link>
-              </span>
-            </div>
 
             {/* ปุ่ม Let's Go */}
             <div className="action-section-inside">

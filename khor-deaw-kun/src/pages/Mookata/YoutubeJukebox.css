@@ -6,243 +6,307 @@
 
 .jukebox-wrapper { width: 100%; }
 
-/* === Container หลัก === */
+/* === Container หลัก (วิทยุไม้) === */
 .jukebox-container.wooden-box {
     width: 100%;
-    padding: 14px 12px;
-    background-color: #EFEBE9;
-    border: 2px solid #A1887F;
-    border-radius: 16px;
-    box-shadow: 4px 4px 0px #BCAAA4;
+    padding: 16px 14px;
+    background: linear-gradient(145deg, #ff9b36 0%, #f99d6f 100%);
+    border: 3px solid #8D6E63;
+    border-radius: 20px;
+    box-shadow: 
+        0 8px 0px #A1887F, /* เงาหนาให้ดูเป็น 3D */
+        inset 0 4px 6px rgba(255,255,255,0.6); /* ไฮไลท์ขอบบน */
     font-family: 'Sarabun', 'Segoe UI', sans-serif;
     color: #3E2723;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    overflow: hidden; /* ป้องกันเนื้อหาด้านในทะลุกรอบ */
+    gap: 12px;
+    overflow: hidden; 
+    margin-bottom: 8px; /* เผื่อพื้นที่ให้เงา 3D ด้านล่าง */
 }
 
 /* === Header === */
 .jukebox-header {
     text-align: center;
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 800;
     color: #4E342E;
-    padding-bottom: 10px;
-    border-bottom: 2px dashed #BCAAA4;
-    letter-spacing: 0.03em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding-bottom: 12px;
+    border-bottom: 2px dashed #D7CCC8;
+    letter-spacing: 0.05em;
+    text-shadow: 1px 1px 0px #FFF; /* ขอบอักษรขาวให้เด้งขึ้น */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 /* === Form เพิ่มเพลง === */
 .jukebox-form {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
+    margin-top: 4px;
 }
 
 .jukebox-input {
     flex: 1;
     min-width: 0;
-    padding: 7px 10px;
-    border: 1.5px solid #BCAAA4;
-    border-radius: 10px;
-    background-color: #FFF8F6;
-    color: #3E2723;
-    font-size: 0.82rem;
+    padding: 10px 14px;
+    border: 2px solid #BCAAA4;
+    border-radius: 12px;
+    background-color: #FFF;
+    color: #4E342E;
+    font-size: 0.9rem;
     font-family: inherit;
+    font-weight: 500;
     outline: none;
-    transition: border-color 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
 
-.jukebox-input::placeholder { color: #A1887F; }
-.jukebox-input:focus { border-color: #795548; background-color: #fff; }
+.jukebox-input::placeholder { color: #BCAAA4; font-weight: 400; }
+.jukebox-input:focus { 
+    border-color: #84E045; /* สีเขียวเด่นๆ ของเว็บ */
+    box-shadow: 0 0 0 3px rgba(132, 224, 69, 0.2); 
+}
 
 /* === Buttons === */
 .btn {
-    padding: 7px 10px;
-    border: none;
-    border-radius: 10px;
+    padding: 8px 16px;
+    border: 2px solid transparent;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     font-family: inherit;
-    font-weight: 600;
+    font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: transform 0.1s, opacity 0.2s;
+    transition: all 0.15s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
-.btn:active { transform: scale(0.97); }
-.btn-add { background-color: #6D4C41; color: #FFF8F6; }
-.btn-add:hover { background-color: #4E342E; }
-.btn-skip { background-color: #FF8F00; color: #fff; }
-.btn-skip:hover { background-color: #E65100; }
-.btn-clear { background-color: #795548; color: #FFF8F6; }
-.btn-clear:hover { background-color: #4E342E; }
+.btn:active { transform: translateY(2px); box-shadow: none !important; }
+
+/* ปุ่ม Add */
+.btn-add { 
+    background-color: #84E045; 
+    color: #2E4C11; 
+    border-color: #6DBB36;
+    box-shadow: 0 4px 0 #6DBB36;
+}
+.btn-add:hover { background-color: #92EE55; transform: translateY(-1px); box-shadow: 0 5px 0 #6DBB36; }
+
+/* ปุ่ม Skip */
+.btn-skip { 
+    background-color: #FFB74D; 
+    color: #4E342E; 
+    border-color: #F57C00;
+    box-shadow: 0 4px 0 #F57C00;
+}
+.btn-skip:hover { background-color: #FFCC80; transform: translateY(-1px); box-shadow: 0 5px 0 #F57C00;}
+
+/* ปุ่ม Clear */
+.btn-clear { 
+    background-color: #EFEBE9; 
+    color: #5D4037; 
+    border-color: #D7CCC8;
+    box-shadow: 0 4px 0 #D7CCC8;
+}
+.btn-clear:hover { background-color: #FFF; transform: translateY(-1px); box-shadow: 0 5px 0 #D7CCC8;}
 
 /* === Video Player === */
 .video-wrapper {
     width: 100%;
-    border-radius: 10px;
+    border-radius: 14px;
+    border: 4px solid #4E342E;
     overflow: hidden;
-    background-color: #000;
+    background-color: #1A1210;
     position: relative;
     transition: height 0.4s ease, margin-bottom 0.4s ease;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
 }
 .video-shield { position: absolute; inset: 0; z-index: 2; }
 
-/* === Controls Panel — redesign === */
+/* === Controls Panel === */
+/* === Controls Panel === */
 .controls-panel {
-    background-color: #D7CCC8;
-    border-radius: 12px;
-    padding: 10px 12px;
+    background-color: #e7ded900;
+    border-radius: 16px;
+    padding: 12px 14px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-width: 0; /* 🌟 ป้องกัน Flexbox ดันกล่องพัง */
+    gap: 8px; /* 🌟 ลดช่องว่างระหว่างบรรทัดลงนิดนึง */
+    min-width: 0; 
+    margin: 10px;
 }
 
-/* 🌟 ชื่อเพลง: scroll แนวนอนเลื่อนอ่านได้ */
+/* 🌟 ป้ายไฟบอกชื่อเพลง (แก้ให้ตัดขึ้นบรรทัดใหม่) */
 .now-playing {
-    font-size: 0.88rem;
+    font-size: 0.88rem; /* 🌟 ปรับขนาดฟอนต์ลงนิดนึงให้อ่านง่ายเมื่อมี 2 บรรทัด */
     font-weight: 700;
-    color: #3E2723;
-    background-color: #BCAAA4;
-    border-radius: 8px;
-    padding: 8px 10px;
+    color: #FFE082;
+    background-color: #3E2723;
+    border-radius: 10px;
+    padding: 8px 12px;
     width: 100%;
+    border: 2px solid #271815;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
     
-    /* เปิดให้เลื่อนแนวนอนได้ */
-    white-space: nowrap;
-    overflow-x: auto;
-    text-overflow: clip;
-    
-    /* ตกแต่ง Scrollbar แนวนอน */
-    scrollbar-width: thin;
-    scrollbar-color: #6D4C41 transparent;
+    /* 🌟 อนุญาตให้ขึ้นบรรทัดใหม่ และจำกัดไว้แค่ 2 บรรทัด */
+    white-space: normal; 
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* โชว์แค่ 2 บรรทัด ถ้าเกินให้เป็น ... */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
 }
-.now-playing::-webkit-scrollbar { height: 4px; }
-.now-playing::-webkit-scrollbar-thumb { background: #6D4C41; border-radius: 4px; }
-
 
 .dj-name {
-    font-size: 0.75rem;
-    color: #6D4C41;
+    font-size: 0.8rem;
+    color: #8D6E63;
     display: flex;
     align-items: center;
-    gap: 4px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    gap: 6px;
+    
+    /* 🌟 ให้ขึ้นบรรทัดใหม่ได้ ไม่โดนตัดขาด */
+    white-space: normal;
+    overflow-wrap: break-word;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
-/* === Volume Control === */
-.volume-control { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+/* === Volume Control (ปรับให้เล็กลงตามคำขอ) === */
+.volume-control { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; /* 🌟 ลดช่องว่าง */
+    font-size: 0.95rem; /* 🌟 ลดขนาดไอคอนลำโพง */
+    color: #5D4037;
+    background: #FFF;
+    padding: 6px 10px; /* 🌟 ลดความอ้วนของกล่องขาว */
+    border-radius: 8px;
+    border: 1px solid #D7CCC8;
+}
 
 .volume-slider {
     flex: 1;
     -webkit-appearance: none;
     appearance: none;
-    height: 4px;
-    border-radius: 4px;
-    background: #A1887F;
+    height: 5px; /* 🌟 ลดความหนาของเส้น */
+    border-radius: 5px;
+    background: #D7CCC8;
     outline: none;
     cursor: pointer;
 }
+
 .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px; height: 16px;
+    width: 14px; /* 🌟 ลดขนาดปุ่มกลมๆ */
+    height: 14px; 
     border-radius: 50%;
-    background: #4E342E;
+    background: #84E045;
     cursor: pointer;
-    border: 2px solid #FFF8F6;
-}
-.volume-slider::-moz-range-thumb {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: #4E342E;
-    cursor: pointer;
-    border: 2px solid #FFF8F6;
-}
+    border: 2px solid #FFF; /* 🌟 ลดความหนาขอบขาว */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}   
 
 /* === Action Buttons === */
-.action-buttons { display: flex; gap: 8px; }
-.action-buttons .btn { flex: 1; text-align: center; }
+.action-buttons { display: flex; gap: 10px; }
+.action-buttons .btn { flex: 1; }
 
-/* === Queue Panel — redesign === */
+/* === Queue Panel === */
 .queue-panel {
-    background-color: #FFF8F6;
-    border: 1.5px solid #D7CCC8;
-    border-radius: 12px;
+    background-color: #FFF;
+    border: 2px solid #D7CCC8;
+    border-radius: 16px;
     overflow: hidden;
-    min-width: 0; /* 🌟 ป้องกัน Flexbox ดันกล่องพัง */
+    min-width: 0; 
 }
 
 .queue-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
-    background: linear-gradient(135deg, #6D4C41 0%, #A1887F 100%);
+    padding: 10px 14px;
+    background: #6D4C41;
     font-weight: 700;
-    font-size: 0.82rem;
-    color: #FFF8F6;
+    font-size: 0.9rem;
+    color: #FFF;
 }
 
 .queue-count {
-    font-size: 0.72rem;
-    background-color: rgba(255,255,255,0.25);
-    color: #FFF8F6;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-weight: 600;
+    font-size: 0.75rem;
+    background-color: #FFB74D;
+    color: #4E342E;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 800;
+    box-shadow: 0 2px 0 #F57C00;
 }
 
 .empty-queue {
     text-align: center;
-    padding: 16px;
+    padding: 24px 16px;
     color: #A1887F;
-    font-size: 0.82rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: repeating-linear-gradient(
+        45deg,
+        #FFF,
+        #FFF 10px,
+        #FAFAFA 10px,
+        #FAFAFA 20px
+    );
 }
 
-/* 🌟 Queue List: จำกัดความสูง + ใส่ Scrollbar แนวตั้ง */
+/* 🌟 Queue List */
 .queue-list { 
     list-style: none; 
     margin: 0; 
-    padding: 0; 
-    max-height: 180px; /* ความสูงของกล่องคิว */
+    padding: 6px; 
+    max-height: 200px; 
     overflow-y: auto; 
     
     scrollbar-width: thin;
-    scrollbar-color: #A1887F transparent;
+    scrollbar-color: #BCAAA4 transparent;
 }
 .queue-list::-webkit-scrollbar { width: 6px; }
 .queue-list::-webkit-scrollbar-track { background: transparent; }
-.queue-list::-webkit-scrollbar-thumb { background: #A1887F; border-radius: 4px; }
+.queue-list::-webkit-scrollbar-thumb { background: #BCAAA4; border-radius: 10px; }
 
 
-/* === Queue item — redesign === */
+/* === Queue item === */
 .queue-item {
     display: flex;
     align-items: center;
-    padding: 7px 10px;
-    border-bottom: 1px solid #EFEBE9;
-    gap: 8px;
-    transition: background-color 0.15s;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    border-radius: 10px;
+    background-color: #FAFAFA;
+    border: 1px solid #EFEBE9;
+    gap: 10px;
+    transition: all 0.2s;
 }
-.queue-item:last-child { border-bottom: none; }
-.queue-item:hover { background-color: #FBF0ED; }
+.queue-item:last-child { margin-bottom: 0; }
+.queue-item:hover { 
+    background-color: #FFF; 
+    border-color: #D7CCC8;
+    transform: translateX(2px);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+}
 
-/* เลขลำดับ — วงกลม */
+/* เลขลำดับ */
 .queue-number {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    background-color: #D7CCC8;
-    color: #6D4C41;
-    font-size: 0.7rem;
-    font-weight: 700;
+    background-color: #FFB74D;
+    color: #4E342E;
+    font-size: 0.75rem;
+    font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -253,43 +317,61 @@
 .queue-info {
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    overflow: hidden;
+    gap: 4px; /* เพิ่มระยะห่างระหว่างชื่อเพลงกับชื่อคนขอนิดนึง */
     flex: 1;
-    min-width: 0; /* 🌟 ป้องกัน Flexbox ดันกล่องพัง */
+    min-width: 0; 
 }
 
 .queue-title-text {
-    font-size: 0.82rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: #3E2723;
+    
+    /* 🌟 แก้ให้ตัดขึ้นบรรทัดใหม่ และโชว์สูงสุดแค่ 2 บรรทัด */
+    white-space: normal; 
+    display: -webkit-box;
+    -webkit-line-clamp: 2; 
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
+    line-height: 1.3;
 }
 
 .queue-requester {
-    font-size: 0.7rem;
-    color: #A1887F;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.75rem;
+    color: #8D6E63;
+    font-weight: 500;
+    
+    /* 🌟 ให้ขึ้นบรรทัดใหม่ได้ถ้าชื่อคนขอยาวเกินไป */
+    white-space: normal;
+    overflow-wrap: break-word;
+    line-height: 1.2;
 }
-
+/* ปุ่มกากบาทลบเพลง */
 .btn-remove {
-    background: none;
+    background: #FFE0B2;
     border: none;
     cursor: pointer;
-    color: #BCAAA4;
-    font-size: 0.78rem;
-    padding: 3px 5px;
-    border-radius: 6px;
+    color: #E65100;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
     flex-shrink: 0;
-    line-height: 1;
-    transition: background-color 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 }
-.btn-remove:hover { background-color: #FFCCBC; color: #BF360C; }
+.btn-remove:hover { 
+    background-color: #FF5252; 
+    color: #FFF; 
+    transform: scale(1.1) rotate(90deg);
+}
 
 /* === Disabled state === */
-.jukebox-input:disabled, .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.jukebox-input:disabled, .btn:disabled { 
+    opacity: 0.6; 
+    cursor: not-allowed; 
+    transform: none; 
+    box-shadow: none !important;
+    filter: grayscale(100%);
+}
