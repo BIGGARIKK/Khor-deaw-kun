@@ -63,7 +63,7 @@ function Hub() {
             }
 
             try {
-                const response = await fetch('https://probable-goldfish-4jvvgxxvpxxcqqpg-5000.app.github.dev/rooms', {
+                const response = await fetch('https://khor-deaw-kun.onrender.com/rooms', {
                     headers: { 
                         'Authorization': `Bearer ${currentToken}` 
                     }
@@ -134,7 +134,7 @@ function Hub() {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/join-room', {
+            const response = await fetch('https://khor-deaw-kun.onrender.com/join-room', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -185,7 +185,7 @@ function Hub() {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/create-room', {
+            const response = await fetch('https://khor-deaw-kun.onrender.com/create-room', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -2,7 +2,7 @@
 
 export const apiRequest = async (endpoint, method = 'GET', data = null) => {
 
-  const BASE_URL = 'https://probable-goldfish-4jvvgxxvpxxcqqpg-5000.app.github.dev/'; // URL ของ Flask
+  const BASE_URL = 'https://khor-deaw-kun.onrender.com'; // URL ของ Flask
 
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;

@@ -22,7 +22,7 @@ function GrillRoom() {
 
     // ✅ สร้าง socket ใน useEffect เพื่อให้ component พร้อมแล้ว
     useEffect(() => {
-        socketRef.current = io('https://probable-goldfish-4jvvgxxvpxxcqqpg-5000.app.github.dev/');
+        socketRef.current = io('https://khor-deaw-kun.onrender.com');
         return () => {
             if (socketRef.current) {
                 socketRef.current.disconnect();
