@@ -5,74 +5,95 @@ import { apiRequest } from '../../../../service/api';
 import './PostCard.css';
 import { IoBeerOutline, IoBeer } from "react-icons/io5";
 
-function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl, likes, comments, currentUser }) {
+function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl, likes, comments, currentUser, onPostDeleted }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showComments, setShowComments] = useState(false);
     const [inputText, setInputText] = useState("");
 
-    // 🌟 1. ตั้ง State พื้นฐานไว้ก่อน
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
     const [commentLists, setCommentList] = useState([]);
 
-    // 🌟 2. อัปเดต Comments เมื่อ Database ส่งมา
+    // 🌟 State สำหรับ Popup แก้ไข
+    const [isEditing, setIsEditing] = useState(false);
+    const [editText, setEditText] = useState(text);
+
+    // 🌟 State ใหม่! สำหรับ Popup ยืนยันการลบ
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
     useEffect(() => {
         setCommentList(Array.isArray(comments) ? comments : []);
     }, [comments]);
 
-    // 🌟 3. อัปเดต Likes เมื่อ Database ส่งมา (นี่คือพระเอกที่หายไป!)
-    // 🌟 3. อัปเดต Likes เมื่อ Database ส่งมา
     useEffect(() => {
         const likesArray = Array.isArray(likes) ? likes : [];
         setLikesCount(likesArray.length);
 
-        // 🌟 แก้ไข: จัดการชื่อให้เป็นตัวพิมพ์เล็กเหมือนกันให้หมด เผื่อตอนพิมพ์ Log in กับตอนเซฟลง DB มันเป็นคนละแบบ
         const isUserLiked = likesArray.some(
             (likeName) => likeName.trim().toLowerCase() === currentUser?.trim().toLowerCase()
         );
-        
         setIsLiked(isUserLiked); 
-        
-        // แอบเช็คดูใน Console (F12) ว่ามันเปรียบเทียบเจอไหม
-        console.log("รายชื่อคนกดไลก์:", likesArray, "ชื่อเรา:", currentUser, "กดไปหรือยัง?", isUserLiked);
-
     }, [likes, currentUser]);
 
+    // --- 🌟 เปลี่ยนฟังก์ชันคลิกลบ ให้เปิด Popup แทน ---
+    const handleDeleteClick = () => {
+        setIsDeleteModalOpen(true);
+        setIsMenuOpen(false); // ปิดเมนูสามจุด
+    };
 
-    const avatarUrl = image_author?.startsWith("http")
-        ? image_author
-        : `/src/assets/avatars/${image_author || '1.png'}`;
+    // --- 🌟 ฟังก์ชันลบจริง (จะถูกเรียกตอนกดยืนยันใน Popup) ---
+    const confirmDelete = async () => {
+        try {
+            const response = await apiRequest(`/posts/${postId}`, 'DELETE');
+            if (response.message.includes("เรียบร้อย")) {
+                setIsDeleteModalOpen(false);
+                if (onPostDeleted) onPostDeleted(postId);
+            }
+        } catch (error) {
+            alert("ลบไม่ได้ สงสัยอาถรรพ์หมูกระทะ ลองใหม่นะ!");
+        }
+    };
 
-    const postImageUrl = imageUrl?.startsWith("http") || imageUrl?.startsWith("data:")
-        ? imageUrl
-        : `/src/assets/avatars/${imageUrl}`;
+    // --- ฟังก์ชันบันทึกการแก้ไข ---
+    const handleSaveEdit = async () => {
+        if (editText.trim() === "" || editText === text) {
+            setIsEditing(false);
+            return;
+        }
+        try {
+            const response = await apiRequest(`/posts/${postId}`, 'PUT', { text: editText });
+            if (response.message.includes("เรียบร้อย")) {
+                setIsEditing(false);
+                window.location.reload(); 
+            }
+        } catch (error) {
+            alert("แก้ไขไม่สำเร็จ ลองอีกทีนะ");
+        }
+    };
+
+    const avatarUrl = image_author?.startsWith("http") ? image_author : `/src/assets/avatars/${image_author || '1.png'}`;
+    const postImageUrl = imageUrl?.startsWith("http") || imageUrl?.startsWith("data:") ? imageUrl : `/src/assets/avatars/${imageUrl}`;
 
     const handleAddComment = async () => {
         if (inputText.trim() === "") return;
         try {
             const response = await apiRequest(`/posts/${postId}/comment`, 'POST', { text: inputText });
-
             if (response.comment) {
                 setCommentList([...commentLists, response.comment]);
                 setInputText("");
             }
         } catch (error) {
             console.error("Comment failed:", error);
-            alert("คอมเมนต์ไม่ไป ลองใหม่อีกครั้งนะ 😅");
         }
     };
 
-    // 🌟 ฟังก์ชันชนแก้ว (กดไลก์)
     const handleLike = async () => {
-        // สลับสีและบวก/ลบเลขทันที ให้ผู้ใช้รู้สึกว่าแตะปุ๊บติดปั๊บ
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-        
         try {
             await apiRequest(`/posts/${postId}/like`, 'POST');
         } catch (error) {
-            // ถ้า Database มีปัญหา ค่อยเด้งกลับมาค่าเดิม
             setIsLiked(!isLiked);
             setLikesCount(isLiked ? likesCount + 1 : likesCount - 1);
         }
@@ -88,15 +109,23 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                         <span className="post-time">{time}</span>
                     </div>
                 </div>
-                <div className="menu-container">
-                    <div className="menu-trigger" onClick={() => setIsMenuOpen(!isMenuOpen)}><TbDots size={24} /></div>
-                    {isMenuOpen && (
-                        <div className="post-dropdown-menu">
-                            <div className="dropdown-item"><TbEdit size={18} /> Edit</div>
-                            <div className="dropdown-item delete"><TbTrash size={18} /> Delete</div>
-                        </div>
-                    )}
-                </div>
+
+                {author?.trim().toLowerCase() === currentUser?.trim().toLowerCase() && (
+                    <div className="menu-container">
+                        <div className="menu-trigger" onClick={() => setIsMenuOpen(!isMenuOpen)}><TbDots size={24} /></div>
+                        {isMenuOpen && (
+                            <div className="post-dropdown-menu">
+                                <div className="dropdown-item" onClick={() => { setIsEditing(true); setIsMenuOpen(false); }}>
+                                    <TbEdit size={18} /> Edit
+                                </div>
+                                {/* ✨ เปลี่ยน onClick มาเรียก handleDeleteClick */}
+                                <div className="dropdown-item delete" onClick={handleDeleteClick}>
+                                    <TbTrash size={18} /> Delete
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="post-content-area">
@@ -110,12 +139,6 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
 
             <div className="post-footer-new">
                 <div className="footer-left-group">
-                    {/*
-                    <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleLike}>
-                        <span className="icon-wrap">{isLiked ? '🍻' : <TbBeer size={22} />}</span>
-                        <span className="count">{likesCount}</span>
-                    {/* ✨ เปลี่ยน onClick มาใช้ handleLikeClick ที่เราสร้างใหม่ */}
-                    
                     <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleLike}>
                         <span className="icon-wrap">
                            {isLiked ? <IoBeer size={22} color="#F48C2A" /> : <IoBeerOutline size={22} />}
@@ -130,6 +153,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                 <button className="action-btn share-btn"><TbSend size={22} /></button>
             </div>
 
+            {/* ... ส่วนคอมเมนต์ ... */}
             {showComments && (
                 <div className="comments-section-wood">
                     <div className="comments-list">
@@ -150,6 +174,51 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                 </div>
             )}
 
+            {/* 🌟 Popup สำหรับแก้ไขข้อความ */}
+            {isEditing && createPortal(
+                <div className="edit-modal-overlay" onClick={() => { setIsEditing(false); setEditText(text); }}>
+                    <div className="edit-modal-content wooden-box" onClick={(e) => e.stopPropagation()}>
+                        <div className="edit-modal-header">
+                            <h3 style={{ margin: 0, color: '#5d3a1a' }}>📝 แก้ไขแคปชั่น</h3>
+                            <button className="modal-close-btn" onClick={() => { setIsEditing(false); setEditText(text); }}><TbX size={24} /></button>
+                        </div>
+                        <textarea 
+                            className="edit-textarea"
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            autoFocus
+                        />
+                        <div className="edit-modal-actions">
+                            <button className="btn-cancel" onClick={() => { setIsEditing(false); setEditText(text); }}>ยกเลิก</button>
+                            <button className="btn-save" onClick={handleSaveEdit}>บันทึก</button>
+                        </div>
+                    </div>
+                </div>, 
+                document.body
+            )}
+
+            {/* 🌟 Popup สำหรับ "ยืนยันการลบ" (หน้าตาเหมือนตอน Edit เป๊ะ แต่อยู่ตรงกลางและมีปุ่มแดง) */}
+            {isDeleteModalOpen && createPortal(
+                <div className="edit-modal-overlay" onClick={() => setIsDeleteModalOpen(false)}>
+                    <div className="edit-modal-content wooden-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+                        <div className="edit-modal-header" style={{ borderBottom: 'none' }}>
+                            <h3 style={{ margin: 0, color: '#5d3a1a' }}>🗑️ ยืนยันการลบ</h3>
+                            <button className="modal-close-btn" onClick={() => setIsDeleteModalOpen(false)}><TbX size={24} /></button>
+                        </div>
+                        <p style={{ fontSize: '1.2rem', color: '#4a2c11', textAlign: 'center', margin: '15px 0 25px 0' }}>
+                            ตี้ยังไม่จบ จะลบโพสต์จริงหรอ? 🍻
+                        </p>
+                        <div className="edit-modal-actions" style={{ justifyContent: 'center' }}>
+                            <button className="btn-cancel" onClick={() => setIsDeleteModalOpen(false)}>ยกเลิก</button>
+                            {/* ✨ ปุ่มกดยืนยันสีแดง */}
+                            <button className="btn-danger" onClick={confirmDelete}>ลบเลย!</button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
+            {/* Modal ซูมรูป */}
             {isModalOpen && createPortal(
                 <div className="image-modal-overlay" onClick={() => setIsModalOpen(false)}>
                     <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>

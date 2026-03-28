@@ -2,18 +2,26 @@
 .post-card-container { transition: transform 0.2s; }
 .post-card-container:hover { transform: translateY(-3px); }
 
-.post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; position: relative; z-index: 2; }
+/* 🌟 แก้ไข: ดัน z-index ของ post-header ขึ้นไปเป็น 10 เพื่อให้อยู่เหนือรูปภาพ */
+.post-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 15px; 
+    position: relative; 
+    z-index: 10; 
+}
 .user-info-group { display: flex; align-items: center; gap: 15px; }
 
 .post-avatar {
     width: 50px;
     height: 50px;
-    background-color: transparent !important; /* ✨ ลบพื้นหลังสีขาวหรือเทาออก */
+    background-color: transparent !important; 
     border: 3px solid #3E2723;
     border-radius: 50%;
     overflow: hidden; 
     box-shadow: 2px 2px 0px #3E2723;
-    padding: 0 !important; /* ✨ ลบระยะขอบทิ้ง */
+    padding: 0 !important; 
     display: block; 
 }
 
@@ -25,8 +33,6 @@
     display: block;
     margin: 0;
     padding: 0;
-    
-
     transform: scale(1.54) translateY(5px);
 }
 
@@ -36,7 +42,23 @@
 .menu-container { position: relative; }
 .menu-trigger { cursor: pointer; padding: 5px; border-radius: 50%; transition: 0.2s; }
 .menu-trigger:hover { background: rgba(255, 255, 255, 0.5); transform: scale(1.1);}
-.post-dropdown-menu { position: absolute; top: 35px; right: 0; background-color: #fff; border: 3px solid #3E2723; border-radius: 12px; box-shadow: 4px 4px 0px #3E2723; width: 130px; z-index: 100; overflow: hidden; display: flex; flex-direction: column; }
+
+/* 🌟 แก้ไข: ดัน z-index ของเมนูขึ้นไปสูงๆ เป็น 999 ให้อยู่เหนือรูปแน่นอน */
+.post-dropdown-menu { 
+    position: absolute; 
+    top: 35px; 
+    right: 0; 
+    background-color: #fff; 
+    border: 3px solid #3E2723; 
+    border-radius: 12px; 
+    box-shadow: 4px 4px 0px #3E2723; 
+    width: 130px; 
+    z-index: 999; 
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+}
+
 .dropdown-item { padding: 10px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; border-bottom: 2px solid #3E2723; }
 .dropdown-item:last-child { border-bottom: none; }
 .dropdown-item:hover { background-color: #F48C2A; }
@@ -49,29 +71,27 @@
 
 .post-footer-new { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 2px dashed rgba(62, 39, 35, 0.4); position: relative; z-index: 2; }
 .footer-left-group { display: flex; gap: 15px; }
+
 /* =========================================
    🍻 ACTION BUTTONS (Like, Comment, Share) 
    ========================================= */
-
-/* 🌟 สไตล์พื้นฐานของทั้ง 3 ปุ่ม (หน้าตาเป็นแผ่นไม้เหมือนกันหมด) */
 .action-btn {
-  background-color: #FDF5E6; /* สีพื้นไม้สว่าง */
-  border: 2px solid #3E2723; /* ขอบน้ำตาลเข้ม */
-  color: #6D4C41; /* ตัวเลขสีน้ำตาลกลาง */
-  border-radius: 12px; /* ทรงแผ่นไม้โค้งมน */
+  background-color: #FDF5E6; 
+  border: 2px solid #3E2723; 
+  color: #6D4C41; 
+  border-radius: 12px; 
   padding: 6px 16px;
   display: flex;
   align-items: center;
-  gap: 8px; /* ระยะห่างระหว่างไอคอนกับตัวอักษร/ตัวเลข */
+  gap: 8px; 
   font-weight: 800;
   font-family: inherit;
   font-size: 1rem;
   cursor: pointer;
-  box-shadow: 2px 2px 0px #3E2723; /* เงาไม้ */
+  box-shadow: 2px 2px 0px #3E2723; 
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* ตอนเอาเมาส์ชี้ (Hover) - ทั้ง 3 ปุ่มจะเด้งขึ้นและเปลี่ยนเป็นสีไม้อ่อน */
 .action-btn:hover {
   transform: translateY(-3px);
   box-shadow: 4px 4px 0px #3E2723;
@@ -79,13 +99,11 @@
   color: #3E2723;
 }
 
-/* ตอนกำลังกดคลิก (Active คลิกค้าง) */
 .action-btn:active {
   transform: translateY(0) scale(0.95);
   box-shadow: 1px 1px 0px #3E2723;
 }
 
-/* ไอคอนภายในปุ่ม */
 .icon-wrap {
   display: flex;
   align-items: center;
@@ -93,61 +111,44 @@
   font-size: 1.2rem;
 }
 
-
-/* =========================================
-   🌟 ลูกเล่นตอนปุ่มอยู่ในสถานะต่างๆ (Active) 
-   ========================================= */
-
-/* 🍻 1. ปุ่ม LIKE (เมื่อกดไลก์แล้ว) */
 .action-btn.cheers-btn.active {
-  background-color: #F48C2A; /* สีส้มทอง (ไฟร้าน/น้ำเบียร์) */
-  color: #1A1A1A; /* ตัวเลขสีดำเข้ม */
+  background-color: #F48C2A; 
+  color: #1A1A1A; 
   border-color: #3E2723;
   box-shadow: 4px 4px 0px #3E2723;
-  
-  /* เรียกใช้อนิเมชันเด้งชนแก้วตอนกดปุ๊บ */
   animation: cheersPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* ตอนชี้ปุ่มที่กดไลก์ไปแล้ว */
 .action-btn.cheers-btn.active:hover {
-  background-color: #FF9F43; /* สว่างขึ้นอีกนิด */
-  transform: translateY(-3px) scale(1.05); /* เด้งและขยาย */
+  background-color: #FF9F43; 
+  transform: translateY(-3px) scale(1.05); 
 }
 
-/* 🎬 แอนิเมชัน "ชนแก้ว" */
 @keyframes cheersPop {
   0% { transform: scale(1) rotate(0deg); }
-  30% { transform: scale(1.15) rotate(-10deg); } /* เอียงซ้ายเตรียมชน */
-  60% { transform: scale(1.15) rotate(10deg); }  /* เอียงขวาชนแก้ว! */
-  100% { transform: scale(1) rotate(0deg); }     /* กลับท่าเดิม */
+  30% { transform: scale(1.15) rotate(-10deg); } 
+  60% { transform: scale(1.15) rotate(10deg); }  
+  100% { transform: scale(1) rotate(0deg); }     
 }
 
-
-/* 💬 2. ปุ่ม COMMENT (เมื่อเปิดช่องคอมเมนต์ค้างไว้) */
 .action-btn.comment-btn.active {
-  background-color: #F48C2A; /* ค้างสีไม้อ่อนไว้ ให้รู้ว่าเปิดอยู่ */
+  background-color: #F48C2A; 
   color: #3E2723;
-  /* ทำให้ดูเหมือนปุ่มถูกกดจมลงไปนิดนึง (บุ๋มลงไปในไม้) */
   box-shadow: 4px 4px 0px #3E2723;
   transform: translateY(1px); 
 }
 
 .action-btn.comment-btn.active:hover {
-  transform: translateY(-2px); /* เวลาชี้ให้เด้งขึ้นมานิดเดียวพอ */
+  transform: translateY(-2px); 
   box-shadow: 3px 3px 0px #3E2723;
 }
 
-
-/* 🚀 3. ปุ่ม SHARE (เวลากดชี้เตรียมแชร์) */
-/* ปุ่มแชร์ไม่มีสถานะ Active ค้างไว้ เลยใส่ลูกเล่นตอน Hover แทน */
 .action-btn.share-btn:hover {
-  background-color: #84E045; /* เปลี่ยนเป็นสีเขียวเด่นๆ พร้อมส่ง */
+  background-color: #84E045; 
   color: #1A1A1A;
-  transform: translateY(-3px) rotate(3deg); /* เอียงเหมือนจรวดกำลังจะบิน */
+  transform: translateY(-3px) rotate(3deg); 
   box-shadow: 4px 4px 0px #3E2723;
 }
-
 
 .comments-section-wood { background: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 15px; margin-top: 20px; border: 3px solid #3E2723; position: relative; z-index: 2; }
 .comment-bubble { background: white; padding: 12px 15px; border-radius: 12px; border: 2px solid #3E2723; margin-bottom: 10px; box-shadow: 2px 2px 0 rgba(62, 39, 35, 0.2); font-size: 1.1rem; }
@@ -156,8 +157,171 @@
 .send-comment-btn { background: #F48C2A; border: 3px solid #3E2723; border-radius: 12px; padding: 0 15px; cursor: pointer; box-shadow: 0 4px 0 #3E2723; }
 .send-comment-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #3E2723; }
 
-.image-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+/* =========================================
+   🖼️ Modal ดูรูปภาพ
+   ========================================= */
+.image-modal-overlay { 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100vw; height: 100vh; 
+    background: rgba(0, 0, 0, 0.85); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 9999; 
+}
 .image-modal-content { position: relative; padding: 20px; max-width: 100vw; max-height: 100vh; }
 .modal-image { max-height: 85vh; max-width: 90vw; border: 4px solid #fff; border-radius: 15px; }
 .modal-close-btn { position: absolute; top: -10px; right: -10px; background: #F48C2A; border: 3px solid #111; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; transition: 0.2s;}
 .modal-close-btn:hover { transform: scale(1.1) rotate(10deg); }
+
+/* =========================================
+   🌟 CSS สำหรับ Edit/Delete Modal (Popup ตรงกลางเป๊ะ!)
+   ========================================= */
+
+/* พื้นหลังสีดำโปร่งแสงตอน Popup เด้ง */
+.edit-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;   
+    bottom: 0;  
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center; 
+    align-items: center;     
+    z-index: 99999;          
+}
+
+/* ตัวกล่องที่จะเด้งขึ้นมา */
+.edit-modal-content {
+    width: 90%;
+    max-width: 500px;
+    padding: 25px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    
+    position: relative !important; 
+    margin: auto !important; 
+    transform: none; 
+    
+    background-color: #FDF5E6; 
+    border: 4px solid #3E2723;
+    box-shadow: 8px 8px 0px #3E2723;
+    
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ส่วนหัว Popup */
+.edit-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px dashed rgba(93, 58, 26, 0.3);
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+}
+
+.edit-modal-header .modal-close-btn {
+    position: relative; 
+    top: 0; right: 0;
+    background: none;
+    color: #5d3a1a;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    width: auto;
+    height: auto;
+    font-size: 1.5rem; 
+}
+.edit-modal-header .modal-close-btn:hover {
+    transform: scale(1.2) rotate(10deg); 
+    color: #f48c2a;
+}
+
+/* ช่องพิมพ์ข้อความ */
+.edit-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 15px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    color: #4a2c11;
+    background: rgba(255, 255, 255, 0.7);
+    border: 2px solid #d4a373;
+    border-radius: 12px;
+    resize: none;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.edit-textarea:focus {
+    background: white;
+    border-color: #f48c2a;
+    box-shadow: 0 0 0 3px rgba(244, 140, 42, 0.2);
+}
+
+/* =========================================
+   🔘 สไตล์ปุ่มกดต่างๆ ใน Popup
+   ========================================= */
+.edit-modal-actions {
+    display: flex;
+    justify-content: flex-end; 
+    gap: 12px;
+    margin-top: 10px;
+}
+
+/* โครงสร้างพื้นฐานของทุกปุ่มใน Popup */
+.btn-cancel, .btn-save, .btn-danger {
+    padding: 10px 25px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid #3E2723; 
+    transition: all 0.2s;
+    box-shadow: 2px 2px 0px #3E2723; 
+}
+
+/* ปุ่มยกเลิก (สีเทา/ไม้ซีด) */
+.btn-cancel {
+    background: #e0d5c1;
+    color: #5d3a1a;
+}
+.btn-cancel:hover {
+    background: #d4c4aa;
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 0px #3E2723;
+}
+
+/* ปุ่มบันทึก (สีส้ม) */
+.btn-save {
+    background: #f48c2a;
+    color: #1A1A1A;
+}
+.btn-save:hover {
+    background: #e67e22;
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 0px #3E2723;
+}
+
+/* 🚨 ปุ่มลบเลย! (สีแดงสด) 🚨 */
+.btn-danger {
+    background: #ff4d4f;
+    color: white;
+}
+.btn-danger:hover {
+    background: #ff7875;
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 0px #3E2723;
+}
+
+/* อนิเมชันเด้งดึ๋ง */
+@keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
