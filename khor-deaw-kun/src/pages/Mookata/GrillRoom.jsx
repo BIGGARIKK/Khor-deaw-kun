@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import RoomChat from './RoomChat';
 import './GrillRoom.css';
+import YouTubeJukebox from './YouTubeJukebox'; // 🌟 นำเข้าตู้เพลง
 const socket = io('http://localhost:5000');
 function GrillRoom() {
     const navigate = useNavigate();
@@ -13,7 +14,7 @@ function GrillRoom() {
     const [selectedIngredient, setSelectedIngredient] = useState(null);
     const [currentRotation, setCurrentRotation] = useState(0);
     const [currentFlip, setCurrentFlip] = useState(1);
-    
+
     // 🌟 1. สร้างรายชื่อคนในห้อง (เอาไว้เป็นเป้าหมายในการป้อนหมู!)
     const [players, setPlayers] = useState([]);
 
@@ -37,8 +38,8 @@ function GrillRoom() {
 
         // 🌟 2. เมื่อเข้าหน้าห้องแล้ว ให้ส่งคำขอจองโต๊ะไปที่ Server ทันที
         // 🌟 3. ตะโกนบอก Server ทันทีที่เข้าหน้าหน้า: "ฉันขอจองโต๊ะเบอร์นี้!"
-        socket.emit('join_game_room', { 
-            room_id: roomId, 
+        socket.emit('join_game_room', {
+            room_id: roomId,
             username: localStorage.getItem('username'),
             profile_image: myProfileImg
         });
@@ -48,12 +49,12 @@ function GrillRoom() {
 
     useEffect(() => {
         if (!socket) return;
-        
+
         socket.on('score_updated', (data) => {
             // อัปเดตคะแนนให้คนโดนป้อน
             setPlayers(prevPlayers => prevPlayers.map(p => {
                 // 🌟 แก้ตรงนี้: เปลี่ยนจาก p.id เป็น p.username
-                if (p.username === data.targetId) { 
+                if (p.username === data.targetId) {
                     return { ...p, score: (p.score || 0) + data.pointChange };
                 }
                 return p;
@@ -75,37 +76,45 @@ function GrillRoom() {
 
     const handleSelectIngredient = (item) => {
         setSelectedIngredient(item);
-        setCurrentRotation(0); 
-        setCurrentFlip(1); 
+        setCurrentRotation(0);
+        setCurrentFlip(1);
     };
 
     const handleLeaveRoomCompletely = () => {
         if (socket) {
-            // ส่งคำสั่งไปบอก Server ว่าเราขอออกนะ
             socket.emit('leave_game_room', { room_id: roomId });
         }
-        // แล้วค่อยเด้งกลับหน้า Hub
+        // ฉีกกระดาษเลขห้องทิ้ง เพราะไม่ได้อยู่โต๊ะนี้แล้ว
+        localStorage.removeItem('active_room');
         navigate('/Hub');
-    };  
+    };
 
-return (
+    const handleMinimizeRoom = () => {
+        // จดเลขห้องลงสมุดพกก่อนไปหน้า Hub
+        localStorage.setItem('active_room', roomId);
+        navigate('/Hub');
+    };
+
+
+
+    return (
         <div className="grill-room-container">
             <div className="room-header">
                 <h2>🏖️ chill chill tee Moo Tha (โต๊ะ: {roomId})</h2>
-                
+
                 {/* 🌟 โซนปุ่มมุมขวาบนที่มี 2 ปุ่ม */}
                 <div className="header-actions">
                     {/* ปุ่ม 1: พับจอ (จานยังอยู่บนโต๊ะ) */}
-                    <button 
-                        className="minimize-room-btn" 
-                        onClick={() => navigate('/Hub')}
+                    <button
+                        className="minimize-room-btn"
+                        onClick={handleMinimizeRoom}
                     >
                         👀 แวะไปหน้า Feed
                     </button>
-                    
+
                     {/* ปุ่ม 2: ลุกจากโต๊ะ (จานหายไปเลย) */}
-                    <button 
-                        className="leave-room-btn" 
+                    <button
+                        className="leave-room-btn"
                         onClick={handleLeaveRoomCompletely}
                     >
                         🚪 ลุกจากโต๊ะ
@@ -114,32 +123,43 @@ return (
             </div>
 
             <div className="room-content-wrapper">
-                <IngredientMenu 
-                    selectedIngredient={selectedIngredient} 
-                    onSelectIngredient={handleSelectIngredient} 
+                <IngredientMenu
+                    selectedIngredient={selectedIngredient}
+                    onSelectIngredient={handleSelectIngredient}
                     currentRotation={currentRotation}
                     setCurrentRotation={setCurrentRotation}
-                    currentFlip={currentFlip} 
-                    setCurrentFlip={setCurrentFlip} 
+                    currentFlip={currentFlip}
+                    setCurrentFlip={setCurrentFlip}
                 />
 
-                <MookataPan 
-                    itemsOnPan={itemsOnPan} 
-                    setItemsOnPan={setItemsOnPan} 
+                <MookataPan
+                    itemsOnPan={itemsOnPan}
+                    setItemsOnPan={setItemsOnPan}
                     selectedIngredient={selectedIngredient}
                     currentRotation={currentRotation}
-                    currentFlip={currentFlip} 
-                    players={players} 
-                    socket={socket} 
+                    currentFlip={currentFlip}
+                    players={players}
+                    socket={socket}
                     roomId={roomId}
                 />
 
-                {/* 🌟 ส่ง players เข้าไปให้ RoomChat จัดการต่อ */}
-                <RoomChat 
-                    socket={socket} 
-                    roomId={roomId}
-                    players={players} 
-                />
+               {/* 🌟 สร้างกล่องหุ้มด้านขวา เพื่อใส่ตู้เพลงและแชทไว้ด้วยกัน */}
+                <div className="right-panel-wrapper">
+                    
+                    {/* 🎵 ตู้เพลง */}
+                    <YouTubeJukebox 
+                        socket={socket} 
+                        roomId={roomId} 
+                        myName={localStorage.getItem('username')} 
+                    />
+
+                    {/* 💬 กล่องแชท (ของเดิม) */}
+                    <RoomChat
+                        socket={socket}
+                        roomId={roomId}
+                        players={players}
+                    />
+                </div>
             </div>
         </div>
     );

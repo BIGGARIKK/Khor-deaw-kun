@@ -210,3 +210,26 @@ def handle_feed_friend(data):
     
     # 🌟 ประกาศบอกทุกคนว่าคะแนนเปลี่ยน
     emit('score_updated', {'targetId': target_username, 'pointChange': point_change}, to=room_id)
+
+# 🌟 ระบบตู้เพลง YouTube
+@socketio.on('play_youtube')
+def handle_play_youtube(data):
+    room_id = data.get('room_id')
+    youtube_url = data.get('url')
+    requester = data.get('username')
+    song_title = data.get('title', 'ไม่ทราบชื่อเพลง')
+    print(f"🎵 [ห้อง {room_id}] {requester} ขอเพลง: {youtube_url}")
+    
+    # ส่งลิงก์เพลงไปให้ทุกคนในห้อง (รวมถึงคนที่ส่งมาด้วย)
+    emit('youtube_started', {
+        'url': youtube_url,
+        'requester': requester,
+        'title': song_title
+    }, to=room_id)
+    
+    # แอบส่งข้อความลงแชทด้วยว่ามีคนเปิดเพลง
+    emit('chat_message', {
+        'id': f'sys-music-{time.time()}',
+        'type': 'system',
+        'text': f'🎵 {requester} เปิดเพลงจาก YouTube!'
+    }, to=room_id)

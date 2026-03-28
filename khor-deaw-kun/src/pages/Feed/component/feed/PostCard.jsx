@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { TbDots, TbEdit, TbTrash, TbMessageCircle, TbSend, TbX, TbBeer } from "react-icons/tb";
 import { apiRequest } from '../../../../service/api';
@@ -31,9 +31,9 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         const isUserLiked = likesArray.some(
             (likeName) => likeName.trim().toLowerCase() === currentUser?.trim().toLowerCase()
         );
-        
-        setIsLiked(isUserLiked); 
-        
+
+        setIsLiked(isUserLiked);
+
         // แอบเช็คดูใน Console (F12) ว่ามันเปรียบเทียบเจอไหม
         console.log("รายชื่อคนกดไลก์:", likesArray, "ชื่อเรา:", currentUser, "กดไปหรือยัง?", isUserLiked);
 
@@ -64,17 +64,42 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
     };
 
     // 🌟 ฟังก์ชันชนแก้ว (กดไลก์)
-    const handleLike = async () => {
-        // สลับสีและบวก/ลบเลขทันที ให้ผู้ใช้รู้สึกว่าแตะปุ๊บติดปั๊บ
-        setIsLiked(!isLiked);
-        setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-        
+    const handleCheers = async () => {
+        // 1. ⚡ Optimistic UI: สลับสถานะและตัวเลขทันทีให้ผู้ใช้รู้สึกลื่นไหล
+        const wasLiked = isLiked;
+        setIsLiked(!wasLiked);
+        setLikesCount(wasLiked ? likesCount - 1 : likesCount + 1);
+
         try {
+            // 2. 🌍 ส่งข้อมูลไปที่ Database (MongoDB)
             await apiRequest(`/posts/${postId}/like`, 'POST');
+
+            // 3. 🏆 ระบบ Daily Quest (ทำงานเฉพาะตอนกด "เพิ่ม" ชนแก้วเท่านั้น)
+            if (!wasLiked) {
+                const today = new Date().toLocaleDateString();
+                const savedDate = localStorage.getItem('quest_last_updated');
+                let currentCheers = parseInt(localStorage.getItem('quest_cheers_count') || '0');
+
+                // เช็คว่าข้ามวันหรือยัง ถ้าข้ามวันให้เริ่มนับ 1 ใหม่ของวันนี้
+                if (savedDate !== today) {
+                    currentCheers = 0;
+                    localStorage.setItem('quest_last_updated', today);
+                }
+
+                // ถ้าเควสต์ยังไม่ครบ 5 ครั้ง ให้บวกเพิ่มและแจ้งเตือน Sidebar
+                if (currentCheers < 5) {
+                    currentCheers += 1;
+                    localStorage.setItem('quest_cheers_count', currentCheers);
+
+                    // 📣 ตะโกนบอก Sidebar ว่า "เควสต์ขยับแล้วนะ!"
+                    window.dispatchEvent(new Event('quest_updated'));
+                }
+            }
         } catch (error) {
-            // ถ้า Database มีปัญหา ค่อยเด้งกลับมาค่าเดิม
-            setIsLiked(!isLiked);
-            setLikesCount(isLiked ? likesCount + 1 : likesCount - 1);
+            // 🛑 ถ้า Database พัง ให้เด้งกลับค่าเดิม (Rollback)
+            setIsLiked(wasLiked);
+            setLikesCount(wasLiked ? likesCount : likesCount);
+            console.error("Cheers error:", error);
         }
     };
 
@@ -115,10 +140,10 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                         <span className="icon-wrap">{isLiked ? '🍻' : <TbBeer size={22} />}</span>
                         <span className="count">{likesCount}</span>
                     {/* ✨ เปลี่ยน onClick มาใช้ handleLikeClick ที่เราสร้างใหม่ */}
-                    
-                    <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleLike}>
+
+                    <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleCheers}>
                         <span className="icon-wrap">
-                           {isLiked ? <IoBeer size={22} color="#F48C2A" /> : <IoBeerOutline size={22} />}
+                            {isLiked ? <IoBeer size={22} color="#F48C2A" /> : <IoBeerOutline size={22} />}
                         </span>
                         <span className="count">{likesCount}</span>
                     </button>

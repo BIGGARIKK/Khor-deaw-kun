@@ -172,11 +172,10 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         const data = JSON.parse(dataString);
 
         if (data.source === 'pan') {
-            // 🌟 คำนวณคะแนนตามความสุก
             let pointChange = 0;
-            if (data.status === 'cooked') pointChange = 100; // สุกพอดี อร่อย!
-            else if (data.status === 'burnt') pointChange = -50; // ไหม้! โดนตัดแต้ม
-            else pointChange = -10; // ดิบ! ท้องเสีย โดนหักแต้ม
+            if (data.status === 'cooked') pointChange = 100; 
+            else if (data.status === 'burnt') pointChange = -50; 
+            else pointChange = -10; 
 
             if (socket) {
                 socket.emit('feed_friend', {
@@ -192,6 +191,32 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
             }
 
             setItemsOnPan(prev => prev.filter(i => i.uniqueId !== data.uniqueId));
+
+            // ==========================================
+            // 🌟 ระบบ Daily Quest: อัปเดตเควสต์ "ป้อนหมูเพื่อน"
+            // ==========================================
+            // เช็คว่าคนที่โดนป้อน "ไม่ใช่ตัวเราเอง"
+            if (targetPlayerName !== myName) {
+                const today = new Date().toLocaleDateString(); // ดึงวันที่วันนี้
+                const savedDate = localStorage.getItem('quest_date');
+                let feedCount = parseInt(localStorage.getItem('quest_feed_count') || '0');
+
+                // ถ้าระบบจำว่าเป็นวันเก่า ให้รีเซ็ตเควสต์กลับเป็น 0
+                if (savedDate !== today) {
+                    feedCount = 0;
+                    localStorage.setItem('quest_date', today);
+                }
+
+                // ถ้ายังทำเควสต์ไม่ครบ 5 ครั้ง ให้บวกเพิ่ม
+                if (feedCount < 5) {
+                    feedCount += 1;
+                    localStorage.setItem('quest_feed_count', feedCount);
+                    
+                    // กระจายข่าวบอกหน้าจออื่นๆ (เช่น Sidebar) ว่าเควสต์ขยับแล้วนะ!
+                    window.dispatchEvent(new Event('quest_updated'));
+                }
+            }
+            // ==========================================
         }
     };
 
