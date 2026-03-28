@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'; 
 import { createPortal } from 'react-dom';
-import { TbDots, TbEdit, TbTrash, TbMessageCircle, TbSend, TbX, TbBeer } from "react-icons/tb";
+import { TbDots, TbEdit, TbTrash, TbMessageCircle, TbSend, TbX } from "react-icons/tb";
 import { apiRequest } from '../../../../service/api';
 import './PostCard.css';
 import { IoBeerOutline, IoBeer } from "react-icons/io5";
@@ -18,8 +18,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
     // 🌟 State สำหรับ Popup แก้ไข
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(text);
-
-    // 🌟 State ใหม่! สำหรับ Popup ยืนยันการลบ
+    const [editImage, setEditImage] = useState(imageUrl || null); // 🌟 เก็บค่ารูประหว่างแก้ไข
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
@@ -36,13 +35,12 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         setIsLiked(isUserLiked); 
     }, [likes, currentUser]);
 
-    // --- 🌟 เปลี่ยนฟังก์ชันคลิกลบ ให้เปิด Popup แทน ---
+    // --- ฟังก์ชันลบโพสต์ ---
     const handleDeleteClick = () => {
         setIsDeleteModalOpen(true);
-        setIsMenuOpen(false); // ปิดเมนูสามจุด
+        setIsMenuOpen(false); 
     };
 
-    // --- 🌟 ฟังก์ชันลบจริง (จะถูกเรียกตอนกดยืนยันใน Popup) ---
     const confirmDelete = async () => {
         try {
             const response = await apiRequest(`/posts/${postId}`, 'DELETE');
@@ -55,14 +53,29 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         }
     };
 
-    // --- ฟังก์ชันบันทึกการแก้ไข ---
+    // 🌟 ฟังก์ชันจัดการเมื่อเลือกรูปภาพใหม่
+    const handleEditImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditImage(reader.result); // แปลงรูปเป็น Base64 แล้วเก็บลง State
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // 🌟 ฟังก์ชันบันทึกการแก้ไข
     const handleSaveEdit = async () => {
-        if (editText.trim() === "" || editText === text) {
-            setIsEditing(false);
+        if (editText.trim() === "" && !editImage) {
+            alert("ต้องมีข้อความหรือรูปภาพอย่างน้อย 1 อย่างนะ!");
             return;
         }
         try {
-            const response = await apiRequest(`/posts/${postId}`, 'PUT', { text: editText });
+            const response = await apiRequest(`/posts/${postId}`, 'PUT', { 
+                text: editText,
+                image_url: editImage // ส่งรูปภาพไปด้วย
+            });
             if (response.message.includes("เรียบร้อย")) {
                 setIsEditing(false);
                 window.location.reload(); 
@@ -115,10 +128,15 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                         <div className="menu-trigger" onClick={() => setIsMenuOpen(!isMenuOpen)}><TbDots size={24} /></div>
                         {isMenuOpen && (
                             <div className="post-dropdown-menu">
-                                <div className="dropdown-item" onClick={() => { setIsEditing(true); setIsMenuOpen(false); }}>
+                                {/* 🌟 เปิด Modal พร้อมดึงข้อมูลรูปภาพเก่ามาแสดง */}
+                                <div className="dropdown-item" onClick={() => { 
+                                    setIsEditing(true); 
+                                    setIsMenuOpen(false);
+                                    setEditText(text);
+                                    setEditImage(imageUrl || null);
+                                }}>
                                     <TbEdit size={18} /> Edit
                                 </div>
-                                {/* ✨ เปลี่ยน onClick มาเรียก handleDeleteClick */}
                                 <div className="dropdown-item delete" onClick={handleDeleteClick}>
                                     <TbTrash size={18} /> Delete
                                 </div>
@@ -153,7 +171,6 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                 <button className="action-btn share-btn"><TbSend size={22} /></button>
             </div>
 
-            {/* ... ส่วนคอมเมนต์ ... */}
             {showComments && (
                 <div className="comments-section-wood">
                     <div className="comments-list">
@@ -174,22 +191,45 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                 </div>
             )}
 
-            {/* 🌟 Popup สำหรับแก้ไขข้อความ */}
+            {/* 🌟 Popup สำหรับแก้ไขข้อความและรูปภาพ */}
             {isEditing && createPortal(
-                <div className="edit-modal-overlay" onClick={() => { setIsEditing(false); setEditText(text); }}>
+                <div className="edit-modal-overlay" onClick={() => setIsEditing(false)}>
                     <div className="edit-modal-content wooden-box" onClick={(e) => e.stopPropagation()}>
                         <div className="edit-modal-header">
-                            <h3 style={{ margin: 0, color: '#5d3a1a' }}>📝 แก้ไขแคปชั่น</h3>
-                            <button className="modal-close-btn" onClick={() => { setIsEditing(false); setEditText(text); }}><TbX size={24} /></button>
+                            <h3 style={{ margin: 0, color: '#5d3a1a' }}>Edit Post</h3>
+                            <button className="modal-close-btn" onClick={() => setIsEditing(false)}><TbX size={24} /></button>
                         </div>
                         <textarea 
                             className="edit-textarea"
                             value={editText}
                             onChange={(e) => setEditText(e.target.value)}
-                            autoFocus
                         />
+
+                        {/* 🌟 ส่วนแสดงและแก้ไขรูปภาพ */}
+                        {editImage ? (
+                            <div className="edit-image-preview">
+                                <img src={editImage.startsWith("http") || editImage.startsWith("data:") ? editImage : `/src/assets/avatars/${editImage}`} alt="Preview" />
+                                <button className="remove-image-btn" onClick={() => setEditImage(null)} title="ลบรูปภาพ">
+                                    <TbX size={18} />
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="edit-image-upload">
+                                <label htmlFor={`edit-image-upload-${postId}`} className="upload-image-label">
+                                    📸 เพิ่มรูปภาพ
+                                </label>
+                                <input 
+                                    id={`edit-image-upload-${postId}`}
+                                    type="file" 
+                                    accept="image/*" 
+                                    style={{ display: 'none' }} 
+                                    onChange={handleEditImageChange}
+                                />
+                            </div>
+                        )}
+
                         <div className="edit-modal-actions">
-                            <button className="btn-cancel" onClick={() => { setIsEditing(false); setEditText(text); }}>ยกเลิก</button>
+                            <button className="btn-cancel" onClick={() => setIsEditing(false)}>ยกเลิก</button>
                             <button className="btn-save" onClick={handleSaveEdit}>บันทึก</button>
                         </div>
                     </div>
@@ -197,7 +237,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                 document.body
             )}
 
-            {/* 🌟 Popup สำหรับ "ยืนยันการลบ" (หน้าตาเหมือนตอน Edit เป๊ะ แต่อยู่ตรงกลางและมีปุ่มแดง) */}
+            {/* Popup ยืนยันการลบ */}
             {isDeleteModalOpen && createPortal(
                 <div className="edit-modal-overlay" onClick={() => setIsDeleteModalOpen(false)}>
                     <div className="edit-modal-content wooden-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
@@ -210,7 +250,6 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                         </p>
                         <div className="edit-modal-actions" style={{ justifyContent: 'center' }}>
                             <button className="btn-cancel" onClick={() => setIsDeleteModalOpen(false)}>ยกเลิก</button>
-                            {/* ✨ ปุ่มกดยืนยันสีแดง */}
                             <button className="btn-danger" onClick={confirmDelete}>ลบเลย!</button>
                         </div>
                     </div>
@@ -218,7 +257,6 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                 document.body
             )}
 
-            {/* Modal ซูมรูป */}
             {isModalOpen && createPortal(
                 <div className="image-modal-overlay" onClick={() => setIsModalOpen(false)}>
                     <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>

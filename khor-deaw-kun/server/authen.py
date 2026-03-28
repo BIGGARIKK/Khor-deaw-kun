@@ -178,13 +178,18 @@ def delete_post(post_id):
     mongo.db.users.update_one({'username': current_user}, {'$inc': {'stats.postCount': -1}})
     return jsonify({'message': 'ลบโพสต์เรียบร้อยแล้ว!'}), 200
 
-# 🌟 NEW: แก้ไขโพสต์ (เช็คความเป็นเจ้าของ)
+# 🌟 NEW: แก้ไขโพสต์ (เช็คความเป็นเจ้าของ + รองรับรูปภาพ)
 @app.route('/posts/<post_id>', methods=['PUT'])
 @jwt_required()
 def update_post(post_id):
     current_user = get_jwt_identity()
     data = request.get_json()
     new_text = data.get('text', '').strip()
+    new_image_url = data.get('image_url') # รับค่ารูปภาพมาด้วย
+
+    # เช็คว่าห้ามลบจนว่างเปล่าทั้งคู่
+    if not new_text and not new_image_url:
+        return jsonify({'message': 'ข้อความหรือรูปภาพห้ามว่างทั้งหมด!'}), 400
 
     post = mongo.db.posts.find_one({'_id': ObjectId(post_id)})
     if not post:
@@ -192,7 +197,14 @@ def update_post(post_id):
     if post.get('author_username') != current_user:
         return jsonify({'message': 'คุณไม่มีสิทธิ์แก้ไขโพสต์คนอื่น!'}), 403
 
-    mongo.db.posts.update_one({'_id': ObjectId(post_id)}, {'$set': {'text': new_text}})
+    # อัปเดตข้อมูล (ทั้งข้อความและรูปภาพ)
+    update_data = {
+        'text': new_text,
+        'image_url': new_image_url,
+        'updated_at': datetime.utcnow()
+    }
+
+    mongo.db.posts.update_one({'_id': ObjectId(post_id)}, {'$set': update_data})
     return jsonify({'message': 'แก้ไขโพสต์เรียบร้อยแล้ว!'}), 200
 
 # ==========================================
