@@ -1,0 +1,230 @@
+/* =========================================
+   1. OVERLAY & MODAL CONTAINER
+   ========================================= */
+.settings-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; 
+    backdrop-filter: blur(3px); 
+    padding: 20px;
+}
+
+.settings-wood-card-modal {
+    background: #4a332a; 
+    border: 4px solid #36251e;
+    border-radius: 25px;
+    width: 100%;
+    max-width: 380px; 
+    padding: 25px;
+    color: #f3e5ab;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+    position: relative;
+    animation: modalPop 0.25s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* =========================================
+   2. HEADER & CLOSE BUTTON
+   ========================================= */
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.settings-header h2 {
+    font-size: 22px;
+    letter-spacing: 2px;
+    margin: 0;
+    font-weight: 800;
+    text-shadow: 2px 2px 0px #36251e;
+}
+
+.close-x-btn {
+    background: #ff5252; 
+    border: 2px solid #36251e;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 2px 0px #36251e;
+}
+
+.close-x-btn:hover {
+    transform: rotate(90deg) scale(1.1);
+    background: #ff1212;
+}
+
+/* =========================================
+   3. BODY & SCROLLBAR
+   ========================================= */
+.settings-body-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+/* Custom Wood Scrollbar */
+.settings-body-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.settings-body-scroll::-webkit-scrollbar-track {
+    background: rgba(54, 37, 30, 0.3);
+    border-radius: 10px;
+}
+
+.settings-body-scroll::-webkit-scrollbar-thumb {
+    background: #36251e;
+    border-radius: 10px;
+}
+
+/* =========================================
+   4. INPUTS & LABELS
+   ========================================= */
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #d2b48c;
+    font-size: 14px;
+}
+
+/* Common Input Style */
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 2px solid #36251e;
+    background-color: #5d4037 !important;
+    color: white !important;
+    font-size: 16px;
+    margin-bottom: 15px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    border-color: #f3e5ab;
+}
+
+/* 🌟 AUTOFILL FIX (For all inputs) */
+.input-group input:-webkit-autofill,
+.input-group input:-webkit-autofill:hover, 
+.input-group input:-webkit-autofill:focus {
+    -webkit-text-fill-color: white !important;
+    -webkit-box-shadow: 0 0 0px 1000px #5d4037 inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* =========================================
+   5. PASSWORD EYE BUTTON LOGIC
+   ========================================= */
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px; /* คุมระยะห่างแทน input ข้างใน */
+}
+
+.password-input-wrapper input {
+    width: 100%;
+    padding-right: 45px !important; /* เว้นที่ให้ลูกตา */
+    margin-bottom: 0px !important; 
+}
+
+.eye-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #d2b48c;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    transition: 0.2s;
+    z-index: 10;
+}
+
+.eye-btn:hover {
+    color: #f3e5ab;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* =========================================
+   6. ACTION BUTTONS (Save & Logout)
+   ========================================= */
+.save-large-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 15px;
+    border: none;
+    background: #8b4513; 
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    box-shadow: 0 4px 0 #5d2e0a;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.1s;
+}
+
+.save-large-btn:hover {
+    background: #a0522d;
+}
+
+.save-large-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #5d2e0a;
+}
+
+.save-large-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+}
+
+.logout-btn {
+    width: 100%;
+    padding: 12px;
+    background: #7b2a1a;
+    border: 2px solid #36251e;
+    border-radius: 15px;
+    color: #f3e5ab;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-top: 25px;
+    transition: 0.2s;
+}
+
+.logout-btn:hover {
+    background: #963522;
+    transform: scale(1.02);
+}
