@@ -47,25 +47,21 @@ function GrillRoom() {
     }, [roomId]);
 
     useEffect(() => {
-        // เมื่อ Flask สั่งกระจายข่าว 'score_updated'
-
+        if (!socket) return;
         
         socket.on('score_updated', (data) => {
-            console.log("คะแนนอัปเดตจาก Server:", data);
             // อัปเดตคะแนนให้คนโดนป้อน
             setPlayers(prevPlayers => prevPlayers.map(p => {
-                if (p.id === data.targetId) {
-                    return { ...p, score: p.score + data.pointChange };
+                // 🌟 แก้ตรงนี้: เปลี่ยนจาก p.id เป็น p.username
+                if (p.username === data.targetId) { 
+                    return { ...p, score: (p.score || 0) + data.pointChange };
                 }
                 return p;
             }));
         });
 
-        // เลิกฟังตอนเปลี่ยนหน้า/ปิดเว็บ
-        return () => {
-            socket.off('score_updated');
-        };
-    }, []);
+        return () => socket.off('score_updated');
+    }, [socket]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -83,11 +79,38 @@ function GrillRoom() {
         setCurrentFlip(1); 
     };
 
+    const handleLeaveRoomCompletely = () => {
+        if (socket) {
+            // ส่งคำสั่งไปบอก Server ว่าเราขอออกนะ
+            socket.emit('leave_game_room', { room_id: roomId });
+        }
+        // แล้วค่อยเด้งกลับหน้า Hub
+        navigate('/Hub');
+    };  
+
 return (
         <div className="grill-room-container">
             <div className="room-header">
                 <h2>🏖️ chill chill tee Moo Tha (โต๊ะ: {roomId})</h2>
-                <button className="leave-room-btn" onClick={() => navigate('/Hub')}>🚪 กลับหน้า Feed</button>
+                
+                {/* 🌟 โซนปุ่มมุมขวาบนที่มี 2 ปุ่ม */}
+                <div className="header-actions">
+                    {/* ปุ่ม 1: พับจอ (จานยังอยู่บนโต๊ะ) */}
+                    <button 
+                        className="minimize-room-btn" 
+                        onClick={() => navigate('/Hub')}
+                    >
+                        👀 แวะไปหน้า Feed
+                    </button>
+                    
+                    {/* ปุ่ม 2: ลุกจากโต๊ะ (จานหายไปเลย) */}
+                    <button 
+                        className="leave-room-btn" 
+                        onClick={handleLeaveRoomCompletely}
+                    >
+                        🚪 ลุกจากโต๊ะ
+                    </button>
+                </div>
             </div>
 
             <div className="room-content-wrapper">

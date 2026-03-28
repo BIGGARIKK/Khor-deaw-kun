@@ -101,7 +101,8 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
     const isInsidePanArea = (x, y, containerWidth, containerHeight) => {
         const centerX = containerWidth / 2;
         const centerY = containerHeight / 2;
-        const radius = 280;
+        // 🌟 แก้ตัวเลขนี้: ลดรัศมีจาก 280 เหลือ 220 ให้พอดีกับเตาไซส์ใหม่
+        const radius = 220; 
         const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
         return distance <= radius;
     };
@@ -247,40 +248,50 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                 })}
             </div>
 
-            {/* 🌟 โซนจานข้าวของเพื่อนแต่ละคน (ดึงจาก players) */}
+            {/* 🌟 โซนจานข้าวของเพื่อนแต่ละคน (อัปเดต UI ให้เข้ากัน) */}
             {/* 🌟 โซนจานข้าวของเพื่อนแต่ละคน */}
             <div className="players-action-board">
                 {players.map((playerObj, index) => {
-                    // 🌟 ดึงค่าจาก Object ที่ Server ส่งมา
                     const playerName = playerObj.username;
                     const playerImg = playerObj.profile_image;
+                    const playerScore = playerObj.score || 0; 
                     const isMe = playerName === myName;
-
+                    
                     return (
-                        <div
-                            key={index}
-                            className={`player-plate-zone ${isMe ? 'is-me' : ''}`}
-                            onDragOver={handleDragOver}
-                            onDrop={(e) => handleDropToPlayer(e, playerName)}
-                        >
-                            {/* 🌟 เช็คว่ามีรูปไหม ถ้ามีโชว์รูป ถ้าไม่มีโชว์รูปหุ่นจำลอง */}
-                            {playerImg ? (
-                                <img
-                                    src={`../../assets/avatar/${playerImg}`}
-                                    alt={playerName}
-                                    className="plate-profile-img"
-                                    onError={(e) => {
-                                        // 🌟 กันเหนียว เผื่อไฟล์รูปหาย ให้ขึ้นรูปนี้แทน
-                                        e.target.onerror = null;
-                                        e.target.src = 'https://ui-avatars.com/api/?name=' + playerName + '&background=random';
-                                    }}
-                                />
-                            ) : (
-                                <div className="plate-icon">{isMe ? '😋' : '🍽️'}</div>
-                            )}
-
-                            <div className="plate-owner-name">{playerName}</div>
+                        <div key={index} className={`player-plate-unit ${isMe ? 'is-me' : ''}`}>
+                            
+                            {/* 1. กล่องวงกลมใส่รูป (รับการดรอปหมู) */}
+                            <div
+                                className="player-plate-zone"
+                                onDragOver={handleDragOver}
+                                onDrop={(e) => handleDropToPlayer(e, playerName)}
+                            >
+                                {playerImg ? (
+                                    <img
+                                        src={`/avatars/${playerImg}`}
+                                        alt={playerName}
+                                        className="plate-profile-img"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://ui-avatars.com/api/?name=' + playerName + '&background=random';
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="plate-icon-fallback">{isMe ? '😋' : '🍽️'}</div>
+                                )}
+                            </div>
+                            
+                            {/* 2. ป้าย "จานของคุณ" (ให้อยู่ตรงกลางระหว่างรูปกับกล่องชื่อ) */}
                             {isMe && <div className="plate-tag">จานของคุณ</div>}
+                            
+                            {/* 3. กล่องรวมชื่อและคะแนน */}
+                            <div className="plate-labels-wrapper">
+                                <div className="plate-owner-name">{playerName}</div>
+                                <div className={`player-score ${playerScore < 0 ? 'negative' : ''}`}>
+                                    ⭐ {playerScore}
+                                </div>
+                            </div>
+                            
                         </div>
                     );
                 })}
