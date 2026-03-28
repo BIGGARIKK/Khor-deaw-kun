@@ -23,7 +23,6 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         setCommentList(Array.isArray(comments) ? comments : []);
     }, [comments]);
 
-    // 🌟 3. อัปเดต Likes เมื่อ Database ส่งมา (นี่คือพระเอกที่หายไป!)
     // 🌟 3. อัปเดต Likes เมื่อ Database ส่งมา
     useEffect(() => {
         const likesArray = Array.isArray(likes) ? likes : [];
@@ -36,8 +35,6 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         
         setIsLiked(isUserLiked); 
         
-        // แอบเช็คดูใน Console (F12) ว่ามันเปรียบเทียบเจอไหม
-        console.log("รายชื่อคนกดไลก์:", likesArray, "ชื่อเรา:", currentUser, "กดไปหรือยัง?", isUserLiked);
 
     }, [likes, currentUser]);
 

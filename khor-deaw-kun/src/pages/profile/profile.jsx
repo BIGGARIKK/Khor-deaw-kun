@@ -75,7 +75,7 @@ const Profile = () => {
 
   // 🌟 3. หาเป้าหมาย: ถ้ามี username ใน URL ให้ดูคนนั้น ถ้าไม่มีให้ดูของตัวเอง
   const targetUser = username || myLoggedInUsername;
-
+ //a
   // เช็คว่าหน้าที่กำลังดู คือหน้าของเราเองใช่ไหม (เพื่อเปิด/ปิดปุ่มแก้ไข)
   const checkIsOwnProfile = targetUser === myLoggedInUsername;
 
