@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TbSunset, TbMap2, TbBell, TbSettings, TbX, TbChevronRight } from "react-icons/tb";
 import { apiRequest } from '../../../../service/api';
-import './BottomBar.css';
+import './Bottombar.css';
 
 // ⚙️ Import Components อื่นๆ
 import Settings from './Setting'; 

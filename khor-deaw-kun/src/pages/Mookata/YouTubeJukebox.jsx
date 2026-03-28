@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './YouTubeJukebox.css';
+import './YoutubeJukebox.css';
 
 function YouTubeJukebox({ socket, roomId, myName }) {
     const [inputUrl, setInputUrl] = useState('');
