@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'; 
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom'; // 🌟 1. นำเข้าคำสั่งสำหรับเปลี่ยนหน้า
 import { TbDots, TbEdit, TbTrash, TbMessageCircle, TbSend, TbX } from "react-icons/tb";
 import { apiRequest } from '../../../../service/api';
 import './PostCard.css';
 import { IoBeerOutline, IoBeer } from "react-icons/io5";
 
 function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl, likes, comments, currentUser, onPostDeleted }) {
+    const navigate = useNavigate(); // 🌟 2. เรียกใช้ฟังก์ชัน navigate
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showComments, setShowComments] = useState(false);
@@ -18,7 +21,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
     // 🌟 State สำหรับ Popup แก้ไข
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(text);
-    const [editImage, setEditImage] = useState(imageUrl || null); // 🌟 เก็บค่ารูประหว่างแก้ไข
+    const [editImage, setEditImage] = useState(imageUrl || null); 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
@@ -59,7 +62,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setEditImage(reader.result); // แปลงรูปเป็น Base64 แล้วเก็บลง State
+                setEditImage(reader.result); 
             };
             reader.readAsDataURL(file);
         }
@@ -74,7 +77,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         try {
             const response = await apiRequest(`/posts/${postId}`, 'PUT', { 
                 text: editText,
-                image_url: editImage // ส่งรูปภาพไปด้วย
+                image_url: editImage 
             });
             if (response.message.includes("เรียบร้อย")) {
                 setIsEditing(false);
@@ -115,10 +118,12 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
     return (
         <div className="wooden-box post-card-container">
             <div className="post-header">
-                <div className="user-info-group">
+                
+                {/* 🌟 3. เติม onClick และ className ให้ตรงจุดนี้ (กดเพื่อไปหน้าโปรไฟล์) */}
+                <div className="user-info-group clickable-profile" onClick={() => navigate(`/profile/${author}`)}>
                     <div className="post-avatar"><img src={avatarUrl} alt="Profile" /></div>
                     <div className="user-meta">
-                        <strong className="post-username">{author}</strong>
+                        <strong className="post-username hover-name">{author}</strong>
                         <span className="post-time">{time}</span>
                     </div>
                 </div>
@@ -128,7 +133,6 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                         <div className="menu-trigger" onClick={() => setIsMenuOpen(!isMenuOpen)}><TbDots size={24} /></div>
                         {isMenuOpen && (
                             <div className="post-dropdown-menu">
-                                {/* 🌟 เปิด Modal พร้อมดึงข้อมูลรูปภาพเก่ามาแสดง */}
                                 <div className="dropdown-item" onClick={() => { 
                                     setIsEditing(true); 
                                     setIsMenuOpen(false);

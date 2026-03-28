@@ -48,6 +48,30 @@ BANNER_PRESETS = [
 ]
 
 # ==========================================
+# 🔔 NOTIFICATION HELPER
+# ==========================================
+def create_notification(recipient, sender, notif_type, message, post_id=None):
+    if recipient == sender:
+        return 
+        
+    sender_data = mongo.db.users.find_one({'username': sender})
+    sender_image = sender_data.get('profile_image', '1.png') if sender_data else '1.png'
+    sender_display_name = sender_data.get('display_name', sender) if sender_data else sender
+
+    notification = {
+        'recipient_username': recipient,
+        'sender_username': sender,
+        'sender_display_name': sender_display_name,
+        'sender_image': sender_image,
+        'type': notif_type, 
+        'message': message,
+        'post_id': str(post_id) if post_id else None,
+        'is_read': False,
+        'created_at': datetime.utcnow()
+    }
+    mongo.db.notifications.insert_one(notification)
+
+# ==========================================
 # 👤 USER SYSTEM (SIGNUP / SIGNIN / PROFILE)
 # ==========================================
 @app.route('/signup', methods=['POST'])
@@ -69,7 +93,7 @@ def signup():
 
     new_user = {
         'username': username,
-        'display_name': username, # ตั้งเป็นชื่อแสดงผลเริ่มต้น
+        'display_name': username,
         'password': hashed_password,
         'email': email,
         'profile_image': default_avatar,
@@ -218,6 +242,10 @@ def toggle_follow(username):
             {'username': current_user},
             {'$push': {'following': username}}
         )
+        
+        # 🌟 แจ้งเตือนเมื่อกดติดตาม
+        create_notification(username, current_user, 'follow', 'เริ่มติดตามคุณแล้ว')
+        
         return jsonify({'message': 'Followed', 'is_following': True}), 200
 
 # ==========================================
@@ -334,6 +362,10 @@ def toggle_like(post_id):
         return jsonify({'message': 'Unliked', 'liked': False}), 200
     else:
         mongo.db.posts.update_one({'_id': ObjectId(post_id)}, {'$push': {'likes': current_user}})
+        
+        # 🌟 แจ้งเตือนเมื่อกด Like
+        create_notification(post.get('author_username'), current_user, 'like', 'ถูกใจโพสต์ของคุณ', post_id)
+        
         return jsonify({'message': 'Liked', 'liked': True}), 200
 
 @app.route('/posts/<post_id>/comment', methods=['POST'])
@@ -344,6 +376,9 @@ def add_comment(post_id):
     comment_text = data.get('text', '').strip()
     if not comment_text: return jsonify({'message': 'Comment cannot be empty!'}), 400
     
+    post = mongo.db.posts.find_one({'_id': ObjectId(post_id)})
+    if not post: return jsonify({'message': 'Post not found'}), 404
+    
     new_comment = {
         'comment_id': str(uuid.uuid4()),
         'author': current_user,
@@ -351,7 +386,48 @@ def add_comment(post_id):
         'create_at': datetime.utcnow()
     }
     mongo.db.posts.update_one({'_id': ObjectId(post_id)}, {'$push': {'comment': new_comment}})
+    
+    # 🌟 แจ้งเตือนเมื่อมีคอมเมนต์
+    create_notification(post.get('author_username'), current_user, 'comment', 'คอมเมนต์ในโพสต์ของคุณ', post_id)
+    
     return jsonify({'message': 'Comment added successfully!', 'comment': new_comment}), 201
+
+# ==========================================
+# 🔔 GET NOTIFICATIONS
+# ==========================================
+@app.route('/notifications', methods=['GET'])
+@jwt_required()
+def get_notifications():
+    current_user = get_jwt_identity()
+    
+    # จำกัดรายการให้ดึงมาแค่ 30 รายการล่าสุด ป้องกันโหลดข้อมูลเยอะเกิน
+    notifs_cursor = mongo.db.notifications.find({'recipient_username': current_user}).sort('created_at', -1).limit(30)
+    
+    notifs_list = []
+    unread_count = 0
+    
+    for n in notifs_cursor:
+        n['_id'] = str(n['_id'])
+        if not n.get('is_read', False):
+            unread_count += 1
+        notifs_list.append(n)
+        
+    return jsonify({
+        'notifications': notifs_list,
+        'unread_count': unread_count
+    }), 200
+
+@app.route('/notifications/read', methods=['PUT'])
+@jwt_required()
+def mark_notifications_read():
+    current_user = get_jwt_identity()
+    
+    # อัปเดตรายการที่ยังไม่ได้อ่านให้เปลี่ยนเป็นอ่านแล้วทั้งหมด
+    mongo.db.notifications.update_many(
+        {'recipient_username': current_user, 'is_read': False},
+        {'$set': {'is_read': True}}
+    )
+    return jsonify({'message': 'ทำเครื่องหมายว่าอ่านแล้วทั้งหมด'}), 200
 
 # ==========================================
 # 🔥 TRENDING HASHTAGS

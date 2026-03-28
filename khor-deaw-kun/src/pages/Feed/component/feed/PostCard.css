@@ -395,3 +395,24 @@
     border-color: #f48c2a;
     color: #3E2723;
 }
+
+/* =========================================
+   👤 Profile Click Hover 
+   ========================================= */
+
+/* ให้เมาส์เป็นรูปนิ้วเวลากดที่ชื่อหรือรูป */
+.clickable-profile {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+/* เวลาเอาเมาส์ชี้ให้รูป/ชื่อ ขยับขึ้นนิดนึงแบบมีมิติ */
+.clickable-profile:hover {
+    transform: translateY(-2px);
+}
+
+/* เวลาเอาเมาส์ชี้ ให้ชื่อเพื่อนเปลี่ยนเป็นสีส้มเด่นๆ */
+.clickable-profile:hover .hover-name {
+    color: #F48C2A; 
+    text-decoration: underline; /* ใส่ขีดเส้นใต้ให้รู้ว่าเป็นลิงก์ */
+}
