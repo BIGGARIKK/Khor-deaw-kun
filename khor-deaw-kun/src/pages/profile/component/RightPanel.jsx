@@ -15,7 +15,7 @@ const RightPanel = ({ setIsStoryOpen, stories = [] }) => {
                   {stories.slice(1, 5).map((img, idx) => (
                      <div key={idx} style={{
                         position: 'absolute',
-                        top: 0, left: 0,
+                        top: 0, left: -6,
                         width: '100%', height: '100%',
                         borderRadius: '8px',
                         border: '2px solid #fff',

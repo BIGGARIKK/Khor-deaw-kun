@@ -63,10 +63,7 @@ const Profile = () => {
 
   const [userData, setUserData] = useState(null);
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [bannerColor, setBannerColor] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * BANNER_PRESETS.length);
-    return BANNER_PRESETS[randomIndex];
-  });
+  const [bannerColor, setBannerColor] = useState(BANNER_PRESETS[0]);
   const colorInputRef = useRef(null);
   const [stories, setStories] = useState([]);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
@@ -97,6 +94,18 @@ const Profile = () => {
 
   const [userPosts, setUserPosts] = useState([]);
 
+  const handleBannerChange = async (newColor) => {
+    setBannerColor(newColor); // เปลี่ยนสีบนหน้าจอทันที
+    try {
+      // 🌟 บันทึกสีลงฐานข้อมูล (ล็อคสี)
+      await apiRequest('/profile', 'PUT', { banner: newColor }); 
+      console.log("ล็อคสีเรียบร้อย:", newColor);
+    } catch (error) {
+      console.error("บันทึกสีไม่สำเร็จ:", error);
+    }
+  };
+  
+
   useEffect(() => {
     if (!targetUser) return; // ถ้าไม่มีข้อมูล User ให้หยุดทำงาน
 
@@ -106,9 +115,11 @@ const Profile = () => {
         const profileData = await apiRequest(`/profile/${targetUser}`, 'GET');
         setUserData(profileData);
 
-        if (profileData && profileData.stories) {
-          setStories(profileData.stories);
-        }
+        if (profileData && profileData.banner) {
+        setBannerColor(profileData.banner);
+      } else {
+        setBannerColor(BANNER_PRESETS[0]);
+      }
 
         if (profileData && profileData.profile_image) {
           const match = profileData.profile_image.match(/\d+/);
@@ -401,7 +412,7 @@ const Profile = () => {
 
       </div>
 
-      {isColorModalOpen && <BannerColorModal setIsColorModalOpen={setIsColorModalOpen} bannerColor={bannerColor} setBannerColor={setBannerColor} bannerPresets={BANNER_PRESETS} />}
+      {isColorModalOpen && <BannerColorModal setIsColorModalOpen={setIsColorModalOpen} bannerColor={bannerColor} setBannerColor={handleBannerChange} bannerPresets={BANNER_PRESETS} />}
       {isAvatarModalOpen && <AvatarModal setIsAvatarModalOpen={setIsAvatarModalOpen} avatarPresets={avatarPresets} avatarImage={avatarImage} setAvatarImage={setAvatarImage} handleUpdateAvatar={handleUpdateAvatar} />}
       {isStoryOpen && <StoryModal setIsStoryOpen={setIsStoryOpen} stories={stories} currentStoryIndex={currentStoryIndex} fileInputRef={fileInputRef} handleDeleteStory={handleDeleteStory} handleStoryNavigation={handleStoryNavigation} handleFileChange={handleFileChange} storyProgress={storyProgress} handlePointerDown={handlePointerDown} handlePointerUp={handlePointerUp} setIsPaused={setIsPaused} handleAddStoryClick={handleAddStoryClick} />}
     </div>

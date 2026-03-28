@@ -32,24 +32,28 @@ const LeftPanel = ({ navigate, userData, setUserData, actualPostCount, isContact
 
   const handleToggleEdit = async () => {
     if (isEditingContact) {
+      
+      // เช็คว่าข้อมูลไม่มีการเปลี่ยนแปลงจากเดิมเลยใช่ไหม
       const isUnchanged = 
         socials.line === (userData?.socials?.line || '') &&
         socials.facebook === (userData?.socials?.facebook || '') &&
         socials.instagram === (userData?.socials?.instagram || '');
 
+      // 🌟 1. ถ้ากดเปิดมาแล้วไม่ได้กรอกอะไรเลย (หรือไม่ได้แก้) ให้ย้อนกลับหน้าเดิม
       if (isUnchanged) {
         setIsEditingContact(false);
         return; 
       }
+
+      // เช็คว่าช่องถูกปล่อยว่างทั้งหมดหรือไม่
+      const isAllEmpty = !socials.line.trim() && !socials.facebook.trim() && !socials.instagram.trim();
 
       try {
         await apiRequest('/profile', 'PUT', { socials: socials });
         if (setUserData) {
           setUserData(prev => ({ ...prev, socials: socials }));
         }
-        
-        const isAllEmpty = !socials.line.trim() && !socials.facebook.trim() && !socials.instagram.trim();
-        
+      
         if (!isAllEmpty) {
           alert("successfully! 💾"); 
         }
@@ -60,6 +64,7 @@ const LeftPanel = ({ navigate, userData, setUserData, actualPostCount, isContact
       }
     }
     
+    // เปลี่ยนสถานะเพื่อปิดโหมด Edit
     setIsEditingContact(!isEditingContact);
   };
 
