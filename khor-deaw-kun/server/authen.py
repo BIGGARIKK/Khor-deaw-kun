@@ -48,14 +48,58 @@ BANNER_PRESETS = [
 ]
 
 # ==========================================
+# 🔔 NOTIFICATION HELPER
+# ==========================================
+def create_notification(recipient, sender, notif_type, message, post_id=None):
+    if recipient == sender:
+        return 
+        
+    sender_data = mongo.db.users.find_one({'username': sender})
+    sender_image = sender_data.get('profile_image', '1.png') if sender_data else '1.png'
+    sender_display_name = sender_data.get('display_name', sender) if sender_data else sender
+
+    notification = {
+        'recipient_username': recipient,
+        'sender_username': sender,
+        'sender_display_name': sender_display_name,
+        'sender_image': sender_image,
+        'type': notif_type, 
+        'message': message,
+        'post_id': str(post_id) if post_id else None,
+        'is_read': False,
+        'created_at': datetime.utcnow()
+    }
+    mongo.db.notifications.insert_one(notification)
+
+# ==========================================
 # 👤 USER SYSTEM (SIGNUP / SIGNIN / PROFILE)
 # ==========================================
+
+@app.route('/check-username', methods=['GET'])
+def check_username():
+    username = request.args.get('username')
+    
+    if not username:
+        return jsonify({'message': 'ไม่ได้ส่งค่า username มา'}), 400
+
+    existing_user = mongo.db.users.find_one({'username': username})
+    
+    if existing_user:
+        return jsonify({'exists': True, 'message': 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว'}), 200
+    else:
+        return jsonify({'exists': False, 'message': 'ชื่อผู้ใช้นี้สามารถใช้งานได้'}), 200
+
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
     email = data.get('email')
+
+    # 🌟 ดักจับข้อมูลว่าง (ป้องกัน Error 500 ตอนสร้าง Hash)
+    if not username or not password or not email:
+        return jsonify({'message': 'กรุณากรอกข้อมูลให้ครบถ้วน!'}), 400
+
     random_banner = random.choice(BANNER_PRESETS)
 
     if mongo.db.users.find_one({'username': username}):
@@ -82,8 +126,8 @@ def signup():
         'following': [],
         'socials': {'line': '', 'facebook': '', 'instagram': ''},
         'vibe_sliders': {'sleepy': 0, 'hungry': 0, 'energy': 0},
-        'online_status': 'online',
-        'notifications': [] # เตรียมถุงเก็บแจ้งเตือนไว้
+        'online_status': 'online'
+        # ไม่ต้องมี array notifications ในนี้แล้ว เพราะเราแยกไป Collection ใหม่แล้ว
     }
     
     mongo.db.users.insert_one(new_user)
@@ -167,7 +211,8 @@ def update_profile():
         
     if 'socials' in data:
         update_fields['socials'] = data['socials']
-    if 'stories' in data: 
+        
+    if 'stories' in data:
         update_fields['stories'] = data['stories']
 
     if update_fields:
@@ -176,7 +221,53 @@ def update_profile():
         
     return jsonify({'message': 'No data provided to update'}), 400
 
+@app.route('/profile/<username>', methods=['GET'])
+def get_other_profile(username):
+    user = mongo.db.users.find_one({'username': username}, {'_id': 0, 'password': 0})
+    if user:
+        return jsonify(user), 200
+    return jsonify({'message': 'User not found'}), 404
 
+# ==========================================
+# 🤝 FOLLOW SYSTEM
+# ==========================================
+@app.route('/users/<username>/follow', methods=['POST'])
+@jwt_required()
+def toggle_follow(username):
+    current_user = get_jwt_identity() 
+    
+    if current_user == username:
+        return jsonify({'message': 'You cannot follow yourself!'}), 400
+        
+    target_user = mongo.db.users.find_one({'username': username})
+    
+    if not target_user:
+        return jsonify({'message': 'User not found'}), 404
+        
+    if current_user in target_user.get('followers', []):
+        mongo.db.users.update_one(
+            {'username': username},
+            {'$pull': {'followers': current_user}}
+        )
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$pull': {'following': username}}
+        )
+        return jsonify({'message': 'Unfollowed', 'is_following': False}), 200
+    else:
+        mongo.db.users.update_one(
+            {'username': username},
+            {'$push': {'followers': current_user}}
+        )
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$push': {'following': username}}
+        )
+        
+        # แจ้งเตือนเมื่อกดติดตาม
+        create_notification(username, current_user, 'follow', 'เริ่มติดตามคุณแล้ว')
+        
+        return jsonify({'message': 'Followed', 'is_following': True}), 200
 
 # ==========================================
 # 📢 POST SYSTEM (CREATE / GET / EDIT / DELETE)
@@ -222,6 +313,19 @@ def get_posts():
         posts_list.append(post)
     return jsonify(posts_list), 200
 
+@app.route('/posts/<username>', methods=['GET'])
+def get_user_posts(username):
+    try:
+        posts_cursor = mongo.db.posts.find({'author_username': username}).sort("create_at", -1)
+        posts_list = []
+        for post in posts_cursor:
+            post["_id"] = str(post['_id']) 
+            posts_list.append(post)
+        return jsonify(posts_list), 200
+    except Exception as e:
+        print(f"Error fetching posts for {username}: {e}")
+        return jsonify({"error": "เกิดข้อผิดพลาดในการดึงข้อมูลโพสต์"}), 500
+
 @app.route('/posts/<post_id>', methods=['DELETE'])
 @jwt_required()
 def delete_post(post_id):
@@ -243,7 +347,7 @@ def update_post(post_id):
     current_user = get_jwt_identity()
     data = request.get_json()
     new_text = data.get('text', '').strip()
-    new_image_url = data.get('image_url') 
+    new_image_url = data.get('image_url')
 
     if not new_text and not new_image_url:
         return jsonify({'message': 'ข้อความหรือรูปภาพห้ามว่างทั้งหมด!'}), 400
@@ -280,23 +384,8 @@ def toggle_like(post_id):
     else:
         mongo.db.posts.update_one({'_id': ObjectId(post_id)}, {'$push': {'likes': current_user}})
         
-        # 🌟 แจ้งเตือน: มีคนมากด Like!
-        post_author = post.get('author_username')
-
-        if current_user != post_author:
-            actor = mongo.db.users.find_one({'username': current_user})
-            actor_image = actor.get('profile_image', '1.png') if actor else '1.png'
-            new_noti = {
-                'id': str(uuid.uuid4()),
-                'type': 'like',
-                'user': current_user,
-                'user_image': actor_image,
-                'text': 'ถูกใจโพสต์ของคุณ',
-                'create_at': datetime.utcnow().isoformat(),
-                'isRead': False
-            }
-            mongo.db.users.update_one({'username': post_author}, {'$push': {'notifications': new_noti}})
-
+        create_notification(post.get('author_username'), current_user, 'like', 'ถูกใจโพสต์ของคุณ', post_id)
+        
         return jsonify({'message': 'Liked', 'liked': True}), 200
 
 @app.route('/posts/<post_id>/comment', methods=['POST'])
@@ -306,7 +395,10 @@ def add_comment(post_id):
     data = request.get_json()
     comment_text = data.get('text', '').strip()
     if not comment_text: return jsonify({'message': 'Comment cannot be empty!'}), 400
-
+    
+    post = mongo.db.posts.find_one({'_id': ObjectId(post_id)})
+    if not post: return jsonify({'message': 'Post not found'}), 404
+    
     new_comment = {
         'comment_id': str(uuid.uuid4()),
         'author': current_user,
@@ -315,61 +407,67 @@ def add_comment(post_id):
     }
     mongo.db.posts.update_one({'_id': ObjectId(post_id)}, {'$push': {'comment': new_comment}})
     
-    # 🌟 แจ้งเตือน: มีคนมา Comment!
-    post = mongo.db.posts.find_one({'_id': ObjectId(post_id)})
-    if post:
-        post_author = post.get('author_username')
-        if current_user != post_author:
-            actor = mongo.db.users.find_one({'username': current_user})
-            actor_image = actor.get('profile_image', '1.png') if actor else '1.png'
-            new_noti = {
-                'id': str(uuid.uuid4()),
-                'type': 'comment',
-                'user': current_user,
-                'user_image': actor_image,
-                'text': f'คอมเมนต์: "{comment_text[:20]}{"..." if len(comment_text) > 20 else ""}"',
-                'create_at': datetime.utcnow().isoformat(),
-                'isRead': False
-            }
-            mongo.db.users.update_one({'username': post_author}, {'$push': {'notifications': new_noti}})
-
+    create_notification(post.get('author_username'), current_user, 'comment', 'คอมเมนต์ในโพสต์ของคุณ', post_id)
+    
     return jsonify({'message': 'Comment added successfully!', 'comment': new_comment}), 201
 
 # ==========================================
 # 🔔 GET NOTIFICATIONS
 # ==========================================
-# ==========================================
-# 🔔 GET NOTIFICATIONS (แก้ไขให้ดึงจาก User ตรงๆ)
-# ==========================================
 @app.route('/notifications', methods=['GET'])
 @jwt_required()
 def get_notifications():
     current_user = get_jwt_identity()
-    user = mongo.db.users.find_one({'username': current_user})
     
-    if not user:
-        return jsonify([]), 200 # ถ้าไม่เจอ user ส่ง array ว่างไป React จะได้ไม่พัง
+    notifs_cursor = mongo.db.notifications.find({'recipient_username': current_user}).sort('created_at', -1).limit(30)
+    
+    notifs_list = []
+    unread_count = 0
+    
+    for n in notifs_cursor:
+        n['_id'] = str(n['_id'])
+        if not n.get('is_read', False):
+            unread_count += 1
+        notifs_list.append(n)
         
-    # ดึง list การแจ้งเตือนออกมา (ถ้าไม่มีให้เป็น list ว่าง)
-    notifications = user.get('notifications', [])
-    
-    # พลิกเอาแจ้งเตือนใหม่ล่าสุดขึ้นก่อน
-    notifications.reverse()
-    
-    # ส่งไปแค่ 30 รายการล่าสุด
-    return jsonify(notifications[:30]), 200
+    return jsonify({
+        'notifications': notifs_list,
+        'unread_count': unread_count
+    }), 200
 
 @app.route('/notifications/read', methods=['PUT'])
 @jwt_required()
 def mark_notifications_read():
     current_user = get_jwt_identity()
     
-    # อัปเดต isRead ใน Array notifications ของ User คนนั้นๆ ให้เป็น True ทั้งหมด
-    mongo.db.users.update_one(
-        {'username': current_user},
-        {'$set': {'notifications.$[].isRead': True}}
+    mongo.db.notifications.update_many(
+        {'recipient_username': current_user, 'is_read': False},
+        {'$set': {'is_read': True}}
     )
-    return jsonify({'message': 'Marked as read'}), 200
+    return jsonify({'message': 'ทำเครื่องหมายว่าอ่านแล้วทั้งหมด'}), 200
+
+# ==========================================
+# 🔥 TRENDING HASHTAGS
+# ==========================================
+@app.route('/trending', methods=['GET'])
+def get_trending():
+    try:
+        posts = mongo.db.posts.find({}, {"text": 1}).sort("create_at", -1).limit(100)
+        all_tags = []
+        for post in posts:
+            text = post.get('text', '')
+            tags = re.findall(r'#[^\s#]+', text)
+            all_tags.extend(tags)
+            
+        top_tags = Counter(all_tags).most_common(5)
+        trending_data = [{"tag": tag, "count": count} for tag, count in top_tags]
+        
+        return jsonify(trending_data), 200
+    except Exception as e:
+        print(f"Error fetching trending tags: {e}")
+        return jsonify({"error": "Failed to fetch trending"}), 500
+
+# ==========================================
 # 🏠 ROOMS SYSTEM
 # ==========================================
 def generate_room_id():
@@ -419,101 +517,7 @@ def get_all_rooms():
     return jsonify(rooms), 200
 
 # ==========================================
-# 🤝 TOGGLE FOLLOW
+# 🚀 MAIN RUN
 # ==========================================
-@app.route('/users/<username>/follow', methods=['POST'])
-@jwt_required()
-def toggle_follow(username):
-    current_user = get_jwt_identity() 
-    
-    if current_user == username:
-        return jsonify({'message': 'You cannot follow yourself!'}), 400
-        
-    target_user = mongo.db.users.find_one({'username': username}) 
-    
-    if not target_user:
-        return jsonify({'message': 'User not found'}), 404
-        
-    if current_user in target_user.get('followers', []):
-        mongo.db.users.update_one(
-            {'username': username},
-            {'$pull': {'followers': current_user}}
-        )
-        mongo.db.users.update_one(
-            {'username': current_user},
-            {'$pull': {'following': username}}
-        )
-        return jsonify({'message': 'Unfollowed', 'is_following': False}), 200
-    else:
-        mongo.db.users.update_one(
-            {'username': username},
-            {'$push': {'followers': current_user}}
-        )
-        mongo.db.users.update_one(
-            {'username': current_user},
-            {'$push': {'following': username}}
-        )
-        
-        # 🌟 แจ้งเตือน: มีคนมากด Follow!
-        actor = mongo.db.users.find_one({'username': current_user})
-        actor_image = actor.get('profile_image', '1.png') if actor else '1.png'
-        new_noti = {
-            'id': str(uuid.uuid4()),
-            'type': 'follow',
-            'user': current_user,
-            'user_image': actor_image,
-            'text': 'เริ่มติดตามคุณแล้ว',
-            'create_at': datetime.utcnow().isoformat(),
-            'isRead': False
-        }
-        mongo.db.users.update_one({'username': username}, {'$push': {'notifications': new_noti}})
-
-        return jsonify({'message': 'Followed', 'is_following': True}), 200
-
-@app.route('/posts/<username>', methods=['GET'])
-def get_user_posts(username):
-    try:
-        posts_cursor = mongo.db.posts.find({'author_username': username}).sort("create_at", -1)
-        posts_list = []
-        for post in posts_cursor:
-            post["_id"] = str(post['_id']) 
-            posts_list.append(post)
-            
-        return jsonify(posts_list), 200
-    except Exception as e:
-        print(f"Error fetching posts for {username}: {e}")
-        return jsonify({"error": "เกิดข้อผิดพลาดในการดึงข้อมูลโพสต์"}), 500
-
-@app.route('/profile/<username>', methods=['GET'])
-def get_other_profile(username):
-    user = mongo.db.users.find_one({'username': username}, {'_id': 0, 'password': 0})
-    if user:
-        return jsonify(user), 200
-    return jsonify({'message': 'User not found'}), 404
-
-# ==========================================
-# 📈 TRENDING & NOTIFICATIONS
-# ==========================================
-
-@app.route('/trending', methods=['GET'])
-def get_trending():
-    try:
-        posts = mongo.db.posts.find({}, {"text": 1}).sort("create_at", -1).limit(100)
-        
-        all_tags = []
-        for post in posts:
-            text = post.get('text', '')
-            tags = re.findall(r'#[^\s#]+', text)
-            all_tags.extend(tags)
-            
-        top_tags = Counter(all_tags).most_common(5)
-        trending_data = [{"tag": tag, "count": count} for tag, count in top_tags]
-        
-        return jsonify(trending_data), 200
-    except Exception as e:
-        print(f"Error fetching trending tags: {e}")
-        return jsonify({"error": "Failed to fetch trending"}), 500
-
-
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5000)

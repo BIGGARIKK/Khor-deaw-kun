@@ -3,12 +3,10 @@ import { TbX } from "react-icons/tb";
 import { apiRequest } from '../../../../service/api'; 
 import './NotificationDropdown.css';
 
-// 🌟 1. แก้ Path รูปให้ตรงกับที่เก็บจริงของโปรเจกต์คุณ
 const getAvatarUrl = (imageName, userName) => {
     if (!imageName) return `https://ui-avatars.com/api/?name=${userName || 'User'}&background=random`;
     if (imageName.startsWith('http')) return imageName;
     
-    // 🌟 เปลี่ยนมาใช้ Path เดียวกับ PostCard.jsx
     return `/src/assets/avatars/${imageName}`; 
 };
 
@@ -35,13 +33,16 @@ function NotificationDropdown({ onClose }) {
         const fetchNotifications = async () => {
             try {
                 const data = await apiRequest('/notifications', 'GET');
-                setNotifications(data || []);
+                
+                // 🌟 ดึงเอา Array ออกมาจาก data.notifications
+                const notiList = data.notifications || [];
+                setNotifications(notiList);
                 setIsLoading(false);
 
-                // 🌟 แอบปริ้นท์ดูใน F12 ว่า Server ส่ง user_image มาให้ไหม?
                 console.log("ข้อมูลแจ้งเตือนที่ได้จาก Server:", data);
 
-                if (data && data.some(n => !n.isRead)) {
+                // 🌟 ใช้ unread_count ที่ Server ส่งมาให้เช็คได้เลยว่าต้องอัปเดตไหม
+                if (data && data.unread_count > 0) {
                     await apiRequest('/notifications/read', 'PUT');
                 }
             } catch (error) {
@@ -55,9 +56,7 @@ function NotificationDropdown({ onClose }) {
 
     return (
         <div className="noti-modal-overlay" onClick={onClose}>
-            
             <div className="noti-modal-content wooden-box" onClick={(e) => e.stopPropagation()}>
-                
                 <div className="noti-header">
                     <h3>การแจ้งเตือน</h3>
                     <button className="noti-close-btn" onClick={onClose}>
@@ -69,34 +68,42 @@ function NotificationDropdown({ onClose }) {
                     {isLoading ? (
                         <div className="noti-empty">กำลังโหลดข้อมูล... ⏳</div>
                     ) : notifications.length > 0 ? (
-                        notifications.map((noti) => (
-                            <div key={noti.id} className={`noti-item ${noti.isRead ? 'read' : 'unread'}`}>
-                                
-                                <div className="noti-avatar-container" style={{ flexShrink: 0, marginRight: '12px' }}>
-                                    <img 
-                                        src={getAvatarUrl(noti.user_image, noti.user)} 
-                                        alt={noti.user} 
-                                        className="noti-profile-img"
-                                        onError={(e) => {
-                                            e.target.onerror = null; 
-                                            e.target.src = `https://ui-avatars.com/api/?name=${noti.user}&background=random`;
-                                        }}
-                                        style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #D7CCC8' }} 
-                                    />
+                        notifications.map((noti) => {
+                            // 🌟 ปรับให้รองรับทั้งข้อมูลแบบเก่าและแบบใหม่จาก Database
+                            const senderName = noti.sender_username || noti.user;
+                            const senderImage = noti.sender_image || noti.user_image;
+                            const messageText = noti.message || noti.text;
+                            const createdAt = noti.created_at || noti.create_at;
+                            const isRead = noti.is_read ?? noti.isRead;
+
+                            return (
+                                <div key={noti._id || noti.id} className={`noti-item ${isRead ? 'read' : 'unread'}`}>
+                                    
+                                    <div className="noti-avatar-container" style={{ flexShrink: 0, marginRight: '12px' }}>
+                                        <img 
+                                            src={getAvatarUrl(senderImage, senderName)} 
+                                            alt={senderName} 
+                                            className="noti-profile-img"
+                                            onError={(e) => {
+                                                e.target.onerror = null; 
+                                                e.target.src = `https://ui-avatars.com/api/?name=${senderName}&background=random`;
+                                            }}
+                                            style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #D7CCC8' }} 
+                                        />
+                                    </div>
+                                    
+                                    <div className="noti-content">
+                                        <p><strong>{senderName}</strong> {messageText}</p>
+                                        <span className="noti-time">{formatTimeAgo(createdAt)}</span>
+                                    </div>
+                                    {!isRead && <div className="noti-dot"></div>}
                                 </div>
-                                
-                                <div className="noti-content">
-                                    <p><strong>{noti.user}</strong> {noti.text}</p>
-                                    <span className="noti-time">{formatTimeAgo(noti.create_at)}</span>
-                                </div>
-                                {!noti.isRead && <div className="noti-dot"></div>}
-                            </div>
-                        ))
+                            );
+                        })
                     ) : (
                         <div className="noti-empty">ไม่มีการแจ้งเตือนใหม่ครับ 🏖️</div>
                     )}
                 </div>
-
             </div>
         </div>
     );
