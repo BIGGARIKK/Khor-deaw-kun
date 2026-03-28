@@ -127,7 +127,7 @@ function BottomBar() {
                             <div className="stat-box"><strong>#1001</strong><span>Table</span></div>
                         </div>
 
-                        <button className="full-profile-btn" onClick={() => { setShowProfileSheet(false); navigate("/profile"); }}>
+                        <button className="full-profile-btn" onClick={() => { setShowProfileSheet(false); navigate(`/profile/${userData?.username}`); }}>
                             ดูโปรไฟล์ฉบับเต็ม <TbChevronRight size={24} />
                         </button>
                     </div>

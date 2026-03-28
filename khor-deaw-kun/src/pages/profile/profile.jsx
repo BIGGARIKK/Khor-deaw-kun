@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom'; // 🌟 1. Import useParams เพิ่มเข้ามา
 import { apiRequest } from '../../service/api';
 import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import PostCard from '../Feed/component/feed/PostCard';
@@ -8,7 +8,7 @@ import './profile.css';
 import LeftPanel from './component/LeftPanel';
 import ProfileHeader from './component/ProfileHeader';
 import RightPanel from './component/RightPanel';
-import MyPosts from './component/MyPosts'; 
+import MyPosts from './component/MyPosts';
 
 import AvatarModal from './component/AvatarModal';
 import StoryModal from './component/StoryModal';
@@ -23,6 +23,24 @@ import myAv6 from '../../assets/avatars/6.png';
 import myAv7 from '../../assets/avatars/7.png';
 import myAv8 from '../../assets/avatars/8.png';
 import myAv9 from '../../assets/avatars/9.png';
+
+// 🌟 ฟังก์ชันแปลงวันที่ให้ปลอดภัย ไม่ขึ้น Invalid
+const formatDate = (dateString) => {
+  if (!dateString) return 'ไม่ทราบเวลา';
+
+  // ถ้า Python ส่งมาเป็น "2024-10-25 14:30:00" ให้เปลี่ยนช่องว่างเป็นตัว T
+  const safeDateString = dateString.toString().replace(' ', 'T');
+  const date = new Date(safeDateString);
+
+  // เช็คอีกรอบว่าแปลงสำเร็จไหม ถ้าไม่สำเร็จให้คืนค่าเดิม
+  if (isNaN(date.getTime())) return 'ไม่ทราบเวลา';
+
+  return date.toLocaleDateString('th-TH', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric' // ถ้าไม่อยากได้ปี เอาบรรทัดนี้ออกได้ครับ
+  });
+};
 
 export const BANNER_PRESETS = [
   { id: 1, color: '#ffb8b8', pattern: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 15px, transparent 15px, transparent 30px)', size: '100% 100%' },
@@ -41,10 +59,12 @@ export const BANNER_PRESETS = [
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { username } = useParams(); // 🌟 2. ดึง username จาก URL (ถ้ามี)
+
   const [userData, setUserData] = useState(null);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [bannerColor, setBannerColor] = useState(() => {
-  const randomIndex = Math.floor(Math.random() * BANNER_PRESETS.length);
+    const randomIndex = Math.floor(Math.random() * BANNER_PRESETS.length);
     return BANNER_PRESETS[randomIndex];
   });
   const colorInputRef = useRef(null);
@@ -53,8 +73,14 @@ const Profile = () => {
   const fileInputRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
+
   const myLoggedInUsername = localStorage.getItem('username');
-  const checkIsOwnProfile = userData?.username === myLoggedInUsername;
+
+  // 🌟 3. หาเป้าหมาย: ถ้ามี username ใน URL ให้ดูคนนั้น ถ้าไม่มีให้ดูของตัวเอง
+  const targetUser = username || myLoggedInUsername;
+
+  // เช็คว่าหน้าที่กำลังดู คือหน้าของเราเองใช่ไหม (เพื่อเปิด/ปิดปุ่มแก้ไข)
+  const checkIsOwnProfile = targetUser === myLoggedInUsername;
 
   const avatarPresets = [myAv1, myAv2, myAv3, myAv4, myAv5, myAv6, myAv7, myAv8, myAv9];
   const [avatarImage, setAvatarImage] = useState(() => {
@@ -72,13 +98,14 @@ const Profile = () => {
   const [userPosts, setUserPosts] = useState([]);
 
   useEffect(() => {
+    if (!targetUser) return; // ถ้าไม่มีข้อมูล User ให้หยุดทำงาน
+
     const loadProfileAndPosts = async () => {
       try {
-        // ดึงข้อมูลโปรไฟล์
-        const profileData = await apiRequest('/profile', 'GET');
+        // 🌟 4. ดึงข้อมูล Profile ตามชื่อเป้าหมาย
+        const profileData = await apiRequest(`/profile/${targetUser}`, 'GET');
         setUserData(profileData);
 
-        // 🌟 1. ดึงข้อมูล Stories จาก Database มาใส่ State
         if (profileData && profileData.stories) {
           setStories(profileData.stories);
         }
@@ -93,18 +120,20 @@ const Profile = () => {
           }
         }
 
-        // ดึงข้อมูลโพสต์ของเราเอง
-        const myPostsData = await apiRequest('/posts/me', 'GET');
-        if (myPostsData) {
-          setUserPosts(myPostsData);
+        // 🌟 5. ดึงข้อมูล Post ตามชื่อเป้าหมาย
+        const userPostsData = await apiRequest(`/posts/${targetUser}`, 'GET');
+
+        if (userPostsData) {
+          setUserPosts(userPostsData);
         }
 
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
     };
+
     loadProfileAndPosts();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [targetUser]); // 🌟 เปลี่ยนมาจับการเปลี่ยนแปลงของ targetUser แทน
 
   const imagePosts = userPosts.filter(post => post.image_url && post.image_url.trim() !== "");
   const textPosts = userPosts.filter(post => !post.image_url || post.image_url.trim() === "");
@@ -195,7 +224,6 @@ const Profile = () => {
     );
   }
 
-  // 🌟 2. แปลงรูปเป็น Base64 แล้วยิงเซฟลง Database
   const handleFileChange = (e) => {
     if (stories.length >= 10) {
       alert("You can upload up to 10 stories only! 📸");
@@ -208,11 +236,10 @@ const Profile = () => {
       reader.onloadend = async () => {
         const base64String = reader.result;
         const newStories = [...stories, base64String];
-        
+
         try {
-          // ยิง API บันทึกสตอรี่ใหม่ลง Database
           await apiRequest('/profile', 'PUT', { stories: newStories });
-          
+
           setStories(newStories);
           setCurrentStoryIndex(newStories.length - 1);
           setStoryProgress(0);
@@ -222,18 +249,17 @@ const Profile = () => {
           alert("อัปโหลดสตอรี่ไม่สำเร็จ!");
         }
       };
-      reader.readAsDataURL(file); // เริ่มการแปลงไฟล์
+      reader.readAsDataURL(file);
     }
   };
 
-  // 🌟 3. ยิง API เวลาลบสตอรี่เพื่อเอาออกจาก Database
   const handleDeleteStory = async (e) => {
     e.stopPropagation();
     const newStories = stories.filter((_, index) => index !== currentStoryIndex);
-    
+
     try {
       await apiRequest('/profile', 'PUT', { stories: newStories });
-      
+
       setStories(newStories);
       setStoryProgress(0);
       if (currentStoryIndex > 0) {
@@ -275,14 +301,14 @@ const Profile = () => {
       />
 
       <div className="profile-container">
-        
+
         {/* ✨ คอลัมน์ซ้าย (1fr) */}
         <div className="left-panel-wrapper">
           <LeftPanel
             navigate={navigate}
             userData={userData}
-            setUserData={setUserData}        
-            actualPostCount={userPosts.length} 
+            setUserData={setUserData}
+            actualPostCount={userPosts.length}
             isContactOpen={isContactOpen}
             setIsContactOpen={setIsContactOpen}
             isOwnProfile={checkIsOwnProfile}
@@ -298,7 +324,7 @@ const Profile = () => {
             avatarImage={avatarImage}
             setIsAvatarModalOpen={setIsAvatarModalOpen}
             avatarPresets={avatarPresets}
-            isOwnProfile={checkIsOwnProfile} 
+            isOwnProfile={checkIsOwnProfile}
           />
 
           <div className="feed-carousel-section">
@@ -312,19 +338,30 @@ const Profile = () => {
               </button>
             )}
 
+            {/* ในไฟล์ Profile.jsx ค้นหาช่วง <div className="carousel-content"> แล้วอัปเดต <PostCard /> ตามนี้ครับ */}
+
             <div className="carousel-content">
               {imagePosts.length > 0 ? (
                 <PostCard
                   postId={imagePosts[currentPostIndex]._id}
                   author={imagePosts[currentPostIndex].author_username}
-                  image_author={imagePosts[currentPostIndex].author_image || userData.profile_image}
-                  time={new Date(imagePosts[currentPostIndex].create_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+
+                  // 🌟 รูปโปรไฟล์: ถ้าโพสต์ไม่มีรูปคนเขียน ให้เอารูปของเจ้าของโปรไฟล์ (userData) มาแสดงแทน
+                  image_author={imagePosts[currentPostIndex].author_image || userData?.profile_image}
+
+                  // 🌟 เวลา: ใช้ฟังก์ชัน formatDate ที่เราเพิ่งทำกันไป เพื่อป้องกัน Invalid Date
+                  time={formatDate(imagePosts[currentPostIndex].create_at)}
+
                   text={imagePosts[currentPostIndex].text}
-                  hasImage={true}
+                  hasImage={true} // เป็น true แน่นอนเพราะอยู่ในโหมด imagePosts
                   imageUrl={imagePosts[currentPostIndex].image_url}
+
+                  // 🌟 ส่ง Array การกดไลก์และคอมเมนต์ไป
                   likes={imagePosts[currentPostIndex].likes || []}
-                  comments={imagePosts[currentPostIndex].comment || []} 
-                  currentUser={userData.username}
+                  comments={imagePosts[currentPostIndex].comment || []}
+
+                  // 🌟 พระเอกของเรา: ส่งชื่อคนล็อกอินเข้าไป เพื่อให้ PostCard เช็คว่าปุ่มไลก์ต้องเป็นสีส้มหรือยัง!
+                  currentUser={myLoggedInUsername}
                 />
               ) : (
                 <div className="doodle-box loading-box">ยังไม่มีโพสต์รูปภาพเลย 📸</div>
@@ -354,12 +391,12 @@ const Profile = () => {
             }}
           />
 
-          <MyPosts 
-            textPosts={textPosts} 
-            username={userData.username} 
-            userAvatar={userData.profile_image} 
+          <MyPosts
+            textPosts={textPosts}
+            username={userData.username}
+            userAvatar={userData.profile_image}
           />
-          
+
         </div>
 
       </div>

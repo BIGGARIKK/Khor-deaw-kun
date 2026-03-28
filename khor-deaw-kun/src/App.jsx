@@ -9,27 +9,25 @@ import Feed from './pages/Feed/Feed';
 import Hub from './pages/Hub/Hub';
 import GrillRoom from './pages/Mookata/GrillRoom';
 
-// ⚙️ เพิ่มการ Import หน้า Settings (เช็ค Path ไฟล์ให้ตรงกับที่บันทึกไว้นะครับ)
 import Settings from './pages/Feed/component/feed/Setting';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 1. เมื่อเข้าหน้าแรกสุด (/) ให้โยนไปหน้า /Signin */}
         <Route path="/" element={<Navigate to="/Signin" />} />
         
-        {/* 2. หน้า Authentication */}
         <Route path="/Signin" element={<SignIn />} />
         <Route path="/Signup" element={<SignUp />} />
         
-        {/* 3. หน้า Profile และ Settings */}
+        {/* 🌟 1. หน้า Profile ของเราเอง (ดึงจาก LocalStorage) */}
         <Route path="/profile" element={<Profile />} />
         
-        {/* ⚙️ เพิ่ม Route สำหรับหน้าตั้งค่าตรงนี้ครับ */}
+        {/* 🌟 2. เพิ่มบรรทัดนี้! สำหรับไปดูหน้า Profile คนอื่นตามชื่อ username ใน URL */}
+        <Route path="/profile/:username" element={<Profile />} />
+        
         <Route path="/settings" element={<Settings />} />
 
-        {/* 4. หน้า Content อื่นๆ */}
         <Route path="/Beach" element={<Feed />} />
         <Route path="/Hub" element={<Hub />} />
         <Route path="/Mookata" element={<GrillRoom />} />

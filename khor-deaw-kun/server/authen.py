@@ -335,5 +335,31 @@ def toggle_follow(username):
         )
         return jsonify({'message': 'Followed', 'is_following': True}), 200
 
+# 🌟 ดูโพสต์ของใครก็ได้ (รวมถึงของตัวเองด้วย)
+@app.route('/posts/<username>', methods=['GET'])
+def get_user_posts(username):
+    try:
+        # ค้นหาโพสต์ของ username นั้นๆ เรียงจากใหม่ไปเก่า
+        posts_cursor = mongo.db.posts.find({'author_username': username}).sort("create_at", -1)
+        
+        posts_list = []
+        for post in posts_cursor:
+            post["_id"] = str(post['_id']) # แปลง _id เป็น String
+            posts_list.append(post)
+            
+        return jsonify(posts_list), 200
+    except Exception as e:
+        print(f"Error fetching posts for {username}: {e}")
+        return jsonify({"error": "เกิดข้อผิดพลาดในการดึงข้อมูลโพสต์"}), 500
+
+
+@app.route('/profile/<username>', methods=['GET'])
+def get_other_profile(username):
+    # ดึงข้อมูล user โดยไม่เอา password และ _id ออกมา
+    user = mongo.db.users.find_one({'username': username}, {'_id': 0, 'password': 0})
+    if user:
+        return jsonify(user), 200
+    return jsonify({'message': 'User not found'}), 404
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5000)

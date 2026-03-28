@@ -38,6 +38,7 @@
 
 .user-meta { display: flex; flex-direction: column; }
 .post-username { font-weight: bold; font-size: 1.3rem; }
+.post-username:hover { color: #ffe0c2; cursor: pointer; }
 .post-time { font-size: 0.9rem; opacity: 0.8; font-weight: bold;}
 .menu-container { position: relative; }
 .menu-trigger { cursor: pointer; padding: 5px; border-radius: 50%; transition: 0.2s; }
