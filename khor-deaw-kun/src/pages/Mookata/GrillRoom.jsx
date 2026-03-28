@@ -104,6 +104,7 @@ function GrillRoom() {
         }
         // ฉีกกระดาษเลขห้องทิ้ง เพราะไม่ได้อยู่โต๊ะนี้แล้ว
         localStorage.removeItem('active_room');
+        
         navigate('/Hub');
     };
 

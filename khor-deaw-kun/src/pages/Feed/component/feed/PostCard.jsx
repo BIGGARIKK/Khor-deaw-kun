@@ -175,7 +175,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                         <span className="count">{commentLists.length}</span>
                     </button>
                 </div>
-                <button className="action-btn share-btn"><TbSend size={22} /></button>
+                {/* <button className="action-btn share-btn"><TbSend size={22} /></button> */}
             </div>
 
             {showComments && (

@@ -1,20 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { TbPhoto, TbMoodSmile, TbSend, TbX } from "react-icons/tb";
+import { useLocation } from 'react-router-dom'; 
 import './CreatePostBox.css';
 import { apiRequest } from '../../../../service/api';
 
-// 🌟 กุญแจ Cloudinary ของคุณ
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/duvkwerga/image/upload";
 const UPLOAD_PRESET = "ml_default";
 
 function CreatePostBox({ onPost }) {
     const [text, setText] = useState('');
-    const [imagePreview, setImagePreview] = useState(null); // ไว้โชว์รูปบนเว็บตอนพรีวิว
-    const [selectedFile, setSelectedFile] = useState(null); // 🌟 เพิ่มตัวนี้! เก็บไฟล์จริงไว้รอส่งขึ้น Cloud
+    const [imagePreview, setImagePreview] = useState(null); 
+    const [selectedFile, setSelectedFile] = useState(null); 
     const [isUploading, setIsUploading] = useState(false);
     
     const fileInputRef = useRef(null);
     const [userdata, setUserData] = useState(null);
+    
+    const location = useLocation(); 
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -31,22 +33,20 @@ function CreatePostBox({ onPost }) {
     const userImage = userdata?.profile_image || '1.png';
     const insertText = (str) => setText((prev) => prev + " " + str);
 
-    // 🌟 1. เลือกรูปปุ๊บ เก็บไฟล์จริงไว้ใน State และสร้าง URL ชั่วคราวไว้โชว์
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setSelectedFile(file); // เก็บไฟล์ตัวจริง!
-            setImagePreview(URL.createObjectURL(file)); // สร้างลิงก์หลอกไว้โชว์เฉยๆ
+            setSelectedFile(file); 
+            setImagePreview(URL.createObjectURL(file)); 
         }
     };
 
     const handleRemoveImage = () => {
         setImagePreview(null);
-        setSelectedFile(null); // 🌟 ล้างไฟล์จริงทิ้งด้วย
+        setSelectedFile(null); 
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    // 🌟 2. ฟังก์ชันคุยกับ Cloudinary
     const uploadImageToCloud = async (file) => {
         const formData = new FormData();
         formData.append("file", file);
@@ -58,14 +58,13 @@ function CreatePostBox({ onPost }) {
                 body: formData,
             });
             const data = await response.json();
-            return data.secure_url; // จะได้ลิงก์จริงกลับมา เช่น https://res.cloudinary...
+            return data.secure_url; 
         } catch (error) {
             console.error("Upload Image Error:", error);
             return null;
         }
     };
 
-    // 🌟 3. กด Shout ปุ๊บ อัปขึ้น Cloud ก่อน ค่อยส่งลิงก์เข้า Database ของเรา
     const handlePost = async () => {
         if (!text.trim() && !selectedFile) return;
 
@@ -74,20 +73,18 @@ function CreatePostBox({ onPost }) {
         try {
             let finalImageUrl = null;
 
-            // ถ้ามียูสเซอร์แนบรูปมา ให้เอาไปฝาก Cloudinary ก่อน!
             if (selectedFile) {
                 finalImageUrl = await uploadImageToCloud(selectedFile);
             }
 
-            // เตรียมข้อมูลส่งให้ Flask
             const postData = {
                 text: text.trim(),
-                image_url: finalImageUrl // 🌟 ส่งลิงก์จริง (https://...) ไปให้ DB เก็บ
+                image_url: finalImageUrl 
             };
 
             await apiRequest('/posts', 'POST', postData);
             
-            onPost(); // สั่งหน้า Feed รีเฟรช
+            onPost(); 
             setText('');
             handleRemoveImage();
 
@@ -96,6 +93,22 @@ function CreatePostBox({ onPost }) {
             alert("Shout ไม่สำเร็จ! ลองใหม่อีกครั้งนะ 🍻");
         } finally {
             setIsUploading(false);
+        }
+    };
+
+    // 🌟 ฟังก์ชันดึงพิกัด (เวอร์ชันอัปเกรด ค้นหาจาก LocalStorage ด้วย)
+    // 🌟 ฟังก์ชันดึงพิกัด (เวอร์ชันดึงจาก active_room)
+    const handleLocationClick = () => {
+        if (isUploading) return;
+        
+        // 1. ลองดึงจากที่เก็บไว้ (ถ้าเข้าห้องแล้ว จะมีค่านี้)
+        const savedRoom = localStorage.getItem('active_room');
+        
+        if (savedRoom) {
+            insertText(`[📍 โต๊ะ ${savedRoom}]`);
+        } else {
+            // ถ้าไม่มี (ยังไม่เข้าห้อง)
+            insertText('[📍 ริมหาดชิลล์ๆ]');
         }
     };
 
@@ -128,7 +141,11 @@ function CreatePostBox({ onPost }) {
                 <div className="premium-tools">
                     <input type="file" accept="image/*" style={{ display: 'none' }} ref={fileInputRef} onChange={handleImageChange} />
                     <div className="tool-btn" onClick={() => !isUploading && fileInputRef.current.click()}><TbPhoto size={24} /></div>
-                    <div className="tool-btn" onClick={() => !isUploading && insertText('[📍 โต๊ะ 1001]')}><span style={{ fontSize: '1.2rem' }}>📍</span></div>
+                    
+                    <div className="tool-btn" onClick={handleLocationClick}>
+                        <span style={{ fontSize: '1.2rem' }}>📍</span>
+                    </div>
+                    
                     <div className="tool-btn" onClick={() => !isUploading && insertText('🍻')}><TbMoodSmile size={24} /></div>
                 </div>
                 

@@ -17,7 +17,6 @@ function BottomBar() {
     // States ควบคุมการเปิด/ปิดหน้าต่างต่างๆ
     const [showProfileSheet, setShowProfileSheet] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false); 
-    // 🌟 เพิ่ม State ควบคุมการเปิดกล่องแจ้งเตือน
     const [showNotifications, setShowNotifications] = useState(false); 
     
     const [userData, setUserData] = useState(null);
@@ -79,7 +78,7 @@ function BottomBar() {
                     </div>
                 </div>
 
-                {/* 🌟 เปลี่ยนปุ่ม Shouts ให้มาสลับเปิด/ปิดกล่องแจ้งเตือนแทนการเปลี่ยนหน้า */}
+                {/* 🌟 ปุ่ม Shouts สลับเปิด/ปิดกล่องแจ้งเตือน */}
                 <div className={`nav-item ${showNotifications ? 'active' : ''}`} onClick={() => setShowNotifications(!showNotifications)}>
                     <TbBell size={28} />
                     <span className="nav-label">Shouts</span>
@@ -117,7 +116,7 @@ function BottomBar() {
                                 )}
                             </div>
                             <div className="sheet-user-info">
-                                <h2>{userData?.username || 'กำลังโหลด...'}</h2>
+                                <h2>{userData?.display_name || userData?.username || 'กำลังโหลด...'}</h2>
                                 <span className="profile-badge">{userData?.badge || 'BEACH VIP 🌴'}</span>
                             </div>
                         </div>
@@ -133,8 +132,10 @@ function BottomBar() {
 
                         <div className="quick-stats">
                             <div className="stat-box"><strong>{userData?.stats?.postCount || 0}</strong><span>Shouts</span></div>
-                            <div className="stat-box"><strong>{userData?.stats?.cheersCount || 0}</strong><span>Cheers!</span></div>
-                            <div className="stat-box"><strong>#1001</strong><span>Table</span></div>
+                            
+                            {/* 🌟 อัปเดตตรงนี้เป็น Followers และ Following */}
+                            <div className="stat-box"><strong>{userData?.followers?.length || 0}</strong><span>Followers</span></div>
+                            <div className="stat-box"><strong>{userData?.following?.length || 0}</strong><span>Following</span></div>
                         </div>
 
                         <button className="full-profile-btn" onClick={() => { setShowProfileSheet(false); navigate(`/profile/${userData?.username}`); }}>

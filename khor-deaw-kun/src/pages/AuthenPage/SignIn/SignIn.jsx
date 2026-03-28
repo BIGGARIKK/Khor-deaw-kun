@@ -54,7 +54,7 @@ function SignIn() {
       // 🌟 เปลี่ยนมาเซฟใส่คีย์ 'access_token' ตรงๆ ไปเลยครับ
 // localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('username', data.username); 
-      
+      localStorage.removeItem('active_room');
       // (เผื่ออยากเก็บรูปไว้ใช้โชว์ตรง Navbar ด้วยก็เก็บได้เลยครับ)
       localStorage.setItem('profile_image', data.profile_image);
       

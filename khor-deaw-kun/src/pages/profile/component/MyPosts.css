@@ -3,56 +3,64 @@
   display: flex; 
   flex-direction: column; 
   margin-top: 40px;
-  
-  /* ✨ ปรับลดเลขตรงนี้ลงครับ จาก 15px เหลือ 0 หรือ 5px ก็ได้ */
   margin-left: 0px; 
-  
   animation: popIn 0.5s ease; 
 }
 
+/* 🌟 ป้ายชื่อปรับให้เหมือนสติกเกอร์น่ารักๆ */
 .text-feed-title {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 800;
-  color: #222;
-  margin: 0 0 16px 0;
+  color: #1A1A1A;
+  margin: 0 0 20px 0;
   
-  /* ✨ ส่วนที่แก้ไขเพื่อให้ข้อความอยู่กึ่งกลางเป๊ะๆ */
   display: flex;
-  align-items: center;     /* กึ่งกลางแนวตั้ง */
-  justify-content: center;  /* กึ่งกลางแนวนอน */
-  min-height: 50px;        /* กำหนดความสูงขั้นต่ำเพื่อให้เห็นความกึ่งกลางชัดเจน */
-  padding: 0 20px;         /* เอา padding บน-ล่างออก แล้วใช้ min-height คุมแทน */
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0 25px;
+  align-self: flex-start; /* ให้กล่องกว้างพอดีตัวอักษร ไม่ยืดเต็มจอ */
   
-  background-color: #ffffff;
-  border: 3px solid #222222;
-  border-radius: 50px; 
-  box-shadow: 4px 4px 0px #222222; 
+  background-color: #FFD54F; /* พื้นสีเหลืองสดใส */
+  border: 3px solid #1A1A1A;
+  border-radius: 15px; /* ขอบมนแบบป้าย */
+  box-shadow: 4px 4px 0px #1A1A1A; 
+  transform: rotate(-2deg); /* เอียงป้ายนิดนึงให้ดูขี้เล่น */
   z-index: 100;
   position: relative;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.text-feed-title:hover {
+  transform: rotate(0deg) scale(1.05); /* ชี้แล้วป้ายเด้งตรง */
 }
 
 .text-posts-scrollable {
   display: flex;
   flex-direction: column;
-  gap: 0;
   max-height: 680px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 0px 25px 40px 18px;
+  padding: 10px 20px 40px 5px; /* เผื่อพื้นที่ให้เงาด้านข้าง */
   -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
 }
 
-.text-posts-scrollable::-webkit-scrollbar { width: 6px; }
+/* 🌟 แต่ง Scrollbar ให้ดูเป็นลายเส้นวาด */
+.text-posts-scrollable::-webkit-scrollbar { width: 8px; }
 .text-posts-scrollable::-webkit-scrollbar-track { background: transparent; }
-.text-posts-scrollable::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-.text-posts-scrollable::-webkit-scrollbar-thumb:hover { background: #aaa; }
+.text-posts-scrollable::-webkit-scrollbar-thumb { 
+  background: #3E2723; 
+  border-radius: 10px; 
+  border: 2px solid #FFF9F0; 
+}
+.text-posts-scrollable::-webkit-scrollbar-thumb:hover { background: #F48C2A; }
 
+/* 🌟 การ์ดแต่ละใบ */
 .text-post-item { 
   width: 100%; 
   position: relative; 
-  margin-top: -10px; 
+  margin-top: -12px; /* ซ้อนกันเหมือนกองกระดาษ */
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
   z-index: 1; 
 }
@@ -61,30 +69,41 @@
   margin-top: 0; 
 }
 
+/* ตอนเอาเมาส์ชี้ ให้ลอยขึ้นและเอียงนิดๆ */
 .text-post-item:hover { 
-  transform: translateY(-8px) scale(1.02); 
+  transform: translateY(-10px) rotate(1deg); 
   z-index: 50; 
 }
 
 .text-post-item > div { 
-  padding: 15px !important; 
+  padding: 18px !important; 
   border-radius: 20px !important;         
-  border: 2px solid #222222 !important;   
-  box-shadow: 4px 4px 0px #222222 !important; 
-  background-color: #ffffff; 
+  border: 3px solid #1A1A1A !important;   
+  box-shadow: 4px 4px 0px #1A1A1A !important; 
+  background-color: #FFF9F0; /* พื้นสีครีมอุ่นๆ ให้อ่านง่าย */
   transition: all 0.3s ease; 
 }
 
+/* ลูกเล่นเปลี่ยนสีเงาตอน Hover */
 .text-post-item:hover > div { 
-  box-shadow: 6px 6px 0px #222222 !important; 
+  box-shadow: 6px 6px 0px #F48C2A !important; 
+  border-color: #3E2723 !important;
 }
 
 .text-post-item p { 
-  font-size: 0.85rem !important; 
-  line-height: 1.5 !important; 
-  margin: 6px 0 0 0 !important; 
+  font-size: 0.95rem !important; /* ปรับให้อ่านง่ายขึ้นนิดนึง */
+  line-height: 1.6 !important; 
+  margin: 8px 0 0 0 !important; 
+  color: #333 !important;
+}
+
+/* อนิเมชันเด้งเปิดตอนโหลด */
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 1024px) {
   .text-posts-feed { margin-top: 20px; } 
+  .text-feed-title { align-self: center; transform: rotate(0deg); }
 }

@@ -174,6 +174,7 @@ function Hub() {
             if (response.ok) {
                 setShowCreateModal(false); 
                 navigate(`/room/${data.room_id}`); 
+                localStorage.setItem('activeRoomId', data.room_id);
             } else {
                 alert("❌ สร้างห้องไม่สำเร็จ: " + (data.message || 'เกิดข้อผิดพลาด'));
             }

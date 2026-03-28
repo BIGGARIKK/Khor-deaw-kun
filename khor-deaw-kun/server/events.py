@@ -135,6 +135,7 @@ def handle_disconnect():
     target_room_id = None
     user_to_remove = None
     
+    # 1. หาว่าคนที่เน็ตหลุด/พับจอ อยู่โต๊ะไหน
     for room_id, members in room_members.items():
         if sid in members:
             target_room_id = room_id
@@ -143,32 +144,31 @@ def handle_disconnect():
             
     if not target_room_id: return
 
-    # กฎ 3 วินาที (ป้องกันอาการเข้าๆ ออกๆ ตอนรีเฟรช)
+    # กฎ 3 วินาที (ป้องกันอาการเข้าๆ ออกๆ ตอนกด F5 รีเฟรชหน้าเว็บ)
     def delayed_cleanup(r_id, disconnected_sid, username):
         socketio.sleep(3)
         if r_id not in room_members: return
         
+        # ถ้าผ่านไป 3 วิแล้วยังไม่กลับมา (แปลว่าพับจอไปหน้าอื่นจริงๆ ไม่ใช่แค่รีเฟรช)
         if disconnected_sid in room_members[r_id]:
+            # ลบแค่ Connection ID (sid) ออกจาก RAM
             del room_members[r_id][disconnected_sid]
             
+            # อัปเดตรายชื่อให้คนที่ยังอยู่ (ถ้ามี) เห็นว่าเพื่อนพับจอไปแล้ว
             socketio.emit('update_player_list', list(room_members[r_id].values()), to=r_id)
-            msg = {'id': f'sys-out-{disconnected_sid}-{time.time()}', 'type': 'system', 'text': f'--- {username} ลุกจากโต๊ะไปแล้ว 🏃‍♂️ ---'}
+            
+            # ส่งแชทแจ้งเตือนแบบน่ารักๆ
+            msg = {'id': f'sys-out-{disconnected_sid}-{time.time()}', 'type': 'system', 'text': f'--- {username} แวะไปเดินเล่นริมหาด (พับจอ) 🏃‍♂️ ---'}
             if r_id in room_chats:
                 room_chats[r_id].append(msg)
                 if len(room_chats[r_id]) > 50: room_chats[r_id].pop(0)
             socketio.emit('chat_message', msg, to=r_id)
             
-            if db:
-                try:
-                    db.db.rooms.update_one({'room_id': r_id}, {'$pull': {'players': username}})
-                    if len(room_members[r_id]) == 0:
-                        del room_members[r_id]
-                        if r_id in room_meats: del room_meats[r_id] # ล้างเตาเมื่อห้องว่าง
-                        db.db.rooms.delete_one({'room_id': r_id})
-                        print(f"🧹 โต๊ะ {r_id} ว่างแล้ว ลบออกจากระบบเรียบร้อย")
-                except Exception as e: print(f"DB Error: {e}")
+            # 🌟 จุดสำคัญที่แก้: เรา "เอาคำสั่งลบ Database ออกไปทั้งหมด" ครับ!
+            # ไม่ลบ user ออกจาก DB และ ไม่ลบห้องทิ้ง ปล่อยให้เตาตั้งรอไว้ก่อนเลย
+            # จะลบทิ้งก็ต่อเมื่อเรียกฟังก์ชัน handle_leave_game_room เท่านั้น
 
-    socketio.start_background_task(delayed_cleanup, target_room_id, sid, user_to_remove)
+    socketio.start_background_task(delayed_cleanup, target_room_id, sid, user_to_remove)    
 
 @socketio.on('leave_game_room')
 def handle_leave_game_room(data):
@@ -276,3 +276,38 @@ def handle_play_youtube(data):
     room_id = data.get('room_id')
     emit('youtube_started', {'url': data.get('url'), 'requester': data.get('username'), 'title': data.get('title', 'ไม่ทราบชื่อเพลง')}, to=room_id)
     emit('chat_message', {'id': f'sys-music-{time.time()}', 'type': 'system', 'text': f"🎵 {data.get('username')} เปิดเพลง: {data.get('title', '')}"}, to=room_id)
+
+
+# ==========================================
+# 🍻 ระบบชนแก้ว (Cheers!)
+# ==========================================
+@socketio.on('send_cheers')
+def handle_send_cheers(data):
+    room_id = data.get('room_id')
+    sender = data.get('sender')
+    target = data.get('target')
+
+    if not room_id or not sender or not target: return
+
+    # 🌟 1. ประกาศให้ทุกคนในโต๊ะเห็นแอนิเมชันพร้อมกัน!
+    emit('receive_cheers', {
+        'sender': sender,
+        'target': target,
+        'message': f'🍻 {sender} ขอชนแก้วกับ {target}!'
+    }, to=room_id)
+
+    # 🌟 2. อัปเดต Database สองเด้ง!
+    if db:
+        try:
+            # เด้งที่ 1: เพิ่มแต้มสะสมให้คนที่ "โดนชน"
+            db.db.users.update_one(
+                {'username': target},
+                {'$inc': {'stats.cheersCount': 1}}
+            )
+            # เด้งที่ 2: เพิ่มยอดเควสต์รายวันให้คนที่ "เป็นคนชน"
+            db.db.users.update_one(
+                {'username': sender},
+                {'$inc': {'daily_quest.cheers_today': 1}}
+            )
+        except Exception as e:
+            print(f"Cheers DB Error: {e}")
