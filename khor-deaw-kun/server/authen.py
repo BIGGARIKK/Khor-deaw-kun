@@ -7,7 +7,9 @@ import random # 🌟 นำเข้า random มาใช้สุ่มรู
 from datetime import datetime # 🌟 นำเข้า datetime มาใช้เก็บเวลาของ Quest
 from bson.objectid import ObjectId
 import uuid
-
+from extensions import socketio
+import events
+import string
 app = Flask(__name__)
 CORS(app)
 # เชื่อมต่อ Database
@@ -15,6 +17,8 @@ app.config["MONGO_URI"] = "mongodb+srv://admin:123@cluster0.azgr14u.mongodb.net/
 app.config["JWT_SECRET_KEY"] = "my-super-secret-key"
 jwt = JWTManager(app)
 mongo = PyMongo(app)
+
+socketio.init_app(app)
 
 # --- SIGNUP ---
 @app.route('/signup', methods=['POST'])
@@ -298,5 +302,97 @@ def toggle_like(post_id):
         )
         return jsonify({'message': 'Liked', 'liked': True}), 200
 
+# ==========================================
+# 🏠 ROOMS SYSTEM (ระบบห้องหมูกระทะ)
+# ==========================================
+
+# ฟังก์ชันช่วยสุ่มรหัสห้อง 6 ตัวอักษร (เช่น AB12CD)
+def generate_room_id():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+# 1. สร้างห้องใหม่
+@app.route('/create-room', methods=['POST'])
+@jwt_required()
+def create_room():
+    current_user = get_jwt_identity()
+    data = request.get_json()
+    
+    room_id = generate_room_id()
+    status = data.get('status', 'public') # public หรือ private
+    password = data.get('password', '')
+    
+    new_room = {
+        'room_id': room_id,
+        'room_name': data.get('room_name', f"โต๊ะของ {current_user}"),
+        'host_username': current_user,
+        'players': [current_user], # สร้างปุ๊บ ตัวเอก (Host) เข้าไปนั่งรอเลย
+        'max_players': int(data.get('max_players', 6)),
+        'status': status,
+        'password': password, 
+        'created_at': datetime.utcnow()
+    }
+    
+    # บันทึกลง Collection ใหม่ชื่อ 'rooms' (MongoDB จะสร้างให้เองอัตโนมัติ)
+    mongo.db.rooms.insert_one(new_room)
+    
+    return jsonify({
+        'message': 'สร้างห้องสำเร็จ!', 
+        'room_id': room_id,
+        'room_name': new_room['room_name']
+    }), 201
+
+# 2. เข้าร่วมห้อง
+@app.route('/join-room', methods=['POST'])
+@jwt_required()
+def join_room_api():
+    current_user = get_jwt_identity()
+    data = request.get_json()
+    room_id = data.get('room_id')
+    password_attempt = data.get('password', '')
+
+    # ไปหาห้องจาก Database
+    room = mongo.db.rooms.find_one({'room_id': room_id})
+    if not room:
+        return jsonify({'message': 'ไม่พบห้องนี้ในระบบ!'}), 404
+
+    # เช็คว่าห้องเต็มหรือยัง?
+    if len(room['players']) >= room['max_players']:
+        return jsonify({'message': 'โต๊ะเต็มแล้วจ้า!'}), 400
+
+    # เช็คว่าเป็นห้อง Private ไหม? ถ้ารหัสไม่ตรงให้เตะออก
+    if room['status'] == 'private' and room['password'] != password_attempt:
+        return jsonify({'message': 'รหัสผ่านห้องไม่ถูกต้อง!'}), 403
+
+    # ถ้าผ่านเงื่อนไขหมด และยังไม่ได้อยู่ในห้อง ให้เพิ่มชื่อเข้าไป
+    if current_user not in room['players']:
+        mongo.db.rooms.update_one(
+            {'room_id': room_id},
+            {'$push': {'players': current_user}}
+        )
+
+    return jsonify({
+        'message': 'เข้าร่วมโต๊ะสำเร็จ!', 
+        'room_id': room_id
+    }), 200
+
+# 3. โหลดรายชื่อห้องทั้งหมด (เอาไปโชว์หน้า Hub / Lobby)
+@app.route('/rooms', methods=['GET'])
+@jwt_required()
+def get_all_rooms():
+    # ดึงห้องทั้งหมดเรียงตามเวลาสร้างล่าสุด
+    rooms_cursor = mongo.db.rooms.find().sort("created_at", -1)
+    
+    rooms_list = []
+    for room in rooms_cursor:
+        room["_id"] = str(room['_id'])
+        
+        # 🌟 ทริคความปลอดภัย: ไม่ส่ง Password ห้องกลับไปให้หน้าบ้านเห็นเด็ดขาด!
+        if 'password' in room:
+            del room['password'] 
+            
+        rooms_list.append(room)
+
+    return jsonify(rooms_list), 200
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True, port=5000)

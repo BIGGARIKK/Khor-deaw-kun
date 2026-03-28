@@ -303,3 +303,161 @@
 /* Theme Colors */
 .moograta-theme .room-card-inner { background-color: #E2A069; }
 .cafe-theme .room-card-inner { background-color: #D1BFA4; }
+
+/* =========================================
+   ➕ ปุ่มเปิดโต๊ะใหม่ (Create Room)
+   ========================================= */
+.create-room-btn {
+    background-color: #84E045;
+    color: #1A1A1A;
+    border: 3px solid #3E2723;
+    border-radius: 15px;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #3E2723;
+    transition: 0.1s;
+    margin-top: 15px;
+    width: 100%; /* ให้ปุ่มกว้างเต็มกล่อง */
+}
+
+.create-room-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0px 0px 0px #3E2723;
+}
+
+.create-room-btn:hover {
+    background-color: #95EF56;
+}
+
+/* ปุ่ม Join ตอนโต๊ะเต็ม */
+.join-btn-small:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    box-shadow: 1px 1px 0px #666;
+    transform: none;
+}
+
+/* =========================================
+   🌟 MODAL (Popup หน้าต่างสร้างห้อง)
+   ========================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-box {
+    background-color: #FFF9F0;
+    border: 4px solid #3E2723;
+    border-radius: 20px;
+    padding: 25px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 8px 8px 0px #3E2723;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-box h2 {
+    color: #3E2723;
+    margin: 0 0 10px 0;
+    text-align: center;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #3E2723;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group select {
+    padding: 10px;
+    border: 3px solid #3E2723;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #F48C2A;
+    background-color: #FFFAEC;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #F48C2A;
+    cursor: pointer;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 10px;
+    border: 3px solid #3E2723;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #3E2723;
+    transition: 0.1s;
+}
+
+.modal-actions button:active {
+    transform: translateY(3px);
+    box-shadow: 0px 0px 0px #3E2723;
+}
+
+.cancel-btn {
+    background-color: #FFDEE4;
+    color: #3E2723;
+}
+
+.confirm-btn {
+    background-color: #84E045;
+    color: #1A1A1A;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

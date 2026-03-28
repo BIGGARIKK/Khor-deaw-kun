@@ -51,6 +51,8 @@ function SignIn() {
       const data = await apiRequest('/signin', 'POST', { username, password });
       console.log('Login Success:', data);
       localStorage.setItem('user', JSON.stringify({ access_token: data.access_token }));
+      // 🌟 เปลี่ยนมาเซฟใส่คีย์ 'access_token' ตรงๆ ไปเลยครับ
+// localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('username', data.username); 
       
       // (เผื่ออยากเก็บรูปไว้ใช้โชว์ตรง Navbar ด้วยก็เก็บได้เลยครับ)
