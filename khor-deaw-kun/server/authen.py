@@ -26,6 +26,23 @@ socketio.init_app(app)
 
 import events
 events.init_db(mongo)
+
+BANNER_PRESETS = [
+    {"id": 1, "color": "#ffb8b8", "pattern": "repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 15px, transparent 15px, transparent 30px)", "size": "100% 100%"},
+    {"id": 2, "color": "#6de6e6", "pattern": "radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.6) 15%, transparent 16%)", "size": "20px 20px", "position": "0 0, 10px 10px"},
+    {"id": 3, "color": "#ffe066", "pattern": "linear-gradient(rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.5) 2px, transparent 2px)", "size": "20px 20px"},
+    {"id": 4, "color": "#84e045", "pattern": "linear-gradient(45deg, rgba(255,255,255,0.5) 2px, transparent 2px), linear-gradient(-45deg, rgba(255,255,255,0.5) 2px, transparent 2px)", "size": "15px 15px"},
+    {"id": 5, "color": "#50ade2", "pattern": "repeating-linear-gradient(-45deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 15px, transparent 15px, transparent 30px)", "size": "100% 100%"},
+    {"id": 6, "color": "#b088f9", "pattern": "radial-gradient(circle at 0 0, rgba(255,255,255,0.4) 50%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(255,255,255,0.4) 50%, transparent 50%)", "size": "30px 30px"},
+    {"id": 7, "color": "#ff99c8", "pattern": "repeating-radial-gradient(circle, transparent, transparent 10px, rgba(255,255,255,0.4) 10px, rgba(255,255,255,0.4) 20px)", "size": "100% 100%"},
+    {"id": 8, "color": "#a0c4ff", "pattern": "linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.4) 75%, rgba(255,255,255,0.4)), linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.4) 75%, rgba(255,255,255,0.4))", "size": "20px 20px", "position": "0 0, 10px 10px"},
+    {"id": 9, "color": "#fdffb6", "pattern": "repeating-linear-gradient(transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px), repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.5) 10px, rgba(255,255,255,0.5) 20px)", "size": "100% 100%"},
+    {"id": 10, "color": "#caffbf", "pattern": "repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0, rgba(255,255,255,0.5) 15px, transparent 15px, transparent 30px)", "size": "100% 100%"},
+    {"id": 11, "color": "#ffd6a5", "pattern": "repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0, rgba(255,255,255,0.4) 10px, transparent 10px, transparent 20px)", "size": "100% 100%"},
+    {"id": 12, "color": "#30795d", "pattern": "repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px)", "size": "100% 100%"}
+]
+
+
 # ==========================================
 # 👤 USER SYSTEM (SIGNUP / SIGNIN / PROFILE)
 # ==========================================
@@ -36,6 +53,7 @@ def signup():
     username = data.get('username')
     password = data.get('password')
     email = data.get('email')
+    random_banner = random.choice(BANNER_PRESETS)
 
     if mongo.db.users.find_one({'username': username}):
         return jsonify({'message': 'Username already exists!'}), 400
@@ -48,9 +66,11 @@ def signup():
 
     new_user = {
         'username': username,
+        'display_name': username, # 🌟 [เพิ่มบรรทัดนี้] เอา username มาตั้งเป็นชื่อแสดงผลเริ่มต้น
         'password': hashed_password,
         'email': email,
         'profile_image': default_avatar,
+        'banner': random_banner,
         'badge': 'NEWCOMER 🌊',
         'vibe_status': 'chill',
         'stats': {'postCount': 0, 'cheersCount': 0, 'followerCount': 0, 'followingCount': 0},
@@ -58,7 +78,8 @@ def signup():
         'followers': [],
         'following': [],
         'socials': {'line': '', 'facebook': '', 'instagram': ''},
-        'vibe_sliders': {'sleepy': 0, 'hungry': 0, 'energy': 0}
+        'vibe_sliders': {'sleepy': 0, 'hungry': 0, 'energy': 0},
+        'online_status': 'online'
     }
     
     mongo.db.users.insert_one(new_user)
@@ -110,6 +131,15 @@ def update_profile():
     current_user = get_jwt_identity()
     data = request.get_json()
     update_fields = {}
+
+    # 🌟 สิ่งที่ต้องเพิ่มเข้ามา: อัปเดต Display Name
+    if 'display_name' in data:
+        update_fields['display_name'] = data['display_name'].strip()
+        # อัปเดตชื่อที่แสดงในโพสต์ทั้งหมดของ user คนนี้ด้วย
+        mongo.db.posts.update_many(
+            {'author_username': current_user},
+            {'$set': {'author_display_name': data['display_name'].strip()}}
+        )
     
     # 🌟 รับค่า profile_image
     if 'profile_image' in data:
@@ -124,29 +154,23 @@ def update_profile():
     if 'vibe' in data:
         update_fields['vibe'] = data['vibe'].strip()
 
-    # 🌟 รับค่า bio (ที่ส่งมาจากหน้า Edit Profile)
     if 'bio' in data:
         update_fields['bio'] = data['bio'].strip()
-
-    # 🌟 รับค่า username (การเปลี่ยนชื่อ)
-    if 'username' in data:
-        new_username = data['username'].strip()
-        # เช็คก่อนว่าชื่อใหม่ซ้ำกับคนอื่นไหม?
-        if new_username != current_user:
-            existing_user = mongo.db.users.find_one({'username': new_username})
-            if existing_user:
-                return jsonify({'message': 'ชื่อนี้มีคนใช้แล้ว!'}), 400
-            
-            update_fields['username'] = new_username
-            
-            # ถ้าเปลี่ยนชื่อ ต้องตามไปแก้ชื่อในตารางอื่นๆ ด้วย
-            mongo.db.posts.update_many(
-                {'author_username': current_user},
-                {'$set': {'author_username': new_username}}
-            )
-            # หมายเหตุ: ถ้ามีการอ้างอิงชื่อใน Comments หรือ Likes อาจจะต้องไปเขียนอัปเดตเพิ่มตรงนี้ด้วย
         
-    # ถ้ามีอะไรให้อัปเดต ก็จัดการอัปเดตลง Database เลย
+    if 'banner' in data:
+        update_fields['banner'] = data['banner']
+
+    if 'online_status' in data:
+        update_fields['online_status'] = data['online_status']
+        
+    # 🌟 สิ่งที่ต้องเพิ่มเข้ามา เพื่อให้บันทึก My Vibe และ Contact ได้
+    if 'vibe_sliders' in data:
+        update_fields['vibe_sliders'] = data['vibe_sliders']
+    if 'socials' in data:
+        update_fields['socials'] = data['socials']
+    if 'stories' in data: # แถมให้ครับ (เพราะฟังก์ชันลงสตอรี่ก็ใช้ route นี้เหมือนกัน)
+        update_fields['stories'] = data['stories']
+
     if update_fields:
         mongo.db.users.update_one({'username': current_user}, {'$set': update_fields})
         return jsonify({'message': 'Profile updated successfully!', 'new_username': update_fields.get('username', current_user)}), 200
@@ -167,12 +191,14 @@ def create_post():
     
     user = mongo.db.users.find_one({'username': current_user})
     author_image = user.get('profile_image', '1.png') if user else '1.png'
+    author_display_name = user.get('display_name', current_user) if user else current_user
     
     if not text and not image_url:
         return jsonify({'message': 'Post cannot be empty!'}), 400
     
     new_post = {
         'author_username': current_user,
+        'author_display_name': author_display_name,
         'author_image': author_image,
         'text': text,
         'image_url': image_url,
