@@ -241,7 +241,7 @@
   margin-top: -85px; 
 }
 
-.btn-edit-profile { position: absolute; bottom: 20px; right: 24px; background-color: #E8CFAF; font-size: 0.9rem; padding: 6px 12px; color: #222; z-index: 10; }
+.btn-edit-profile { position: absolute; bottom: 20px; right: 24px; background-color: #f3e1c7; font-size: 0.9rem; padding: 6px 12px; color: #222; z-index: 10; }
 .btn-edit-profile:hover { background-color: #ffe066; transform: translate(-2px, -2px); box-shadow: 3px 3px 0px #222; }
 
 .highlight-text { 
@@ -267,3 +267,48 @@
 }
 
 .highlight-text:hover { transform: translateY(-5px); }
+
+/* ================= FOLLOW BUTTON ================= */
+.doodle-follow-btn {
+  margin-top: -12px;
+   margin-left: 5px;
+  padding: 6px 18px;
+  font-family: 'Mali', cursive;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #222;
+  background-color: #fff;
+  border: 3px solid #222;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #222; /* เงาแข็งสไตล์ Doodle */
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* อนิเมชั่นเด้งๆ */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 12;
+}
+
+/* เอฟเฟกต์เวลาเอาเมาส์ชี้ (Hover) - ปุ่มเด้งขึ้นและเปลี่ยนสี */
+.doodle-follow-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px #222;
+  background-color: #84E045; /* เปลี่ยนเป็นสีฟ้าพาสเทลน่ารักๆ */
+}
+
+/* เอฟเฟกต์เวลากดคลิก (Active) - ปุ่มยุบลงไป */
+.doodle-follow-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #222;
+}
+
+/* สไตล์เมื่อกดติดตามแล้ว (Following) */
+.doodle-follow-btn.following {
+  background-color: #84E045; /* สีเขียวเหมือนที่ใช้ในเว็บ */
+  color: #222;
+}
+
+/* เอฟเฟกต์เวลาเอาเมาส์ชี้ปุ่มที่กดติดตามแล้ว */
+.doodle-follow-btn.following:hover {
+  background-color: #6cc933; /* สีเขียวเข้มขึ้นนิดหน่อย */
+}

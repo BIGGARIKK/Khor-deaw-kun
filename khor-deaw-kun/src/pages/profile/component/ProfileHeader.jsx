@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { TbEdit, TbCheck, TbX, TbTrash } from "react-icons/tb";
+import { apiRequest } from "../../../service/api"; // 🌟 อย่าลืม import API Request
 import './ProfileHeader.css';
 
-const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen, avatarImage, setIsAvatarModalOpen, avatarPresets }) => {
+const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen, avatarImage, setIsAvatarModalOpen, avatarPresets, isOwnProfile = true }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
@@ -13,7 +14,18 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
 
   const [isHoveringAvatar, setIsHoveringAvatar] = useState(false);
   const [phraseIndices, setPhraseIndices] = useState(Array(9).fill(0));
+  
   const [isFollowing, setIsFollowing] = useState(false);
+  
+  // 🌟 ดึงชื่อของเราที่ล็อกอินอยู่
+  const myLoggedInUsername = localStorage.getItem('username'); 
+
+  // 🌟 เช็คสถานะเริ่มต้นว่าเรา Follow เขาอยู่หรือเปล่า
+  useEffect(() => {
+    if (userData?.followers && myLoggedInUsername) {
+      setIsFollowing(userData.followers.includes(myLoggedInUsername));
+    }
+  }, [userData, myLoggedInUsername]);
 
   const allAvatarPhrases = [
     ["What's up! 😎", "Nice to meet you!", "Looking good today!"],
@@ -44,7 +56,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     setIsEditing(true);
   };
 
-  // เช็กไม่ให้พิมพ์เกิน 3 บรรทัด
   const handleBioChange = (e) => {
     const text = e.target.value;
     const lines = text.split('\n');
@@ -62,6 +73,31 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     setIsEditing(false);
   };
 
+  // 🌟 ฟังก์ชันจัดการปุ่ม Follow โดยยิง API และอัปเดตตัวเลข
+  const handleToggleFollow = async () => {
+    try {
+      const response = await apiRequest(`/users/${userData.username}/follow`, 'POST');
+      
+      // เปลี่ยนสีและข้อความปุ่ม
+      setIsFollowing(response.is_following);
+
+      // 🌟 อัปเดตตัวเลข Follower เข้าไปใน userData (ทำให้แถบซ้ายตัวเลขเด้งขึ้นทันที)
+      setUserData(prev => {
+        let updatedFollowers = [...(prev.followers || [])];
+        if (response.is_following) {
+          updatedFollowers.push(myLoggedInUsername); // ถ้าฟอล ให้เพิ่มชื่อเรา
+        } else {
+          updatedFollowers = updatedFollowers.filter(name => name !== myLoggedInUsername); // ถ้าอันฟอล ให้ลบชื่อเราออก
+        }
+        return { ...prev, followers: updatedFollowers };
+      });
+
+    } catch (error) {
+      console.error("Failed to follow/unfollow:", error);
+      alert("มีข้อผิดพลาด ไม่สามารถติดตามได้");
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -76,9 +112,9 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
     <div className="wooden-box profile-header-card" style={{ '--status-color': statusConfig[status].color }}>
       <div
         className="profile-cover"
-        onClick={() => setIsColorModalOpen(true)}
+        onClick={() => isOwnProfile && setIsColorModalOpen(true)}
         style={{ 
-          cursor: 'pointer', 
+          cursor: isOwnProfile ? 'pointer' : 'default', 
           backgroundColor: typeof bannerColor === 'object' ? bannerColor.color : bannerColor,
           backgroundImage: typeof bannerColor === 'object' ? bannerColor.pattern : 'none',
           backgroundSize: typeof bannerColor === 'object' ? bannerColor.size : 'auto',
@@ -88,7 +124,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
       
       <div className="profile-header-content">
         
-        {/* รูปโปรไฟล์ฝั่งซ้าย */}
         <div className="left-profile-col">
           <div 
             className="avatar-wrapper"
@@ -108,25 +143,26 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
               <div key={phraseIndices[currentAvatarIndex]} className="main-avatar-speech-bubble">
                 {allAvatarPhrases[currentAvatarIndex][phraseIndices[currentAvatarIndex]]}
               </div>
-              
             )}
             
             <img 
               src={avatarImage} 
               alt="avatar" 
               className="avatar" 
-              onClick={() => setIsAvatarModalOpen(true)} 
-              style={{ cursor: 'pointer' }}
+              onClick={() => isOwnProfile && setIsAvatarModalOpen(true)} 
+              style={{ cursor: isOwnProfile ? 'pointer' : 'default' }}
             />
             
             <div className="status-container" ref={menuRef}>
               <div 
                 className="online-dot" 
-                title="Change Status"
+                title={isOwnProfile ? "Change Status" : statusConfig[status].label}
                 onClick={(e) => { 
+                  if (!isOwnProfile) return; 
                   e.stopPropagation(); 
                   setIsStatusMenuOpen(!isStatusMenuOpen); 
                 }}
+                style={{ cursor: isOwnProfile ? 'pointer' : 'default' }}
               ></div>
               
               {isStatusMenuOpen && (
@@ -149,22 +185,21 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
             </div>
           </div>
 
-          {/* ✨ ✨ ✨ ปุ่ม Follow จะถูกจัดให้อยู่ใต้กรอบ Avatar ตรงนี้ครับ ✨ ✨ ✨ */}
-          <button 
-            className={`doodle-follow-btn ${isFollowing ? 'following' : ''}`}
-            onClick={() => setIsFollowing(!isFollowing)}
-          >
-            {isFollowing ? 'Following ✨' : 'Follow +'}
-          </button>
+          {/* 🌟 ปรับให้เรียกใช้ฟังก์ชันใหม่ (ยิง API แทนการสลับ State ธรรมดา) */}
+          {!isOwnProfile && (
+            <button 
+              className={`doodle-follow-btn ${isFollowing ? 'following' : ''}`}
+              onClick={handleToggleFollow}
+            >
+              {isFollowing ? 'Following ' : 'Follow '}
+            </button>
+          )}
 
         </div>
         
-        {/* ข้อความและช่องกรอกข้อมูลฝั่งขวา */}
         <div className="profile-text-info">
           {isEditing ? (
             <div className="edit-profile-form">
-              
-              {/* กล่องกรอกชื่อ */}
               <div className="input-wrapper">
                 <input
                   type="text"
@@ -179,7 +214,6 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
                 </span>
               </div>
 
-              {/* กล่องกรอกคำอธิบายตัวเอง */}
               <div className="input-wrapper">
                 <textarea
                   className={`doodle-input edit-bio-input ${(editBio || '').length >= 30 ? 'input-full' : ''}`}
@@ -200,24 +234,21 @@ const ProfileHeader = ({ userData, setUserData, bannerColor, setIsColorModalOpen
             </div>
           ) : (
             <>
-              {/* ชื่อโชว์เดี่ยวๆ */}
               <h1 className="profile-name">
                 <span 
                   className="highlight-text"
-                  // ✨ เพิ่ม style ตรงนี้เพื่อดึงสีจาก bannerColor มาใช้กับตัวหนังสือ
                   style={{ color: typeof bannerColor === 'object' ? bannerColor.color : bannerColor }}
                 >
                   {userData.username}
                 </span> 
               </h1>
-              
               <p className="profile-bio">{userData?.bio || ""}</p>
             </>
           )}
         </div>
       </div>
 
-      {!isEditing && (
+      {isOwnProfile && !isEditing && (
         <button className="doodle-btn btn-edit-profile" onClick={handleEditClick}>
           <TbEdit size={20} /> Edit
         </button>

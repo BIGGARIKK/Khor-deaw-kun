@@ -52,7 +52,9 @@ def signup():
         'stats': {'postCount': 0, 'cheersCount': 0, 'followerCount': 0, 'followingCount': 0},
         'daily_quest': {'last_updated': today_str, 'cheers_today': 0, 'target': 5, 'is_completed': False},
         'followers': [],
-        'following': []
+        'following': [],
+        'socials': {'line': '', 'facebook': '', 'instagram': ''},
+        'vibe_sliders': {'sleepy': 0, 'hungry': 0, 'energy': 0}
     }
     
     mongo.db.users.insert_one(new_user)
@@ -292,6 +294,46 @@ def get_all_rooms():
         r["_id"] = str(r['_id'])
         if 'password' in r: del r['password']
     return jsonify(rooms), 200
+
+    # ==========================================
+# 🤝 TOGGLE FOLLOW
+# ==========================================
+@app.route('/users/<username>/follow', methods=['POST'])
+@jwt_required()
+def toggle_follow(username):
+    current_user = get_jwt_identity() # คนที่กดปุ่ม
+    
+    if current_user == username:
+        return jsonify({'message': 'You cannot follow yourself!'}), 400
+        
+    target_user = mongo.db.users.find_one({'username': username}) # คนที่ถูกกดฟอล
+    
+    if not target_user:
+        return jsonify({'message': 'User not found'}), 404
+        
+    # เช็คว่าเราฟอลเขาอยู่หรือยัง
+    if current_user in target_user.get('followers', []):
+        # Unfollow: เอาเราออกจาก followers เขา และเอาเขาออกจาก following เรา
+        mongo.db.users.update_one(
+            {'username': username},
+            {'$pull': {'followers': current_user}}
+        )
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$pull': {'following': username}}
+        )
+        return jsonify({'message': 'Unfollowed', 'is_following': False}), 200
+    else:
+        # Follow: เพิ่มเราเข้าไปใน followers เขา และเพิ่มเขาใน following เรา
+        mongo.db.users.update_one(
+            {'username': username},
+            {'$push': {'followers': current_user}}
+        )
+        mongo.db.users.update_one(
+            {'username': current_user},
+            {'$push': {'following': username}}
+        )
+        return jsonify({'message': 'Followed', 'is_following': True}), 200
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5000)
