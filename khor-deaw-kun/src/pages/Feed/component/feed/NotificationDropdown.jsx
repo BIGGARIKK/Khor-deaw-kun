@@ -7,7 +7,7 @@ const getAvatarUrl = (imageName, userName) => {
     if (!imageName) return `https://ui-avatars.com/api/?name=${userName || 'User'}&background=random`;
     if (imageName.startsWith('http')) return imageName;
     
-    return `/src/assets/avatars/${imageName}`; 
+    return `/avatars/${imageName}`; 
 };
 
 // 🌟 ฟังก์ชันจัดการเวลาแบบ "ครอบจักรวาล" (กันบั๊ก Invalid Date 100%)
