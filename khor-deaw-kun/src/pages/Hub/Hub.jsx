@@ -63,7 +63,7 @@ function Hub() {
             }
 
             try {
-                const response = await fetch('http://localhost:5000/rooms', {
+                const response = await fetch('https://probable-goldfish-4jvvgxxvpxxcqqpg-5000.app.github.dev/rooms', {
                     headers: { 
                         'Authorization': `Bearer ${currentToken}` 
                     }
