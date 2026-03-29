@@ -121,14 +121,14 @@ function BottomBar() {
                             </div>
                         </div>
 
-                        <div className="vibe-check-section">
+                        {/* <div className="vibe-check-section">
                             <h3 className="section-title">สถานะตอนนี้ (Vibe Check)</h3>
                             <div className="vibe-options">
                                 <button className={`vibe-btn ${currentVibe === 'chill' ? 'active-chill' : ''}`} onClick={() => handleVibeChange('chill')}>🟢 ชิลล์ๆ</button>
                                 <button className={`vibe-btn ${currentVibe === 'tipsy' ? 'active-tipsy' : ''}`} onClick={() => handleVibeChange('tipsy')}>🟡 กรึ่มๆ</button>
                                 <button className={`vibe-btn ${currentVibe === 'wasted' ? 'active-wasted' : ''}`} onClick={() => handleVibeChange('wasted')}>🔴 ภาพตัด</button>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="quick-stats">
                             <div className="stat-box"><strong>{userData?.stats?.postCount || 0}</strong><span>Shouts</span></div>
