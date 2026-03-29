@@ -91,7 +91,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         }
     };
 
-    const avatarUrl = image_author?.startsWith("http") ? image_author : `/assets/avatars/${image_author || '1.png'}`;
+    const avatarUrl = image_author?.startsWith("http") ? image_author : `/avatars/${image_author || '1.png'}`;
     const postImageUrl = imageUrl?.startsWith("http") || imageUrl?.startsWith("data:") ? imageUrl : `/avatars/${imageUrl}`;
 
     const handleAddComment = async () => {
