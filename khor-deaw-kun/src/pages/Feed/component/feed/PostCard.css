@@ -102,7 +102,7 @@
 .action-btn:hover {
   transform: translateY(-3px);
   box-shadow: 4px 4px 0px #3E2723;
-  background-color: #FFD285;
+  background-color: #cfa04e;
   color: #3E2723;
 }
 
@@ -118,18 +118,6 @@
   font-size: 1.2rem;
 }
 
-.action-btn.cheers-btn.active {
-  background-color: #F48C2A; 
-  color: #1A1A1A; 
-  border-color: #3E2723;
-  box-shadow: 4px 4px 0px #3E2723;
-  animation: cheersPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-.action-btn.cheers-btn.active:hover {
-  background-color: #FF9F43; 
-  transform: translateY(-3px) scale(1.05); 
-}
 
 @keyframes cheersPop {
   0% { transform: scale(1) rotate(0deg); }
