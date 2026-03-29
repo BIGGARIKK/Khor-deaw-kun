@@ -71,7 +71,7 @@ function BottomBar() {
                 <div className="nav-profile-center" onClick={() => setShowProfileSheet(true)}>
                     <div className="profile-frame">
                         {userData?.profile_image ? (
-                            <img src={`/src/assets/avatars/${userData.profile_image}`} alt="Profile" />
+                            <img src={`/avatars/${userData.profile_image}`} alt="Profile" />
                         ) : (
                             <div className="profile-placeholder" />
                         )}
@@ -112,7 +112,7 @@ function BottomBar() {
                         <div className="sheet-header">
                             <div className="sheet-avatar">
                                 {userData?.profile_image && (
-                                    <img src={`/src/assets/avatars/${userData.profile_image}`} alt="Profile" />
+                                    <img src={`/avatars/${userData.profile_image}`} alt="Profile" />
                                 )}
                             </div>
                             <div className="sheet-user-info">

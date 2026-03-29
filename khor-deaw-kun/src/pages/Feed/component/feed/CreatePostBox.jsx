@@ -116,7 +116,7 @@ function CreatePostBox({ onPost }) {
         <div className="wooden-box create-post-premium">
             <div className="create-post-top">
                 <div className="author-avatar-large">
-                    <img src={`/src/assets/avatars/${userImage}`} alt="Profile" />
+                    <img src={`/avatars/${userImage}`} alt="Profile" />
                 </div>
                 <textarea 
                     className="premium-textarea" placeholder="คืนนี้ชิลล์ไหนดี? ส่งเสียงหน่อย! 🍻🌊" 
