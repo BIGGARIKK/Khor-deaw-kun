@@ -49,18 +49,13 @@ function Sidebar() {
             <div className="wooden-box widget-box">
                 <div className="widget-header">
                     <h3>🥓 My Table</h3>
-                    <span className="table-id" style={{ color: activeRoom ? '#3E2723' : '#A0A0A0' }}>
+                    <span className="table-id" style={{ color: activeRoom ? '#dfdfdf' : '#A0A0A0' }}>
                         {activeRoom ? `#${activeRoom}` : '-'}
                     </span>
                 </div>
 
                 {activeRoom ? (
                     <>
-                        <div className="table-members">
-                            <div className="member-avatar">😋</div>
-                            <div className="member-avatar">😎</div>
-                            <div className="member-avatar empty">+</div>
-                        </div>
                         <button
                             className="btn-wood-small"
                             style={{ backgroundColor: '#F48C2A', color: 'white', borderColor: '#3E2723' }}

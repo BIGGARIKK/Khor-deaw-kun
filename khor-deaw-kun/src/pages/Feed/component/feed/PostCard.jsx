@@ -164,7 +164,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
 
             <div className="post-footer-new">
                 <div className="footer-left-group">
-                    <button className={`action-btn cheers-btn ${isLiked ? 'active' : ''}`} onClick={handleLike}>
+                    <button className={`action-btn ${isLiked ? 'active' : ''}`} onClick={handleLike}>
                         <span className="icon-wrap">
                            {isLiked ? <IoBeer size={22} color="#F48C2A" /> : <IoBeerOutline size={22} />}
                         </span>
