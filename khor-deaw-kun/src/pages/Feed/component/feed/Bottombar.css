@@ -37,7 +37,7 @@
 /* ใส่ลายไม้จางๆ ให้แผ่นป้าย */
 .profile-sheet-content::before {
     content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url('../../assets/Hub/cartoon-wood-pattern.avif'); 
+    background-image: url('/public/cards/cartoon-wood-pattern.avif'); 
     background-size: 250px; opacity: 0.25; pointer-events: none;
     border-radius: 25px 25px 0 0;
 }
