@@ -42,7 +42,7 @@ const RightPanel = ({ userPosts, userData }) => {
             userData.following.slice(0, 5).map((f, i) => (
               <div key={i} className="following-row">
                 <div className="mini-avatar-circle">
-                   <img src={`/src/assets/avatars/${(i % 9) + 1}.png`} alt="friend" />
+                   <img src={`/avatars/${(i % 9) + 1}.png`} alt="friend" />
                 </div>
                 <span className="friend-name">{f}</span>
               </div>
