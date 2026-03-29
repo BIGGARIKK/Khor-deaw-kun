@@ -91,8 +91,8 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
         }
     };
 
-    const avatarUrl = image_author?.startsWith("http") ? image_author : `/src/assets/avatars/${image_author || '1.png'}`;
-    const postImageUrl = imageUrl?.startsWith("http") || imageUrl?.startsWith("data:") ? imageUrl : `/src/assets/avatars/${imageUrl}`;
+    const avatarUrl = image_author?.startsWith("http") ? image_author : `/assets/avatars/${image_author || '1.png'}`;
+    const postImageUrl = imageUrl?.startsWith("http") || imageUrl?.startsWith("data:") ? imageUrl : `/avatars/${imageUrl}`;
 
     const handleAddComment = async () => {
         if (inputText.trim() === "") return;
@@ -215,7 +215,7 @@ function PostCard({ postId, author, image_author, time, text, hasImage, imageUrl
                         {/* 🌟 ส่วนแสดงและแก้ไขรูปภาพ */}
                         {editImage ? (
                             <div className="edit-image-preview">
-                                <img src={editImage.startsWith("http") || editImage.startsWith("data:") ? editImage : `/src/assets/avatars/${editImage}`} alt="Preview" />
+                                <img src={editImage.startsWith("http") || editImage.startsWith("data:") ? editImage : `/avatars/${editImage}`} alt="Preview" />
                                 <button className="remove-image-btn" onClick={() => setEditImage(null)} title="ลบรูปภาพ">
                                     <TbX size={18} />
                                 </button>
