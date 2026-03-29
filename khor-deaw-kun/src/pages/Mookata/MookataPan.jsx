@@ -9,12 +9,10 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
     // 👂 1. ดักฟังความเคลื่อนไหวจากเพื่อนในห้อง!
     // ==========================================
     useEffect(() => {
-        if (!socket || !roomId) return; // 🌟 ป้องกันกรณีที่ Socket หรือ roomId ยังมาไม่ถึง
+        if (!socket || !roomId) return; 
 
-        // 🌟 พอหน้าเว็บเปิดมาปุ๊บ ให้ตะโกนขอข้อมูลเตาจาก Server เลย!
         socket.emit('request_pan_sync', { room_id: roomId });
 
-        // 🌟 ดักรอรับข้อมูลที่ Server จะส่งกลับมา
         socket.on('load_pan_state', (savedMeats) => {
             setItemsOnPan(savedMeats || []); 
         });
@@ -52,7 +50,7 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
             socket.off('meat_flipped');
             socket.off('meat_removed');
         };
-    }, [socket, roomId, setItemsOnPan]); // 🌟 เพิ่ม roomId เป็น Dependency
+    }, [socket, roomId, setItemsOnPan]); 
 
     // ==========================================
     // 🕰️ ระบบจับเวลาสุก/ไหม้
@@ -221,7 +219,7 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
         }
     };
 
-    // 🌟 5. ฟังก์ชันล้างเตา (แจ้งคนอื่นในห้องด้วยว่าเราล้างเตาแล้ว)
+    // 🌟 5. ฟังก์ชันล้างเตา 
     const handleClearPan = () => {
         itemsOnPan.forEach(item => {
             if (socket) {
@@ -232,7 +230,36 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
     };
 
     return (
-        <div className="pan-container">
+        <div className="pan-container" style={{ position: 'relative' }}>
+            
+            {/* 🌟 ปุ่มล้างเตา มุมขวาบน */}
+            <div 
+                className="pan-controls-mini" 
+                style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100 }}
+            >
+                <button 
+                    onClick={handleClearPan}
+                    style={{
+                        padding: '10px 18px',
+                        backgroundColor: '#ff4d4f',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '25px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
+                        transition: 'transform 0.1s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    🧽 ล้างเตา
+                </button>
+            </div>
+
             <div
                 className="mookata-pan-area"
                 onClick={handleDropIngredientClick}
@@ -284,8 +311,15 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                 })}
             </div>
 
-            {/* โซนจานข้าวของเพื่อนแต่ละคน */}
-            <div className="players-action-board">
+            {/* 🌟 โซนจานข้าวของเพื่อน ดึงขึ้นมาด้วย marginTop ติดลบ */}
+            <div 
+                className="players-action-board" 
+                style={{ 
+                    marginTop: '-60px', // 👈 ดึงขึ้นมา 60px (ถ้าอยากให้ขึ้นอีก ให้เปลี่ยนเป็น -80px หรือ -100px)
+                    position: 'relative', 
+                    zIndex: 10 
+                }}
+            >
                 {players.map((playerObj, index) => {
                     const playerName = playerObj.username;
                     const playerImg = playerObj.profile_image;
@@ -330,10 +364,6 @@ function MookataPan({ itemsOnPan, setItemsOnPan, selectedIngredient, currentRota
                         </div>
                     );
                 })}
-            </div>
-
-            <div className="pan-controls-mini">
-                <button onClick={handleClearPan}>🧽 ล้างเตา</button>
             </div>
         </div>
     );
